@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>AndroidPlugin源码解析(一) | Air</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="前言上一篇我们知道com.android.application plugin对应的类为com.android.build.gradle.AppPlugin 这个类的声明为: public class AppPlugin extends BasePlugin implements Plugin&amp;lt;Project&amp;gt; 看到最后implements Plugin&amp;lt;Project&amp;gt;，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AndroidPlugin源码解析(一)">
+<meta property="og:url" content="http://yoursite.com/2017/05/30/2017-05-30-AndroidPlugin源码解析(一)/index.html">
+<meta property="og:site_name" content="Air">
+<meta property="og:description" content="前言上一篇我们知道com.android.application plugin对应的类为com.android.build.gradle.AppPlugin 这个类的声明为: public class AppPlugin extends BasePlugin implements Plugin&amp;lt;Project&amp;gt; 看到最后implements Plugin&amp;lt;Project&amp;gt;，">
+<meta property="og:updated_time" content="2017-06-01T00:17:23.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="AndroidPlugin源码解析(一)">
+<meta name="twitter:description" content="前言上一篇我们知道com.android.application plugin对应的类为com.android.build.gradle.AppPlugin 这个类的声明为: public class AppPlugin extends BasePlugin implements Plugin&amp;lt;Project&amp;gt; 看到最后implements Plugin&amp;lt;Project&amp;gt;，">
+  
+    <link rel="alternate" href="/atom.xml" title="Air" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Air</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">Little Place</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-2017-05-30-AndroidPlugin源码解析(一)" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/05/30/2017-05-30-AndroidPlugin源码解析(一)/" class="article-date">
+  <time datetime="2017-05-29T16:00:00.000Z" itemprop="datePublished">2017-05-30</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      AndroidPlugin源码解析(一)
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>上一篇我们知道<code>com.android.application</code> plugin对应的类为<code>com.android.build.gradle.AppPlugin</code></p>
+<p>这个类的声明为: <code>public class AppPlugin extends BasePlugin implements Plugin&lt;Project&gt;</code></p>
+<p>看到最后<code>implements Plugin&lt;Project&gt;</code>，熟悉gradle plugin的人应该知道，<br><code>apply plugin: &#39;com.android.application&#39;</code>其实就是调用<code>AppPlugin类</code>的<code>public void apply(@NonNull Project project)</code>方法。</p>
+<p><code>com.android.library</code> plugin对应的类为<code>com.android.build.gradle.LibraryPlugin</code>。</p>
+<p>这个类的声明为: <code>public class LibraryPlugin extends BasePlugin implements Plugin&lt;Project&gt;</code></p>
+<p>这个两个<code>apply</code>方法的具体内容只有一点点不同，两个都调用了<code>super.apply(project)</code>方法:</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line">@Override</div><div class="line">public void apply(@NonNull Project project) &#123;</div><div class="line">    super.apply(project);</div><div class="line">    // 下面的代码只在Library plugin中存在</div><div class="line">    // Default assemble task for the default-published artifact.</div><div class="line">    // This is needed for the prepare task on the consuming project.</div><div class="line">    project.getTasks().create("assembleDefault");</div><div class="line">&#125;</div><div class="line">~~~ </div><div class="line"></div><div class="line">接下来我们一步步的跟进:</div><div class="line"></div><div class="line">### BasePlugin apply</div><div class="line"></div><div class="line">可以看到，就是调用了BasePlugin的`apply`方法。我们来看一下BasePlugin的`apply`方法做了什么。</div><div class="line">老规矩，分析中会去掉日志，记录，错误检查之类的代码。</div><div class="line"></div><div class="line">~~~ java</div><div class="line">// 去掉那些我认为不重要的代码后，整个apply方法的流程如下。</div><div class="line">protected void apply(@NonNull Project project) &#123;</div><div class="line">    configureProject();</div><div class="line">    createExtension();</div><div class="line">    createTasks();</div><div class="line">    // 读取 "android.additional.plugins"对应的插件名称</div><div class="line">    // Apply additional plugins</div><div class="line">    for (String plugin : AndroidGradleOptions.getAdditionalPlugins(project)) &#123;</div><div class="line">        project.apply(ImmutableMap.of("plugin", plugin));</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>可以看到，其实整个<code>apply</code>方法分4步，最后一步读取插件没有什么好分析的，对于剩下三步来说本篇文章只分析前两步。</p>
+<h3 id="BasePlugin-configureProject"><a href="#BasePlugin-configureProject" class="headerlink" title="BasePlugin configureProject"></a>BasePlugin configureProject</h3><p>我们一个过程一个过程研究。<br>先看<code>configureProject()</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div></pre></td><td class="code"><pre><div class="line">String creator = <span class="string">"Android Gradle "</span> Version.ANDROID_GRADLE_PLUGIN_VERSION;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">configureProject</span><span class="params">()</span> </span>&#123;</div><div class="line">    sdkHandler = <span class="keyword">new</span> SdkHandler(project, getLogger());</div><div class="line">    </div><div class="line">    androidBuilder = <span class="keyword">new</span> AndroidBuilder(</div><div class="line">            project == project.getRootProject() ? project.getName() : project.getPath(), <span class="comment">// project Id</span></div><div class="line">            creator, <span class="comment">// the createdBy String for the apk manifest（打包之后的MANIFEST.MF文件可以看到）</span></div><div class="line">            <span class="keyword">new</span> GradleProcessExecutor(project),  <span class="comment">// An executor for external processes.</span></div><div class="line">            <span class="keyword">new</span> GradleJavaProcessExecutor(project), <span class="comment">// An executor for external Java-based processes.</span></div><div class="line">            extraModelInfo,</div><div class="line">            getLogger(),</div><div class="line">            isVerbose());</div><div class="line">    </div><div class="line">    project.getPlugins().apply(JavaBasePlugin.class);</div><div class="line">    jacocoPlugin = project.getPlugins().apply(JacocoPlugin.class);</div><div class="line">    project.getTasks().getByName(<span class="string">"assemble"</span>).setDescription(</div><div class="line">            <span class="string">"Assembles all variants of all applications and secondary packages."</span>);</div><div class="line">    <span class="comment">// call back on execution. This is called after the whole build is done (not</span></div><div class="line">    <span class="comment">// after the current project is done).</span></div><div class="line">    <span class="comment">// This is will be called for each (android) projects though, so this should support</span></div><div class="line">    <span class="comment">// being called 2+ times.</span></div><div class="line">    project.getGradle().addBuildListener(<span class="keyword">new</span> BuildListener() &#123;</div><div class="line">        <span class="keyword">private</span> <span class="keyword">final</span> LibraryCache libraryCache = LibraryCache.getCache();</div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">buildStarted</span><span class="params">(Gradle gradle)</span> </span>&#123; &#125;</div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">settingsEvaluated</span><span class="params">(Settings settings)</span> </span>&#123; &#125;</div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">projectsLoaded</span><span class="params">(Gradle gradle)</span> </span>&#123; &#125;</div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">projectsEvaluated</span><span class="params">(Gradle gradle)</span> </span>&#123; &#125;</div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">buildFinished</span><span class="params">(BuildResult buildResult)</span> </span>&#123;</div><div class="line">            ExecutorSingleton.shutdown();</div><div class="line">            sdkHandler.unload();</div><div class="line">            PreDexCache.getCache().clear(</div><div class="line">                                    <span class="keyword">new</span> File(project.getRootProject().getBuildDir(),</div><div class="line">                                    FD_INTERMEDIATES + <span class="string">"/dex-cache/cache.xml"</span>),</div><div class="line">                                    getLogger());</div><div class="line">                            JackConversionCache.getCache().clear(</div><div class="line">                                    <span class="keyword">new</span> File(project.getRootProject().getBuildDir(),</div><div class="line">                                    FD_INTERMEDIATES + <span class="string">"/jack-cache/cache.xml"</span>),</div><div class="line">                                    getLogger());</div><div class="line">            libraryCache.unload();</div><div class="line">            Main.clearInternTables();</div><div class="line">        &#125;</div><div class="line">    &#125;);</div><div class="line">    project.getGradle().getTaskGraph().addTaskExecutionGraphListener(</div><div class="line">            <span class="keyword">new</span> TaskExecutionGraphListener() &#123;</div><div class="line">                <span class="meta">@Override</span></div><div class="line">                <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">graphPopulated</span><span class="params">(TaskExecutionGraph taskGraph)</span> </span>&#123;</div><div class="line">                    <span class="keyword">for</span> (Task task : taskGraph.getAllTasks()) &#123;</div><div class="line">                        <span class="keyword">if</span> (task <span class="keyword">instanceof</span> TransformTask) &#123;</div><div class="line">                            Transform transform = ((TransformTask) task).getTransform();</div><div class="line">                            <span class="keyword">if</span> (transform <span class="keyword">instanceof</span> DexTransform) &#123;</div><div class="line">                                PreDexCache.getCache().load(</div><div class="line">                                        <span class="keyword">new</span> File(project.getRootProject().getBuildDir(),</div><div class="line">                                        FD_INTERMEDIATES + <span class="string">"/dex-cache/cache.xml"</span>));</div><div class="line">                                <span class="keyword">break</span>;</div><div class="line">                            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (transform <span class="keyword">instanceof</span> JackPreDexTransform) &#123;</div><div class="line">                                JackConversionCache.getCache().load(</div><div class="line">                                        <span class="keyword">new</span> File(project.getRootProject().getBuildDir(),</div><div class="line">                                        FD_INTERMEDIATES + <span class="string">"/jack-cache/cache.xml"</span>));</div><div class="line">                                <span class="keyword">break</span>;</div><div class="line">                            &#125;</div><div class="line">                        &#125;</div><div class="line">                    &#125;</div><div class="line">                &#125;</div><div class="line">            &#125;);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这个方法主要做了如下几个操作:</p>
+<ul>
+<li>初始化SdkHandler</li>
+<li>初始化AndroidBuilder</li>
+<li>依赖JavaBasePlugin，JacocoPlugin；这两个Plugin的apply()方法我这里就不写了，大家有兴趣就像本文一样跟进去即可。</li>
+<li>给”assemble”任务加上说明</li>
+<li>当Gradle Build完成的时候做一些关闭和清理的操作</li>
+<li>在Transform任务真正执行之前，读取对应的Cache。</li>
+</ul>
+<p>SdkHandler主要作用是找local.properties文件里SdkLocation和NdkLocation<br>SdkLocation的查找顺序为：</p>
+<pre><code>1. local.properties文件里sdk.dir的配置
+2. local.properties文件里android.dir的配置
+3. 环境变量&quot;ANDROID_HOME&quot;
+4. 环境变量&quot;android.home&quot;
+</code></pre><p>NdkLocation的查找顺序为：</p>
+<pre><code>1. local.properties文件里ndk.dir的配置
+2. 环境变量&quot;ANDROID_NDK_HOME&quot;
+</code></pre><p>AndroidBuilder对象主要的几个参数的含义从我在代码中添加的注释即可了解。<br>最后讲一下<code>TaskExecutionGraphListener</code>这个接口。<br>官方文档是这样说的: </p>
+<p>&gt;<br>    A TaskExecutionGraphListener is notified when the TaskExecutionGraph has been populated.<br>    You can use this interface in your build file to perform some action based on the contents of the graph,<br>    before any tasks are actually executed.</p>
+<p>大概翻译一下，当Gradle将所有task的关系图填充之后，该接口会被调用。<br>你可以在build文件中使用这个接口，在任意task真正执行之前，去完成一些基于task关系图内容的任务。<br>所以这里可以根据对应的Task，判断Task的类型，做对应的操作。</p>
+<h3 id="BasePlugin-createExtension"><a href="#BasePlugin-createExtension" class="headerlink" title="BasePlugin createExtension"></a>BasePlugin createExtension</h3><p>继续看<code>apply</code>方法中第二个过程<code>createExtension()</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">createExtension</span><span class="params">()</span> </span>&#123;</div><div class="line">    <span class="comment">// 保存BuildType的NamedDomainObjectContainer</span></div><div class="line">    <span class="keyword">final</span> NamedDomainObjectContainer&lt;BuildType&gt; buildTypeContainer = project.container(</div><div class="line">            BuildType.class,</div><div class="line">            <span class="keyword">new</span> BuildTypeFactory(instantiator, project, project.getLogger())); </div><div class="line">    <span class="comment">// 保存ProductFlavor的NamedDomainObjectContainer</span></div><div class="line">    <span class="keyword">final</span> NamedDomainObjectContainer&lt;ProductFlavor&gt; productFlavorContainer = project.container(</div><div class="line">            ProductFlavor.class,</div><div class="line">            <span class="keyword">new</span> ProductFlavorFactory(instantiator, project, project.getLogger(), extraModelInfo));</div><div class="line">    <span class="comment">// 保存SigningConfig的NamedDomainObjectContainer</span></div><div class="line">    <span class="keyword">final</span> NamedDomainObjectContainer&lt;SigningConfig&gt;  signingConfigContainer = project.container(</div><div class="line">            SigningConfig.class,</div><div class="line">            <span class="keyword">new</span> SigningConfigFactory(instantiator));</div><div class="line">    <span class="comment">// 创建android这个extension</span></div><div class="line">    extension = project.getExtensions().create(<span class="string">"android"</span>, getExtensionClass(),</div><div class="line">            project, instantiator, androidBuilder, sdkHandler,</div><div class="line">            buildTypeContainer, productFlavorContainer, signingConfigContainer,</div><div class="line">            extraModelInfo, isLibrary());</div><div class="line"></div><div class="line">    <span class="comment">// create the default mapping configuration.</span></div><div class="line">    <span class="comment">// 创建default-mapping和default-metadata两个configuration，并加入描述</span></div><div class="line">    <span class="comment">// 具体的作用暂时没有看出来,如果你知道，欢迎留言告诉我</span></div><div class="line">    <span class="comment">// 通过如下代码放在build.gradle，可以打印出当前所有的configuration</span></div><div class="line">    <span class="comment">/**</span></div><div class="line">        configurations.names.forEach(new Consumer&lt;String&gt;() &#123;</div><div class="line">                <span class="doctag">@Override</span></div><div class="line">                void accept(String s) &#123;</div><div class="line">                        println "configurations：" + s;</div><div class="line">                &#125;</div><div class="line">        &#125;)</div><div class="line">    */</div><div class="line">    project.getConfigurations().create(<span class="string">"default"</span> + VariantDependencies.CONFIGURATION_MAPPING)</div><div class="line">            .setDescription(<span class="string">"Configuration for default mapping artifacts."</span>);</div><div class="line">    project.getConfigurations().create(<span class="string">"default"</span> + VariantDependencies.CONFIGURATION_METADATA)</div><div class="line">            .setDescription(<span class="string">"Metadata for the produced APKs."</span>);</div><div class="line">    <span class="comment">// 创建DependencyManager, 负责管理配置的所有依赖</span></div><div class="line">    dependencyManager = <span class="keyword">new</span> DependencyManager(</div><div class="line">            project,</div><div class="line">            extraModelInfo,</div><div class="line">            sdkHandler);</div><div class="line">    <span class="comment">// 负责管理ndk相关，这里略过不提</span></div><div class="line">    ndkHandler = <span class="keyword">new</span> NdkHandler(</div><div class="line">            project.getRootDir(),</div><div class="line">            <span class="keyword">null</span>, <span class="comment">/* compileSkdVersion, this will be set in afterEvaluate */</span></div><div class="line">            <span class="string">"gcc"</span>,<span class="comment">/* toolchainName */</span></div><div class="line">            <span class="string">""</span> <span class="comment">/*toolchainVersion*/</span>);</div><div class="line">    <span class="comment">// 负责创建taskManager</span></div><div class="line">    taskManager = createTaskManager(</div><div class="line">            project,</div><div class="line">            androidBuilder,</div><div class="line">            dataBindingBuilder,</div><div class="line">            extension,</div><div class="line">            sdkHandler,</div><div class="line">            ndkHandler,</div><div class="line">            dependencyManager,</div><div class="line">            registry);</div><div class="line">    </div><div class="line">    <span class="comment">// 负责创建variant</span></div><div class="line">    variantFactory = createVariantFactory();</div><div class="line">    variantManager = <span class="keyword">new</span> VariantManager(</div><div class="line">            project,</div><div class="line">            androidBuilder,</div><div class="line">            extension,</div><div class="line">            variantFactory,</div><div class="line">            taskManager,</div><div class="line">            instantiator);</div><div class="line"></div><div class="line">    <span class="comment">// Register a builder for the custom tooling model</span></div><div class="line">    ModelBuilder modelBuilder = <span class="keyword">new</span> ModelBuilder(</div><div class="line">            androidBuilder,</div><div class="line">            variantManager,</div><div class="line">            taskManager,</div><div class="line">            extension,</div><div class="line">            extraModelInfo,</div><div class="line">            ndkHandler,</div><div class="line">            <span class="keyword">new</span> NativeLibraryFactoryImpl(ndkHandler),</div><div class="line">            isLibrary(),</div><div class="line">            AndroidProject.GENERATION_ORIGINAL);</div><div class="line">    registry.register(modelBuilder);</div><div class="line"></div><div class="line">    <span class="comment">// Register a builder for the native tooling model</span></div><div class="line">    NativeModelBuilder nativeModelBuilder = <span class="keyword">new</span> NativeModelBuilder(variantManager);</div><div class="line">    registry.register(nativeModelBuilder);</div><div class="line"></div><div class="line">    <span class="comment">// 下面三个whenObjectAdded方法从名字上就很好理解</span></div><div class="line">    <span class="comment">// 当你添加一个对应的对象的时候，回调此方法，也就是需要在variantManager里面添加对应的对象</span></div><div class="line"></div><div class="line">    <span class="comment">// map the whenObjectAdded callbacks on the containers.</span></div><div class="line">    signingConfigContainer.whenObjectAdded(<span class="keyword">new</span> Action&lt;SigningConfig&gt;() &#123;</div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">execute</span><span class="params">(SigningConfig signingConfig)</span> </span>&#123;</div><div class="line">            variantManager.addSigningConfig(signingConfig);</div><div class="line">        &#125;</div><div class="line">    &#125;);</div><div class="line"></div><div class="line">    buildTypeContainer.whenObjectAdded(<span class="keyword">new</span> Action&lt;BuildType&gt;() &#123;</div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">execute</span><span class="params">(BuildType buildType)</span> </span>&#123;</div><div class="line">            <span class="comment">// 默认debug签名</span></div><div class="line">            SigningConfig signingConfig = signingConfigContainer.findByName(BuilderConstants.DEBUG);</div><div class="line">            buildType.init(signingConfig);</div><div class="line">            variantManager.addBuildType(buildType);</div><div class="line">        &#125;</div><div class="line">    &#125;);</div><div class="line"></div><div class="line">    productFlavorContainer.whenObjectAdded(<span class="keyword">new</span> Action&lt;ProductFlavor&gt;() &#123;</div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">execute</span><span class="params">(ProductFlavor productFlavor)</span> </span>&#123;</div><div class="line">            variantManager.addProductFlavor(productFlavor);</div><div class="line">        &#125;</div><div class="line">    &#125;);</div><div class="line"></div><div class="line">    <span class="comment">// 同上面类似，三个回调方法，不过是移除的时候抛出异常</span></div><div class="line">    <span class="comment">// 这个只能讲一下注释，具体如何复现暂时我不了解</span></div><div class="line">    <span class="comment">// map whenObjectRemoved on the containers to throw an exception.</span></div><div class="line">    signingConfigContainer.whenObjectRemoved(</div><div class="line">            <span class="keyword">new</span> UnsupportedAction(<span class="string">"Removing signingConfigs is not supported."</span>));</div><div class="line">    buildTypeContainer.whenObjectRemoved(</div><div class="line">            <span class="keyword">new</span> UnsupportedAction(<span class="string">"Removing build types is not supported."</span>));</div><div class="line">    productFlavorContainer.whenObjectRemoved(</div><div class="line">            <span class="keyword">new</span> UnsupportedAction(<span class="string">"Removing product flavors is not supported."</span>));</div><div class="line">    </div><div class="line">    <span class="comment">// 最后创建了这些默认的对象</span></div><div class="line">    <span class="comment">// create default Objects, signingConfig first as its used by the BuildTypes.</span></div><div class="line">    variantFactory.createDefaultComponents(</div><div class="line">            buildTypeContainer, productFlavorContainer, signingConfigContainer);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>看到这么长的代码，本想去掉点，发现这里面去什么都不合适。<br>那么跟着我慢慢看一下。这里有几个地方需要解释:</p>
+<ul>
+<li><code>NamedDomainObjectContainer</code>是什么？</li>
+</ul>
+<p><code>NamedDomainObjectContainer</code>简单来说就是一个容器，里面的泛型<t>保存了容器里面需要传的类型，类似一个List<t>。</t></t></p>
+<ul>
+<li>extension的创建代表了什么?</li>
+</ul>
+<p>extension的创建代表了我们在build.gradle文件中，可以使用</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">android&#123;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这样的闭包来给该扩展传消息。我们在<code>{}</code>内写的任何被允许的内容，在这里都被定义好了。从<code>getExtensionClass</code>方法获取具体的Class，<br>application: 使用<code>com.android.build.gradle.AppExtension.class</code><br>library: 使用<code>com.android.build.gradle.LibraryExtension.class</code>。<br>后面的值都是负责初始化这两个类的时候传入的值。</p>
+<ul>
+<li>TaskManager的作用?</li>
+</ul>
+<p>首先这个依旧根据application和library做区分。<br>application: 创建<code>ApplicationTaskManager</code><br>library: 创建<code>LibraryTaskManager</code><br>这两个类就是负责创建我们用来处理Android源码的Gradle Task的地方，比如assemblyDebug, installDebug…<br>现在这里大概了解一下这个对象，后面再细细解读此对象。</p>
+<ul>
+<li>VariantManager的作用？</li>
+</ul>
+<p>这就是管理<code>Build Variant</code>的地方，<code>Build Variant</code>的意义就是<code>build type</code>和<code>product flavor</code>交叉形成的，换句话说就是合并这两个东东的属性形成<code>Build Variant</code>的配置。<br>暂时也是单纯的提一下，后面再细细解读。</p>
+<p><code>ModelBuilder</code>, <code>NativeModelBuilder</code>和<code>private ToolingModelBuilderRegistry registry</code>这三个对象我们都先放一下，<br>这个和Android Plugin本身无关，是和gradle的运行机制相关的东东。</p>
+<p>好了，这里大概梳理一下此方法的逻辑，</p>
+<ul>
+<li>创建<code>buildTypeContainer</code>, <code>productFlavorContainer</code>, <code>signingConfigContainer</code></li>
+<li>将android这个extension加入build.gradle</li>
+<li>创建一些后面要使用的对象主要指<code>ModelBuilder</code>和<code>NativeModelBuilder</code>,注册到gradle中。</li>
+<li>给上面提到的Container加一些回调</li>
+<li>通过<code>variantFactory</code>给Container创建默认的配置</li>
+</ul>
+<p>看一下这个默认的配置，App和Library的默认配置是相同的，都是如下代码。</p>
+<h4 id="VariantFactory-createDefaultComponents"><a href="#VariantFactory-createDefaultComponents" class="headerlink" title="VariantFactory createDefaultComponents"></a>VariantFactory createDefaultComponents</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Override</span></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">createDefaultComponents</span><span class="params">(</span></span></div><div class="line">        @NonNull NamedDomainObjectContainer&lt;BuildType&gt; buildTypes,</div><div class="line">        @NonNull NamedDomainObjectContainer&lt;ProductFlavor&gt; productFlavors,</div><div class="line">        @NonNull NamedDomainObjectContainer&lt;SigningConfig&gt; signingConfigs) &#123;</div><div class="line">    <span class="comment">// must create signing config first so that build type 'debug' can be initialized</span></div><div class="line">    <span class="comment">// with the debug signing config.</span></div><div class="line">    signingConfigs.create(DEBUG);</div><div class="line">    buildTypes.create(DEBUG);</div><div class="line">    buildTypes.create(RELEASE);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>可以看出来我们的SigningConfigs里面默认有debug类型。<br>为什么不需要写signingConfig就有个默认的debug签名？就是这里配置的。<br>同理，为什么新建工程buildTypes有debug和release？就是这里创建的。<br>这里就相当于我们在<code>build.gradle</code>文件写了如下内容:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">android&#123;</div><div class="line">    signingConfigs &#123;</div><div class="line">        debug &#123;&#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    buildTypes &#123;</div><div class="line">        debug &#123;&#125;</div><div class="line">        release &#123;&#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这个方法到这里也就暂时过完了。所以这一篇到这里就告一段落了。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/05/30/2017-05-30-AndroidPlugin源码解析(一)/" data-id="cj3doeu3s000ui6h2c7svfzzv" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2017/05/31/2017-05-31-AndroidPlugin源码解析(二)/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          AndroidPlugin源码解析(二)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/05/29/2017-05-29-AndroidPlugin概述/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Android Plugin 概述</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AndFix/">AndFix</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Jenkins/">Jenkins</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/square-okhttp/">square, okhttp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/square-retrofit/">square, retrofit</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/AndFix/" style="font-size: 15px;">AndFix</a> <a href="/tags/Jenkins/" style="font-size: 10px;">Jenkins</a> <a href="/tags/square-okhttp/" style="font-size: 10px;">square, okhttp</a> <a href="/tags/square-retrofit/" style="font-size: 20px;">square, retrofit</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">五月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/03/">三月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">一月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/10/">十月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/09/">九月 2015</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2017/05/31/2017-05-31-AndroidPlugin源码解析(二)/">AndroidPlugin源码解析(二)</a>
+          </li>
+        
+          <li>
+            <a href="/2017/05/30/2017-05-30-AndroidPlugin源码解析(一)/">AndroidPlugin源码解析(一)</a>
+          </li>
+        
+          <li>
+            <a href="/2017/05/29/2017-05-29-AndroidPlugin概述/">Android Plugin 概述</a>
+          </li>
+        
+          <li>
+            <a href="/2017/03/01/2017-03-01-Groovy&Gradle入门/">Groovy &amp; Gradle 入门</a>
+          </li>
+        
+          <li>
+            <a href="/2016/12/10/2016-12-10-OkHttp源码解析-(下)/">OkHttp源码解析-(下)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 Air<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

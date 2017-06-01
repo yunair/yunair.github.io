@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>AndroidPlugin源码解析(二) | Air</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="前言上一篇文章还没分析完，还留了剩下两步，这一篇我们继续跟进。先从第三步开始： BasePlugin createTasks看apply方法中第三个过程createTasks() 12345private void createTasks() &amp;#123;    taskManager.createTasksBeforeEvaluate(                            ne">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AndroidPlugin源码解析(二)">
+<meta property="og:url" content="http://yoursite.com/2017/05/31/2017-05-31-AndroidPlugin源码解析(二)/index.html">
+<meta property="og:site_name" content="Air">
+<meta property="og:description" content="前言上一篇文章还没分析完，还留了剩下两步，这一篇我们继续跟进。先从第三步开始： BasePlugin createTasks看apply方法中第三个过程createTasks() 12345private void createTasks() &amp;#123;    taskManager.createTasksBeforeEvaluate(                            ne">
+<meta property="og:updated_time" content="2017-06-01T00:17:31.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="AndroidPlugin源码解析(二)">
+<meta name="twitter:description" content="前言上一篇文章还没分析完，还留了剩下两步，这一篇我们继续跟进。先从第三步开始： BasePlugin createTasks看apply方法中第三个过程createTasks() 12345private void createTasks() &amp;#123;    taskManager.createTasksBeforeEvaluate(                            ne">
+  
+    <link rel="alternate" href="/atom.xml" title="Air" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Air</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">Little Place</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-2017-05-31-AndroidPlugin源码解析(二)" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/05/31/2017-05-31-AndroidPlugin源码解析(二)/" class="article-date">
+  <time datetime="2017-05-30T16:00:00.000Z" itemprop="datePublished">2017-05-31</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      AndroidPlugin源码解析(二)
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>上一篇文章还没分析完，还留了剩下两步，这一篇我们继续跟进。<br>先从第三步开始：</p>
+<h3 id="BasePlugin-createTasks"><a href="#BasePlugin-createTasks" class="headerlink" title="BasePlugin createTasks"></a>BasePlugin createTasks</h3><p>看<code>apply</code>方法中第三个过程<code>createTasks()</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">createTasks</span><span class="params">()</span> </span>&#123;</div><div class="line">    taskManager.createTasksBeforeEvaluate(</div><div class="line">                            <span class="keyword">new</span> TaskContainerAdaptor(project.getTasks()));</div><div class="line">    createAndroidTasks(<span class="keyword">false</span>);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>方法很短，里面的内容就两个方法。<br>第一个方法里面创建了一些task，可是这些task和我们打包过程基本无关，所以这里忽视掉。<br>跳过了一些ndk相关的代码，来看看第二个方法</p>
+<h4 id="BasePlugin-createAndroidTasks"><a href="#BasePlugin-createAndroidTasks" class="headerlink" title="BasePlugin createAndroidTasks"></a>BasePlugin createAndroidTasks</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@VisibleForTesting</span></div><div class="line"><span class="function"><span class="keyword">final</span> <span class="keyword">void</span> <span class="title">createAndroidTasks</span><span class="params">(<span class="keyword">boolean</span> force)</span> </span>&#123;</div><div class="line">    <span class="comment">// 检测buildToolVersion,compileSdkVersion的设置</span></div><div class="line">    <span class="comment">// Make sure unit tests set the required fields.</span></div><div class="line">    checkState(extension.getBuildToolsRevision() != <span class="keyword">null</span>,</div><div class="line">            <span class="string">"buildToolsVersion is not specified."</span>);</div><div class="line">    checkState(extension.getCompileSdkVersion() != <span class="keyword">null</span>, <span class="string">"compileSdkVersion is not specified."</span>);</div><div class="line"></div><div class="line">    <span class="comment">// 不允许依赖java plugin</span></div><div class="line">    <span class="comment">// get current plugins and look for the default Java plugin.</span></div><div class="line">    <span class="keyword">if</span> (project.getPlugins().hasPlugin(JavaPlugin.class)) &#123;</div><div class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> BadPluginException(</div><div class="line">                <span class="string">"The 'java' plugin has been applied, but it is not compatible with the Android plugins."</span>);</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    <span class="comment">// 初始化TargetInfo这个类</span></div><div class="line">    <span class="comment">// 这个类负责给build project的时候提供需要的信息</span></div><div class="line">    ensureTargetSetup();</div><div class="line"></div><div class="line">    <span class="comment">// don't do anything if the project was not initialized.</span></div><div class="line">    <span class="comment">// Unless TEST_SDK_DIR is set in which case this is unit tests and we don't return.</span></div><div class="line">    <span class="comment">// This is because project don't get evaluated in the unit test setup.</span></div><div class="line">    <span class="comment">// See AppPluginDslTest</span></div><div class="line">    <span class="keyword">if</span> (!force</div><div class="line">            &amp;&amp; (!project.getState().getExecuted() || project.getState().getFailure() != <span class="keyword">null</span>)</div><div class="line">            &amp;&amp; SdkHandler.sTestSdkFolder == <span class="keyword">null</span>) &#123;</div><div class="line">        <span class="keyword">return</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (hasCreatedTasks) &#123;</div><div class="line">        <span class="keyword">return</span>;</div><div class="line">    &#125;</div><div class="line">    hasCreatedTasks = <span class="keyword">true</span>;</div><div class="line"></div><div class="line">    extension.disableWrite();</div><div class="line"></div><div class="line">    <span class="comment">// 移除远端Android sdk Maven依赖，改为本地，并将Android sdk Maven依赖放置到最前方</span></div><div class="line">    <span class="comment">// setup Android SDK repositories.</span></div><div class="line">    sdkHandler.addLocalRepositories(project);</div><div class="line">    <span class="comment">// databinding相关</span></div><div class="line">    taskManager.addDataBindingDependenciesIfNecessary(extension.getDataBinding());</div><div class="line">  </div><div class="line">    variantManager.createAndroidTasks();</div><div class="line">    </div><div class="line">    ApiObjectFactory apiObjectFactory = <span class="keyword">new</span> ApiObjectFactory(</div><div class="line">            androidBuilder, extension, variantFactory, instantiator);</div><div class="line">    <span class="keyword">for</span> (BaseVariantData variantData : variantManager.getVariantDataList())  &#123;</div><div class="line">        apiObjectFactory.create(variantData);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>前面的通过注释能了解一个大概，后面的很重要，也无法用注释来简单说明。<br>这个方法里有一个方法是最重要的，那就是<code>variantManager.createAndroidTasks();</code><br>我们来看一看这个方法</p>
+<h4 id="VariantManager-createAndroidTasks"><a href="#VariantManager-createAndroidTasks" class="headerlink" title="VariantManager createAndroidTasks"></a>VariantManager createAndroidTasks</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">createAndroidTasks</span><span class="params">()</span> </span>&#123;</div><div class="line">    <span class="comment">// 这里主要是检测Libray plugin情况下 ProductFlavor和BuildType不能添加applicationIdSuffix和Jack支持</span></div><div class="line">    <span class="comment">// 以及ProductFlavor不能重写applicationId</span></div><div class="line">    variantFactory.validateModel(<span class="keyword">this</span>);</div><div class="line">    <span class="comment">// 这个只是在AndroidTest的时候做了操作</span></div><div class="line">    variantFactory.preVariantWork(project);</div><div class="line"></div><div class="line">    <span class="keyword">final</span> TaskFactory tasks = <span class="keyword">new</span> TaskContainerAdaptor(project.getTasks());</div><div class="line">    <span class="comment">// 生成我们选择最终编译出来的Variant, 比如debugProd。就是BuildType和ProductFlaovr结合生成的</span></div><div class="line">    <span class="comment">// ProductFlavor自身也可以通过dimensions结合，参见http://tools.android.com/tech-docs/new-build-system/user-guide#TOC-Multi-flavor-variants</span></div><div class="line">    <span class="keyword">if</span> (variantDataList.isEmpty()) &#123;</div><div class="line">        populateVariantDataList();</div><div class="line">    &#125;</div><div class="line">    <span class="comment">// Create top level test tasks.</span></div><div class="line">    taskManager.createTopLevelTestTasks(tasks, !productFlavors.isEmpty());</div><div class="line"></div><div class="line">    <span class="keyword">for</span> (<span class="keyword">final</span> BaseVariantData&lt;? extends BaseVariantOutputData&gt; variantData : variantDataList) &#123;</div><div class="line">        createTasksForVariantData(tasks, variantData);</div><div class="line">    &#125;</div><div class="line">    <span class="comment">// 类似androidDependencies之类的获取信息的task</span></div><div class="line">    taskManager.createReportTasks(tasks, variantDataList);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这里提一点，我们项目里出现的<code>defaultConfig</code>其实就是<code>ProductFlavor</code>；<br>所以，所有<code>defaultConfig</code>里出现的设置，都可以在<code>ProductFlavor</code>中修改。</p>
+<p>我们来仔细看一下这个方法<code>createTasksForVariantData(tasks, variantData);</code>,这个方法描述了打包流程。所以这个方法很重要。<br>去掉为测试生成的task代码</p>
+<h4 id="VariantManager-createTasksForVariantData"><a href="#VariantManager-createTasksForVariantData" class="headerlink" title="VariantManager createTasksForVariantData"></a>VariantManager createTasksForVariantData</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * Create tasks for the specified variantData.</div><div class="line"> */</div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">createTasksForVariantData</span><span class="params">(</span></span></div><div class="line">        <span class="keyword">final</span> TaskFactory tasks,</div><div class="line">        <span class="keyword">final</span> BaseVariantData&lt;? extends BaseVariantOutputData&gt; variantData) &#123;</div><div class="line">    <span class="keyword">final</span> BuildTypeData buildTypeData = buildTypes.get(</div><div class="line">            variantData.getVariantConfiguration().getBuildType().getName());</div><div class="line">    <span class="comment">// 创建类似于AssembleDebug,　AssembleRelease之类的Ｔａｓｋ</span></div><div class="line">    <span class="keyword">if</span> (buildTypeData.getAssembleTask() == <span class="keyword">null</span>) &#123;</div><div class="line">        buildTypeData.setAssembleTask(taskManager.createAssembleTask(tasks, buildTypeData));</div><div class="line">    &#125;</div><div class="line">    <span class="comment">// Add dependency of assemble task on assemble build type task.</span></div><div class="line">    tasks.named(<span class="string">"assemble"</span>, <span class="keyword">new</span> Action&lt;Task&gt;() &#123;</div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">execute</span><span class="params">(Task task)</span> </span>&#123;</div><div class="line">            <span class="keyword">assert</span> buildTypeData.getAssembleTask() != <span class="keyword">null</span>;</div><div class="line">            task.dependsOn(buildTypeData.getAssembleTask().getName());</div><div class="line">        &#125;</div><div class="line">    &#125;);</div><div class="line"></div><div class="line">    VariantType variantType = variantData.getType();</div><div class="line">    <span class="comment">// 把ProductFlaovr的Assemble任务加上</span></div><div class="line">    createAssembleTaskForVariantData(tasks, variantData);</div><div class="line"></div><div class="line">    taskManager.createTasksForVariantData(tasks, variantData);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这个方法里最重要的就是最后一行<code>taskManager.createTasksForVariantData(tasks, variantData);</code>，不管Test的情况下分为两种实现，一种是application，一种是library，这里我们先放着，因为这里是整个打包过程具体实现的地方，下一系列文章(Android打包过程解析)来解析这个方法的代码。<br>本篇文章继续往下跟进。</p>
+<p>打包过程的第一阶段——配置，到这里还剩最后一个方法就完成了，我们来看看。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">ApiObjectFactory apiObjectFactory = <span class="keyword">new</span> ApiObjectFactory(</div><div class="line">    androidBuilder, extension, variantFactory, instantiator);</div><div class="line">    <span class="comment">// variantManager.getVariantDataList() 就是前面创建的ProductFlavor</span></div><div class="line"><span class="keyword">for</span> (BaseVariantData variantData : variantManager.getVariantDataList())  &#123;</div><div class="line">    apiObjectFactory.create(variantData);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>我们来看看<code>create</code>方法</p>
+<h4 id="ApiObjectFactory-create"><a href="#ApiObjectFactory-create" class="headerlink" title="ApiObjectFactory create"></a>ApiObjectFactory create</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">create</span><span class="params">(BaseVariantData&lt;?&gt; variantData)</span> </span>&#123;</div><div class="line">    <span class="comment">// 这个方法主要目的是把output对象和variant对象关联起来</span></div><div class="line">    BaseVariant variantApi =</div><div class="line">            variantFactory.createVariantApi(variantData, readOnlyObjectProvider);</div><div class="line">    <span class="comment">// Only add the variant API object to the domain object set once it's been fully</span></div><div class="line">    <span class="comment">// initialized.</span></div><div class="line">    extension.addVariant(variantApi);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>不管Test相关的代码的话，我们可以看到，这个方法变成了只有两行，且最后一个方法的注释明显的写明了初始化完毕(it’s been fully initialized)。</p>
+<p>最后那个extension对象就是我们刚开始用的Android Extension对象。将variant加入Android Extension对象，初始化就完毕了。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/05/31/2017-05-31-AndroidPlugin源码解析(二)/" data-id="cj3doeu3u000wi6h268t0yl34" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2017/05/30/2017-05-30-AndroidPlugin源码解析(一)/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">AndroidPlugin源码解析(一)</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AndFix/">AndFix</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Jenkins/">Jenkins</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/square-okhttp/">square, okhttp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/square-retrofit/">square, retrofit</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/AndFix/" style="font-size: 15px;">AndFix</a> <a href="/tags/Jenkins/" style="font-size: 10px;">Jenkins</a> <a href="/tags/square-okhttp/" style="font-size: 10px;">square, okhttp</a> <a href="/tags/square-retrofit/" style="font-size: 20px;">square, retrofit</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">五月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/03/">三月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">一月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/10/">十月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/09/">九月 2015</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2017/05/31/2017-05-31-AndroidPlugin源码解析(二)/">AndroidPlugin源码解析(二)</a>
+          </li>
+        
+          <li>
+            <a href="/2017/05/30/2017-05-30-AndroidPlugin源码解析(一)/">AndroidPlugin源码解析(一)</a>
+          </li>
+        
+          <li>
+            <a href="/2017/05/29/2017-05-29-AndroidPlugin概述/">Android Plugin 概述</a>
+          </li>
+        
+          <li>
+            <a href="/2017/03/01/2017-03-01-Groovy&Gradle入门/">Groovy &amp; Gradle 入门</a>
+          </li>
+        
+          <li>
+            <a href="/2016/12/10/2016-12-10-OkHttp源码解析-(下)/">OkHttp源码解析-(下)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 Air<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

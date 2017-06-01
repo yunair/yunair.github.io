@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Retrofit-1.9源码分析-(下) | Air</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="看过上一篇的分析，并思考了我在最后留给大家的对那个方法的思考之后，我们就可以继续解析这个库了。 记得上一篇提到的小尾巴吗？这里我们先不谈这个小尾巴，先从Demo里接口里面的定义开始谈。 注解1234567public interface GitHubService &amp;#123;    //被注释的内容是同步方法，在Android 4.0以后不允许主线程进行网络请求，所以一般不这么用    //@G">
+<meta name="keywords" content="square, retrofit">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Retrofit-1.9源码分析-(下)">
+<meta property="og:url" content="http://yoursite.com/2016/01/16/2016-01-16-Retrofit_1.9源码分析-(下)/index.html">
+<meta property="og:site_name" content="Air">
+<meta property="og:description" content="看过上一篇的分析，并思考了我在最后留给大家的对那个方法的思考之后，我们就可以继续解析这个库了。 记得上一篇提到的小尾巴吗？这里我们先不谈这个小尾巴，先从Demo里接口里面的定义开始谈。 注解1234567public interface GitHubService &amp;#123;    //被注释的内容是同步方法，在Android 4.0以后不允许主线程进行网络请求，所以一般不这么用    //@G">
+<meta property="og:image" content="https://raw.githubusercontent.com/yunair/blog/gh-pages/media/retrofit/retrofit1.9.png">
+<meta property="og:updated_time" content="2017-06-01T00:11:35.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Retrofit-1.9源码分析-(下)">
+<meta name="twitter:description" content="看过上一篇的分析，并思考了我在最后留给大家的对那个方法的思考之后，我们就可以继续解析这个库了。 记得上一篇提到的小尾巴吗？这里我们先不谈这个小尾巴，先从Demo里接口里面的定义开始谈。 注解1234567public interface GitHubService &amp;#123;    //被注释的内容是同步方法，在Android 4.0以后不允许主线程进行网络请求，所以一般不这么用    //@G">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/yunair/blog/gh-pages/media/retrofit/retrofit1.9.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Air" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Air</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">Little Place</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-2016-01-16-Retrofit_1.9源码分析-(下)" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/01/16/2016-01-16-Retrofit_1.9源码分析-(下)/" class="article-date">
+  <time datetime="2016-01-15T16:00:00.000Z" itemprop="datePublished">2016-01-16</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Retrofit-1.9源码分析-(下)
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>看过上一篇的分析，并思考了我在最后留给大家的对那个方法的思考之后，我们就可以继续解析这个库了。</p>
+<p>记得上一篇提到的小尾巴吗？这里我们先不谈这个小尾巴，先从Demo里接口里面的定义开始谈。</p>
+<h3 id="注解"><a href="#注解" class="headerlink" title="注解"></a>注解</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">GitHubService</span> </span>&#123;</div><div class="line">    <span class="comment">//被注释的内容是同步方法，在Android 4.0以后不允许主线程进行网络请求，所以一般不这么用</span></div><div class="line">    <span class="comment">//@GET("/users/&#123;user&#125;/repos")</span></div><div class="line">    <span class="comment">//List&lt;Repo&gt; listRepos(@Path("user") String user);</span></div><div class="line">    <span class="meta">@GET</span>(<span class="string">"/users/&#123;user&#125;/repos"</span>)</div><div class="line">    <span class="function"><span class="keyword">void</span> <span class="title">listRepos</span><span class="params">(@Path(<span class="string">"user"</span>)</span> String user, Callback&lt;List&lt;Repo&gt;&gt; callback)</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>在这里我们看到使用注解定义进行http请求时所需要的各种信息，比如相对url，参数等等。<br>那我们就先观察一下注解。这里使用了<code>@GET</code>注解，表示HTTP中的GET方法，</p>
+<h4 id="GET"><a href="#GET" class="headerlink" title="GET"></a>GET</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/** Make a GET request to a REST path relative to base URL. */</span></div><div class="line"><span class="meta">@Documented</span></div><div class="line"><span class="meta">@Target</span>(METHOD)</div><div class="line"><span class="meta">@Retention</span>(RUNTIME)</div><div class="line"><span class="meta">@RestMethod</span>(<span class="string">"GET"</span>)</div><div class="line"><span class="keyword">public</span> <span class="meta">@interface</span> GET &#123;</div><div class="line">  <span class="function">String <span class="title">value</span><span class="params">()</span></span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>注解基础就不在这里讲了，这个<code>@GET</code>注解又被<code>@RestMethod</code>注解注解了，我们来看一下。</p>
+<h4 id="RestMethod"><a href="#RestMethod" class="headerlink" title="RestMethod"></a>RestMethod</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Documented</span></div><div class="line"><span class="meta">@Target</span>(ANNOTATION_TYPE)</div><div class="line"><span class="meta">@Retention</span>(RUNTIME)</div><div class="line"><span class="keyword">public</span> <span class="meta">@interface</span> RestMethod &#123;</div><div class="line">  <span class="function">String <span class="title">value</span><span class="params">()</span></span>;</div><div class="line">  <span class="function"><span class="keyword">boolean</span> <span class="title">hasBody</span><span class="params">()</span> <span class="keyword">default</span> <span class="keyword">false</span></span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这是注解注解的注解，也就是所谓的元注解。所有被这个注解注解的注解都可以被认为是该类型，<br>可以当作所有子类都可以被转换为父类。</p>
+<p>被这个元注解注解的注解有这么几个, <code>@GET</code>, <code>@POST</code>, <code>@PUT</code>, <code>@PATCH</code>, <code>@DELETE</code>, <code>@DELETE</code>,<br>可以看出，这就是进行HTTP请求的几种常用的请求方式。</p>
+<p>在示例中出现的其他注解先放一下。有了注解，那要实现这些注解的解析方式，这个实现在<code>RestMethodInfo.java</code>中<br>这里有两个重要方法来处理自定义的注解：<br>第一种是用在方法上的注解，如<code>@GET</code>，由<code>parseMethodAnnotations()</code>方法实现，<br>第二种是用在参数内的注解，如<code>@PATH</code>，由<code>parseParameters()</code>实现，</p>
+<p>在这两个方法中，你可以知道哪些注解可以用在方法上，哪些注解可以用在参数内。</p>
+<p>好了，到这里，我们终于可以返回上一篇最后留下的坑继续看了。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">return</span> (T) Proxy.newProxyInstance(service.getClassLoader(), </div><div class="line">    <span class="keyword">new</span> Class&lt;?&gt;[] &#123; service &#125;,</div><div class="line">    <span class="keyword">new</span> RestHandler(getMethodInfoCache(service)));</div></pre></td></tr></table></figure>
+<h3 id="完成接口代理的创建"><a href="#完成接口代理的创建" class="headerlink" title="完成接口代理的创建"></a>完成接口代理的创建</h3><p>最终，<code>RestHandler</code>实现了<code>InvocationHandler</code>，对接口中的方法进行加工。</p>
+<p>看名字应该也很容易理解，<code>getMethodInfoCache()</code>的意义就是从传入的接口中获取对应的相关方法的缓存，<br>用户定义的接口中每个<code>Method</code>都要和<code>RestMethodInfo</code>对应，自然想到使用<code>Map</code>做它们关系的联结。<br><code>RestHandler</code>持有对应的<code>Map</code>。<br>来看一下<code>InvocationHandler</code>接口中必须实现的唯一的方法：</p>
+<h4 id="RestHandler-invoke"><a href="#RestHandler-invoke" class="headerlink" title="RestHandler.invoke()"></a>RestHandler.invoke()</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@SuppressWarnings</span>(<span class="string">"unchecked"</span>) <span class="comment">//</span></div><div class="line"><span class="meta">@Override</span> <span class="function"><span class="keyword">public</span> Object <span class="title">invoke</span><span class="params">(Object proxy, Method method, <span class="keyword">final</span> Object[] args)</span></span></div><div class="line">    <span class="keyword">throws</span> Throwable &#123;</div><div class="line">  <span class="comment">// If the method is a method from Object then defer to normal invocation.</span></div><div class="line">  <span class="comment">//Object类方法，直接执行，不需要做额外操作</span></div><div class="line">  <span class="keyword">if</span> (method.getDeclaringClass() == Object.class) &#123;</div><div class="line">    <span class="keyword">return</span> method.invoke(<span class="keyword">this</span>, args);</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  <span class="comment">// Load or create the details cache for the current method.</span></div><div class="line">  <span class="keyword">final</span> RestMethodInfo methodInfo = getMethodInfo(methodDetailsCache, method);</div><div class="line"></div><div class="line">  <span class="comment">//同步方法的处理逻辑，作为Android库的话忽视就可以了</span></div><div class="line">  <span class="keyword">if</span> (methodInfo.isSynchronous) &#123;</div><div class="line">    <span class="keyword">try</span> &#123;</div><div class="line">      <span class="keyword">return</span> invokeRequest(requestInterceptor, methodInfo, args);</div><div class="line">    &#125; <span class="keyword">catch</span> (RetrofitError error) &#123;</div><div class="line">      Throwable newError = errorHandler.handleError(error);</div><div class="line">      <span class="keyword">if</span> (newError == <span class="keyword">null</span>) &#123;</div><div class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">"Error handler returned null for wrapped exception."</span>,</div><div class="line">            error);</div><div class="line">      &#125;</div><div class="line">      <span class="keyword">throw</span> newError;</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  <span class="keyword">if</span> (httpExecutor == <span class="keyword">null</span> || callbackExecutor == <span class="keyword">null</span>) &#123;</div><div class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">"Asynchronous invocation requires calling setExecutors."</span>);</div><div class="line">  &#125;</div><div class="line">  <span class="comment">//这个RestMethodInfo类中的类变量，通过你接口中方法定义来确认</span></div><div class="line">  <span class="keyword">if</span> (methodInfo.isObservable) &#123;</div><div class="line">    <span class="keyword">if</span> (rxSupport == <span class="keyword">null</span>) &#123; </div><div class="line">      <span class="keyword">if</span> (Platform.HAS_RX_JAVA) &#123;  <span class="comment">//和前面hasOkHttpOnClasspath()方法类似，就是找对应的包名</span></div><div class="line">        rxSupport = <span class="keyword">new</span> RxSupport(httpExecutor, errorHandler, requestInterceptor);</div><div class="line">      &#125; <span class="keyword">else</span> &#123;</div><div class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">"Observable method found but no RxJava on classpath."</span>);</div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="comment">//rxSupport是一个自定义的类，查看这个方法的源码应该可以提升你对任意对象转换成Observable对象的理解</span></div><div class="line">    <span class="keyword">return</span> rxSupport.createRequestObservable(<span class="keyword">new</span> RxSupport.Invoker() &#123;</div><div class="line">      <span class="meta">@Override</span> <span class="function"><span class="keyword">public</span> ResponseWrapper <span class="title">invoke</span><span class="params">(RequestInterceptor requestInterceptor)</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> (ResponseWrapper) invokeRequest(requestInterceptor, methodInfo, args);</div><div class="line">      &#125;</div><div class="line">    &#125;);</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  <span class="comment">// Apply the interceptor synchronously, recording the interception so we can replay it later.</span></div><div class="line">  <span class="comment">// This way we still defer argument serialization to the background thread.</span></div><div class="line">  <span class="keyword">final</span> RequestInterceptorTape interceptorTape = <span class="keyword">new</span> RequestInterceptorTape();</div><div class="line">  requestInterceptor.intercept(interceptorTape);</div><div class="line"></div><div class="line">  Callback&lt;?&gt; callback = (Callback&lt;?&gt;) args[args.length - <span class="number">1</span>];</div><div class="line">  <span class="comment">//线程池执行网络请求，callbackExecutor指定callback执行的线程</span></div><div class="line">  httpExecutor.execute(<span class="keyword">new</span> CallbackRunnable(callback, callbackExecutor, errorHandler) &#123;</div><div class="line">    <span class="meta">@Override</span> <span class="function"><span class="keyword">public</span> ResponseWrapper <span class="title">obtainResponse</span><span class="params">()</span> </span>&#123;</div><div class="line">      <span class="keyword">return</span> (ResponseWrapper) invokeRequest(interceptorTape, methodInfo, args);</div><div class="line">    &#125;</div><div class="line">  &#125;);</div><div class="line">  <span class="keyword">return</span> <span class="keyword">null</span>; <span class="comment">// Asynchronous methods should have return type of void.</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>不得不说这个代码的注释写的真好，我针对其中的一部分代码写了中文注释。这里<code>invokeRequest()</code>方法很复杂，下面我们来看一下。</p>
+<h4 id="RestHandler-invokeRequest"><a href="#RestHandler-invokeRequest" class="headerlink" title="RestHandler.invokeRequest()"></a>RestHandler.invokeRequest()</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * Execute an HTTP request.</div><div class="line"> *</div><div class="line"> * <span class="doctag">@return</span> HTTP response object of specified &#123;<span class="doctag">@code</span> type&#125; or &#123;<span class="doctag">@code</span> null&#125;.</div><div class="line"> * <span class="doctag">@throws</span> RetrofitError if any error occurs during the HTTP request.</div><div class="line"> */</div><div class="line"><span class="function"><span class="keyword">private</span> Object <span class="title">invokeRequest</span><span class="params">(RequestInterceptor requestInterceptor, RestMethodInfo methodInfo,</span></span></div><div class="line">    Object[] args) &#123;</div><div class="line">  String url = <span class="keyword">null</span>;</div><div class="line">  <span class="keyword">try</span> &#123;</div><div class="line">    methodInfo.init(); <span class="comment">// Ensure all relevant method information has been loaded.</span></div><div class="line"></div><div class="line">    String serverUrl = server.getUrl();</div><div class="line">    RequestBuilder requestBuilder = <span class="keyword">new</span> RequestBuilder(serverUrl, methodInfo, converter);</div><div class="line">    <span class="comment">//在这个方法内，将你放入该方法中的各个参数处理成http标准格式</span></div><div class="line">    requestBuilder.setArguments(args);</div><div class="line">    <span class="comment">//给http请求添加额外的信息，这些信息在requestBuilder写好了</span></div><div class="line">    <span class="comment">//自己在初始化RestAdapter的时候也可以初始化自己的RequestInterceptor，</span></div><div class="line">    <span class="comment">//这样的话就可以为一群http请求添加共同的header也好，参数也好</span></div><div class="line">    requestInterceptor.intercept(requestBuilder);</div><div class="line">    <span class="comment">//封装了一个HTTP请求所有需要的信息</span></div><div class="line">    Request request = requestBuilder.build();</div><div class="line"></div><div class="line">    ...</div><div class="line"></div><div class="line">    <span class="keyword">long</span> start = System.nanoTime();</div><div class="line">    <span class="comment">//使用之前设置的Client.Provider进行网络请求，并得到返回值</span></div><div class="line">    <span class="comment">//Response这个类封装了HTTP返回信息</span></div><div class="line">    Response response = clientProvider.get().execute(request);</div><div class="line">    <span class="keyword">long</span> elapsedTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);</div><div class="line"></div><div class="line">    <span class="keyword">int</span> statusCode = response.getStatus();</div><div class="line">    <span class="comment">//就是指接口中方法的返回值类型</span></div><div class="line">    Type type = methodInfo.responseObjectType;</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (statusCode &gt;= <span class="number">200</span> &amp;&amp; statusCode &lt; <span class="number">300</span>) &#123; <span class="comment">// 2XX == successful request</span></div><div class="line">      <span class="comment">//我们一般都要Convert之后的格式, 我还没遇到直接需要Response的情况，</span></div><div class="line">      <span class="comment">// Caller requested the raw Response object directly.</span></div><div class="line">      <span class="keyword">if</span> (type.equals(Response.class)) &#123;</div><div class="line">        <span class="keyword">if</span> (!methodInfo.isStreaming) &#123;</div><div class="line">          <span class="comment">//如果你返回值是Response，并且不返回流，而返回原始类型，</span></div><div class="line">          <span class="comment">//response会将服务端返回值写入一个64K大小的数组中，如果返回值很大，那么数据就无法完全储存，所以在这种情况下返回大文件会有问题</span></div><div class="line">          <span class="comment">// Read the entire stream and replace with one backed by a byte[].</span></div><div class="line">          response = Utils.readBodyToBytesIfNecessary(response);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="keyword">if</span> (methodInfo.isSynchronous) &#123;</div><div class="line">          <span class="keyword">return</span> response;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">new</span> ResponseWrapper(response, response);</div><div class="line">      &#125;</div><div class="line">      <span class="comment">//这个接口的注释 Binary data with an associated mime type.</span></div><div class="line">      <span class="comment">//这个接口用来抽象http的返回值的body</span></div><div class="line">      TypedInput body = response.getBody();</div><div class="line">      <span class="keyword">if</span> (body == <span class="keyword">null</span>) &#123;</div><div class="line">        <span class="keyword">if</span> (methodInfo.isSynchronous) &#123;</div><div class="line">          <span class="keyword">return</span> <span class="keyword">null</span>;</div><div class="line">        &#125;</div><div class="line">        <span class="comment">//这个就是callback里的Response和Body</span></div><div class="line">        <span class="keyword">return</span> <span class="keyword">new</span> ResponseWrapper(response, <span class="keyword">null</span>);</div><div class="line">      &#125;</div><div class="line"></div><div class="line">      ExceptionCatchingTypedInput wrapped = <span class="keyword">new</span> ExceptionCatchingTypedInput(body);</div><div class="line">      <span class="keyword">try</span> &#123;</div><div class="line">        <span class="comment">//调用我们之前定义的Converter来解析数据</span></div><div class="line">        Object convert = converter.fromBody(wrapped, type);</div><div class="line">        logResponseBody(body, convert);</div><div class="line">        <span class="keyword">if</span> (methodInfo.isSynchronous) &#123;</div><div class="line">          <span class="keyword">return</span> convert;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">new</span> ResponseWrapper(response, convert);</div><div class="line">      &#125; <span class="keyword">catch</span> (ConversionException e) &#123;</div><div class="line">        ...</div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="comment">//将body的数据转换成byte数组, http状态码不在200-300之间</span></div><div class="line">    response = Utils.readBodyToBytesIfNecessary(response);</div><div class="line">    ...</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这个方法很长，我去掉了<code>profiler</code>和<code>log</code>以及错误处理相关的内容。</p>
+<p>这里首先调用的就是<code>method.init()</code>方法，这个方法:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">()</span> </span>&#123;</div><div class="line">  <span class="keyword">if</span> (loaded) <span class="keyword">return</span>;</div><div class="line"></div><div class="line">  parseMethodAnnotations();</div><div class="line">  parseParameters();</div><div class="line"></div><div class="line">  loaded = <span class="keyword">true</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>如果执行过，直接从缓存Map里拿就可以了，不需要重复执行，<br>这个方法就是前面说的，获取每个方法对应的注解和方法参数内的注解，并给你的那些方法做合理的替换。</p>
+<p>剩下的方法基本都已做了注释，看代码即可了解。再提示一点，有<code>TypedInput</code>，自然有<code>TypedOutput</code>，<br><code>TypedOutput</code>的作用就和大家想的一样，是发送出去的数据类型的接口抽象。</p>
+<h3 id="提示"><a href="#提示" class="headerlink" title="提示"></a>提示</h3><p>在这里进行几点提示：</p>
+<ol>
+<li>自定义converter的时候需要实现<code>Converter</code>接口，比如你想用其它的Json解析库替代Gson，或者服务端返回值不是Json，而是XML等等。<br>只要了解了<code>TypedInput</code>和<code>TypedOutput</code>，剩下的很容易就可以完成了。</li>
+<li>Retrofit这个版本不支持Multimap，所以如果服务端要求请求的时候key一样value不一样就很悲剧，那么修改RequestBuilder就可以达到Multimap的目的。</li>
+<li>Retrofit这个版本不支持在接口中写入整个url，如果endpoint不一样就要重新创建一个<code>RestAdapter</code>，但悲剧的是创建一个<code>RestAdapter</code>的代价是很大的，<br>那么修改RestMethodInfo就可以达到在HTTP方法注解中使用整个url的目的。</li>
+</ol>
+<p>到这里我们对这个库的源码分析就完了，接下来以一副图来结束这个专题。</p>
+<p><img src="https://raw.githubusercontent.com/yunair/blog/gh-pages/media/retrofit/retrofit1.9.png" alt=""></p>
+<p>这样看来，Retrofit本身就是一个胶水层，同时像插槽一样留出一些插口给大家使用，简化了网络请求。</p>
+<p>参考: <a href="http://www.cnblogs.com/angeldevil/p/3757335.html" target="_blank" rel="external">快速Android开发系列网络篇之Retrofit</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2016/01/16/2016-01-16-Retrofit_1.9源码分析-(下)/" data-id="cj3doeu32000bi6h236ar62ni" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/square-retrofit/">square, retrofit</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2016/03/06/2016-03-06-Android管理任务栈之——launchMode/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          Android管理任务栈之——launchMode
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2016/01/13/2016-01-13-Retrofit-1.9源码分析-(上)/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Retrofit-1.9源码分析-(上)</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AndFix/">AndFix</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Jenkins/">Jenkins</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/square-okhttp/">square, okhttp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/square-retrofit/">square, retrofit</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/AndFix/" style="font-size: 15px;">AndFix</a> <a href="/tags/Jenkins/" style="font-size: 10px;">Jenkins</a> <a href="/tags/square-okhttp/" style="font-size: 10px;">square, okhttp</a> <a href="/tags/square-retrofit/" style="font-size: 20px;">square, retrofit</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">五月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/03/">三月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">一月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/10/">十月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/09/">九月 2015</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2017/05/31/2017-05-31-AndroidPlugin源码解析(二)/">AndroidPlugin源码解析(二)</a>
+          </li>
+        
+          <li>
+            <a href="/2017/05/30/2017-05-30-AndroidPlugin源码解析(一)/">AndroidPlugin源码解析(一)</a>
+          </li>
+        
+          <li>
+            <a href="/2017/05/29/2017-05-29-AndroidPlugin概述/">Android Plugin 概述</a>
+          </li>
+        
+          <li>
+            <a href="/2017/03/01/2017-03-01-Groovy&Gradle入门/">Groovy &amp; Gradle 入门</a>
+          </li>
+        
+          <li>
+            <a href="/2016/12/10/2016-12-10-OkHttp源码解析-(下)/">OkHttp源码解析-(下)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 Air<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

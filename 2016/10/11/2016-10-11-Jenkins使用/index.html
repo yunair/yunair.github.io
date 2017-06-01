@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Jenkins的使用 | Air</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="前提: 使用Git作为公司的版本控制工具，使用GitLab作为对应的服务器 首先安装Jenkins plugins, 下面列出两个关键的Plugins GitLab Plugin Git plugin 打包APK对于APK的打包，相信大家公司内部都有不同的测试环境，不同的功能需要在不同的测试环境上测试，不同的功能又对应不同的分支，如果开发人员负责根据测试人员的需求打包的话，测试人员麻烦，开发人员也">
+<meta name="keywords" content="Jenkins">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Jenkins的使用">
+<meta property="og:url" content="http://yoursite.com/2016/10/11/2016-10-11-Jenkins使用/index.html">
+<meta property="og:site_name" content="Air">
+<meta property="og:description" content="前提: 使用Git作为公司的版本控制工具，使用GitLab作为对应的服务器 首先安装Jenkins plugins, 下面列出两个关键的Plugins GitLab Plugin Git plugin 打包APK对于APK的打包，相信大家公司内部都有不同的测试环境，不同的功能需要在不同的测试环境上测试，不同的功能又对应不同的分支，如果开发人员负责根据测试人员的需求打包的话，测试人员麻烦，开发人员也">
+<meta property="og:image" content="https://raw.githubusercontent.com/yunair/blog/gh-pages/media/jenkins/build_params.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/yunair/blog/gh-pages/media/jenkins/url.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/yunair/blog/gh-pages/media/jenkins/git_branch.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/yunair/blog/gh-pages/media/jenkins/scm_git.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/yunair/blog/gh-pages/media/jenkins/change_env.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/yunair/blog/gh-pages/media/jenkins/build_env_inject.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/yunair/blog/gh-pages/media/jenkins/post_build_action.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/yunair/blog/gh-pages/media/jenkins/build_trigger.png">
+<meta property="og:updated_time" content="2017-06-01T00:12:56.818Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Jenkins的使用">
+<meta name="twitter:description" content="前提: 使用Git作为公司的版本控制工具，使用GitLab作为对应的服务器 首先安装Jenkins plugins, 下面列出两个关键的Plugins GitLab Plugin Git plugin 打包APK对于APK的打包，相信大家公司内部都有不同的测试环境，不同的功能需要在不同的测试环境上测试，不同的功能又对应不同的分支，如果开发人员负责根据测试人员的需求打包的话，测试人员麻烦，开发人员也">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/yunair/blog/gh-pages/media/jenkins/build_params.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Air" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Air</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">Little Place</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-2016-10-11-Jenkins使用" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/10/11/2016-10-11-Jenkins使用/" class="article-date">
+  <time datetime="2016-10-10T16:00:00.000Z" itemprop="datePublished">2016-10-11</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Jenkins的使用
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><strong>前提: 使用Git作为公司的版本控制工具，使用GitLab作为对应的服务器</strong></p>
+<p>首先安装Jenkins plugins, 下面列出两个关键的Plugins</p>
+<p><a href="https://wiki.jenkins-ci.org/display/JENKINS/GitLab+Plugin" target="_blank" rel="external">GitLab Plugin</a></p>
+<p><a href="https://wiki.jenkins-ci.org/display/JENKINS/Git+Plugin" target="_blank" rel="external">Git plugin</a></p>
+<h3 id="打包APK"><a href="#打包APK" class="headerlink" title="打包APK"></a>打包APK</h3><p>对于APK的打包，相信大家公司内部都有不同的测试环境，不同的功能需要在不同的测试环境上测试，不同的功能又对应不同的分支，如果开发人员负责根据测试人员的需求打包的话，测试人员麻烦，开发人员也麻烦。程序员一个极好的特质就是懒，那么，这时候，Jenkins提供的<code>This build is parameterized</code>功能就派上了用处。</p>
+<p><img src="https://raw.githubusercontent.com/yunair/blog/gh-pages/media/jenkins/build_params.png" alt=""></p>
+<p>勾选了这个选项之后，就可以添加自己需要的参数了，比如:</p>
+<p><img src="https://raw.githubusercontent.com/yunair/blog/gh-pages/media/jenkins/url.png" alt="测试环境地址 "><br><img src="https://raw.githubusercontent.com/yunair/blog/gh-pages/media/jenkins/git_branch.png" alt="git的分支名称"></p>
+<p>记住这个地方填写的<code>name</code>， 这里的名称将会是shell里的变量，使用$来引用对应具体的变量，下面将会看到这些变量的使用。</p>
+<p>既然环境和分支都已经可选，第二步是配置Jenkins去哪个地址拉源代码，即SCM配置，如下图:<br><img src="https://raw.githubusercontent.com/yunair/blog/gh-pages/media/jenkins/scm_git.png" alt=""></p>
+<p>可以看到，在<code>Branches to build</code>的地方，我填的内容是<code>*/$git_branch</code>，这个参数就是从前面<code>This build is parameterized</code>位置添加的参数，所以用户填了哪个分支，这里就能拿到用户填写的分支，在Build的时候也就会拉对应分支的代码。</p>
+<p>按照我们的意向拉了对应分支的代码，开头所说的另外一个问题，更改对应的环境，当然，可以使用<code>ProductFlavor</code>来解决这个问题，再最后打包的情况下选择对应的<code>ProductFlavor</code>，数量少了还好说，数量多了，就会变得很麻烦。因此，这里在<code>Build Environment</code>的地方，打勾<br><code>Executor shell script on remote host using ssh</code>，如下图<br><img src="https://raw.githubusercontent.com/yunair/blog/gh-pages/media/jenkins/change_env.png" alt=""></p>
+<p>在<code>Pre build script</code>的地方，修改你工程中决定使用哪个环境的文件，这里就可以使用最开头的<code>$url_host</code>那个设定的参数。</p>
+<p>当然还有<code>Post build script</code>，需要的话就同样写一段shell来达到你的目的。</p>
+<p>有些情况下，你需要获取这次打包对应的git信息，可以看到，每个打包都有一个Git Build Data，这里面有对应的git信息，所以，勾选<code>inject environment variables to the build process</code>即可将对应的信息添加到这次打包的环境变量中。<br>这个需要<a href="https://wiki.jenkins-ci.org/display/JENKINS/EnvInject+Plugin" target="_blank" rel="external">Environment Injector Plugin</a>插件的支持。<br>这里有个问题，就是<code>Evaluated  Groovy Script</code>脚本的执行过程中，使用正常方式无法获取所有的Jenkins环境变量，那么需要使用<code>currentBuild.getEnvironment(currentListener).get(&#39;var&#39;)</code>来获取var的环境变量。currentBuild和currentListener在Evaluated  Groovy Script右边的<code>?</code>说明里</p>
+<p><img src="https://raw.githubusercontent.com/yunair/blog/gh-pages/media/jenkins/build_env_inject.png" alt=""></p>
+<p>最后，测试人员肯定希望能下载打包完成的APK，那么在最后的<code>Post-build Actions</code>即可实现该需求。</p>
+<p><img src="https://raw.githubusercontent.com/yunair/blog/gh-pages/media/jenkins/post_build_action.png" alt=""></p>
+<p>在<code>Archive the artifacts</code>里面填入打包完成的apk的路径，则Jenkins会以可以下载的形式输出该Apk的链接在对应的打包完成页面。</p>
+<h3 id="打包AAR"><a href="#打包AAR" class="headerlink" title="打包AAR"></a>打包AAR</h3><p>打包AAR和打包APK的需求是不同的，对于AAR的输出，一定希望对开发透明，不需要任何人去点一下build，才去打包AAR，这个时候，我们前面安装的GitLab Plugin就十分有用。有了它，我们可以设定触发打包任务的条件:</p>
+<p><img src="https://raw.githubusercontent.com/yunair/blog/gh-pages/media/jenkins/build_trigger.png" alt=""></p>
+<p>画红线的URL代表  GitLab WebHook需要回调的URL，即GitLab收到某些事件(push, merge request ..etc)，将会调用该URL，此时将会触发打包。在最下面还有个红线，就是指定相应的分支，在这些分支另在GitLab WebHook回调的时候才进行打包，公司的特殊需求即可在这里定制。</p>
+<p>有可能你想流式的打包，也可能你的aar有优先级，换句话说，A aar可能依赖B aar，那么一定要B aar打包完毕后，才能打包A aar，那样的话你就需要下面这个插件<br><a href="https://wiki.jenkins-ci.org/display/JENKINS/Parameterized+Trigger+Plugin" target="_blank" rel="external">Jenkins Parameterized Trigger plugin</a><br>这个插件将前一个打包aar的Build Env传给后一个打包aar的过程中，那样，就拥有一致的Build Env了。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2016/10/11/2016-10-11-Jenkins使用/" data-id="cj3doeu3f000ji6h2nutf1j22" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Jenkins/">Jenkins</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2016/12/03/2016-12-03-OkHttp源码解析-(上)/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          OkHttp源码解析-(上)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2016/05/22/2016-05-22-retrofit2.0源码解析(下)/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Retrofit2源码分析-(下)</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AndFix/">AndFix</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Jenkins/">Jenkins</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/square-okhttp/">square, okhttp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/square-retrofit/">square, retrofit</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/AndFix/" style="font-size: 15px;">AndFix</a> <a href="/tags/Jenkins/" style="font-size: 10px;">Jenkins</a> <a href="/tags/square-okhttp/" style="font-size: 10px;">square, okhttp</a> <a href="/tags/square-retrofit/" style="font-size: 20px;">square, retrofit</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">五月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/03/">三月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">一月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/10/">十月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/09/">九月 2015</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2017/05/31/2017-05-31-AndroidPlugin源码解析(二)/">AndroidPlugin源码解析(二)</a>
+          </li>
+        
+          <li>
+            <a href="/2017/05/30/2017-05-30-AndroidPlugin源码解析(一)/">AndroidPlugin源码解析(一)</a>
+          </li>
+        
+          <li>
+            <a href="/2017/05/29/2017-05-29-AndroidPlugin概述/">Android Plugin 概述</a>
+          </li>
+        
+          <li>
+            <a href="/2017/03/01/2017-03-01-Groovy&Gradle入门/">Groovy &amp; Gradle 入门</a>
+          </li>
+        
+          <li>
+            <a href="/2016/12/10/2016-12-10-OkHttp源码解析-(下)/">OkHttp源码解析-(下)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 Air<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>
