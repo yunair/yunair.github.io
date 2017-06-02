@@ -1,0 +1,1164 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="GroovyGroovy的API文档位于 http://www.groovy-lang.org/api.html 字符串 单引号’’中的内容严格对应Java中的String，不对$符号进行转义  1def singleQuote=&apos;I am $ dolloar&apos;  //输出就是I am $ dolloar  双引号””的内容则和脚本语言的处理有点像，如果字符中有$符的话，则它会$表达式先求值。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Groovy &amp; Gradle 入门">
+<meta property="og:url" content="http://yoursite.com/2017/03/01/Groovy&Gradle入门/index.html">
+<meta property="og:site_name" content="Air Little Place">
+<meta property="og:description" content="GroovyGroovy的API文档位于 http://www.groovy-lang.org/api.html 字符串 单引号’’中的内容严格对应Java中的String，不对$符号进行转义  1def singleQuote=&apos;I am $ dolloar&apos;  //输出就是I am $ dolloar  双引号””的内容则和脚本语言的处理有点像，如果字符中有$符的话，则它会$表达式先求值。">
+<meta property="og:image" content="https://raw.githubusercontent.com/yunair/blog/gh-pages/media/gradle/gradle.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/yunair/blog/gh-pages/media/gradle/apply.png">
+<meta property="og:updated_time" content="2017-06-01T00:14:02.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Groovy &amp; Gradle 入门">
+<meta name="twitter:description" content="GroovyGroovy的API文档位于 http://www.groovy-lang.org/api.html 字符串 单引号’’中的内容严格对应Java中的String，不对$符号进行转义  1def singleQuote=&apos;I am $ dolloar&apos;  //输出就是I am $ dolloar  双引号””的内容则和脚本语言的处理有点像，如果字符中有$符的话，则它会$表达式先求值。">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/yunair/blog/gh-pages/media/gradle/gradle.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+
+
+
+
+  <title>Groovy & Gradle 入门 | Air Little Place</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Air Little Place</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/01/Groovy&Gradle入门/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Air">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Air Little Place">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Groovy & Gradle 入门</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-01T00:00:00+08:00">
+                2017-03-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="Groovy"><a href="#Groovy" class="headerlink" title="Groovy"></a>Groovy</h2><p><strong>Groovy的API文档位于 <a href="http://www.groovy-lang.org/api.html" target="_blank" rel="external">http://www.groovy-lang.org/api.html</a></strong></p>
+<h3 id="字符串"><a href="#字符串" class="headerlink" title="字符串"></a>字符串</h3><ol>
+<li>单引号’’中的内容严格对应Java中的String，不对$符号进行转义</li>
+</ol>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">def</span> singleQuote=<span class="string">'I am $ dolloar'</span>  <span class="comment">//输出就是I am $ dolloar</span></div></pre></td></tr></table></figure>
+<ol>
+<li>双引号””的内容则和脚本语言的处理有点像，如果字符中有<em>$</em>符的话，则它会<strong>$表达式</strong>先求值。</li>
+</ol>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">def</span> doubleQuoteWithoutDollar = <span class="string">"I am one dollar"</span> <span class="comment">//输出 I am one dollar</span></div><div class="line"><span class="keyword">def</span> x = <span class="number">1</span></div><div class="line"><span class="keyword">def</span> doubleQuoteWithDollar = <span class="string">"I am $x dolloar"</span> <span class="comment">//输出I am 1 dolloar</span></div></pre></td></tr></table></figure>
+<h3 id="函数"><a href="#函数" class="headerlink" title="函数"></a>函数</h3><p>调用的时候可以不加括号</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">println(<span class="string">"test"</span>) ----&gt;  println <span class="string">"test"</span></div></pre></td></tr></table></figure>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">def</span> getString()&#123;</div><div class="line">	<span class="comment">//代码的最后一句是返回值</span></div><div class="line">  <span class="string">"Hello World!"</span></div><div class="line">  <span class="comment">// 也可以使用return，和Java中普通函数一样</span></div><div class="line">	<span class="comment">// return "Hello World!"</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="闭包-Closure"><a href="#闭包-Closure" class="headerlink" title="闭包(Closure)"></a>闭包(Closure)</h3><p>是一种数据类型，它代表了一段可执行的代码（类比Java的匿名内部类，可以被称为匿名函数）。其外形如下：</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">def</span> closure = &#123;<span class="comment">//闭包是一段代码，所以需要用花括号括起来..</span></div><div class="line">    String param1, <span class="keyword">int</span> param2</div><div class="line">    -&gt;  <span class="comment">//这个箭头很关键。箭头前面是参数定义，箭头后面是代码</span></div><div class="line">    println <span class="string">"this is codes, $param1, $param2"</span> <span class="comment">//这是代码，最后一句是返回值</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>简而言之，Closure的定义格式是：</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">def</span> closure = &#123;params -&gt; codes&#125;  <span class="comment">// or</span></div><div class="line"><span class="keyword">def</span> closure = &#123;codes&#125;  <span class="comment">// no params ,so  no '-&gt;'</span></div></pre></td></tr></table></figure>
+<p>闭包定义好后，要调用它的方法就是：</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">closure.call(params) </div><div class="line"><span class="comment">// 下面的方式也可以（groovy 的语法糖）</span></div><div class="line">closure(params)</div></pre></td></tr></table></figure>
+<p><strong>如果闭包没定义参数的话，则隐含有一个参数，这个参数名字叫it，和this的作用类似。it代表闭包的参数。</strong></p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">def</span> greeting = &#123; <span class="string">"Hello, $it!"</span> &#125;</div><div class="line"><span class="keyword">assert</span> greeting(<span class="string">'XiaoKa'</span>) == <span class="string">'Hello, XiaoKa!'</span></div></pre></td></tr></table></figure>
+<p><strong>Groovy中，调用函数时可以省略圆括号，当然，对于函数的参数里包含闭包同样适用。</strong></p>
+<p>比如对于下面这个方法</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; List&lt;T&gt; each(List&lt;T&gt; self, Closure closure)</div></pre></td></tr></table></figure>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 就可以如下方式调用</span></div><div class="line"><span class="keyword">def</span> testList = [<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>]  <span class="comment">//定义一个List</span></div><div class="line">testList.each &#123;</div><div class="line">  println it</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这个地方要记得，对于看gradle的代码很有帮助</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">doLast&#123;</div><div class="line">  println <span class="string">'Hello World!'</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>完整代码应该是</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">doLast(&#123;</div><div class="line">  println <span class="string">'Hello World!'</span></div><div class="line">&#125;)</div></pre></td></tr></table></figure>
+<h2 id="Gradle-基于3-2-1版本"><a href="#Gradle-基于3-2-1版本" class="headerlink" title="Gradle (基于3.2.1版本)"></a>Gradle (基于3.2.1版本)</h2><p>Gradle是什么:</p>
+<p><strong>Gradle是一个框架，作为框架，它负责定义流程和规则。而具体的编译工作则是通过插件(Plugin)的方式来完成的。</strong></p>
+<h3 id="Gradle工作流程"><a href="#Gradle工作流程" class="headerlink" title="Gradle工作流程"></a>Gradle工作流程</h3><p><img src="https://raw.githubusercontent.com/yunair/blog/gh-pages/media/gradle/gradle.png" alt="img"></p>
+<p>可以看出，Gradle工作包含三个阶段：</p>
+<ul>
+<li>首先是初始化阶段(Initiliazation phase):对Android项目而言，就是evaluate <code>settings.gradle</code>，并将每个Project内的build.gradle转化为Project对象。</li>
+<li>Configration阶段:配置对应的Project对象，<code>build.gradle</code>中有关build的代码将会被执行。Configuration阶段完了后，整个build的project以及内部的Task关系就确定了。Configuration会建立一个有向图来描述Task之间的依赖关系。</li>
+<li>最后一个阶段就是执行阶段: 我们可以通过给<code>gradle</code>传递相应的命令来执行相应的task。</li>
+</ul>
+<h3 id="写Gradle代码"><a href="#写Gradle代码" class="headerlink" title="写Gradle代码"></a>写Gradle代码</h3><p>Gradle dsl api 文档: <a href="https://docs.gradle.org/current/dsl/" target="_blank" rel="external">https://docs.gradle.org/current/dsl/</a></p>
+<p>Gradle基于Groovy，Groovy又基于Java。所以，Gradle执行的时候和Groovy一样，会把脚本转换成Java对象。<br>Gradle主要有三种对象，这三种对象和三种不同的脚本文件对应，在gradle执行的时候，会将脚本转换成对应的对象：</p>
+<ul>
+<li>Gradle对象：当我们执行gradle xxx或者什么的时候，gradle会从默认的配置脚本中构造出一个Gradle对象。在整个执行过程中，只有这么一个对象。Gradle对象的数据类型就是Gradle。我们一般很少去定制这个默认的配置脚本。</li>
+<li>Project对象：每一个build.gradle会转换成一个Project对象。</li>
+<li>Settings对象：显然，每一个settings.gradle都会转换成一个Settings对象。</li>
+</ul>
+<p>当我们执行gradle的时候，gradle首先是按顺序解析各个gradle文件。这里边就有所谓的顺序问题。这里看一下下面的文档，里面提到的生命周期就是说明这个顺序的。</p>
+<p><strong>Lifecycle</strong></p>
+<p>There is a one-to-one relationship between a Project and a build.gradle file. During build initialisation, Gradle assembles a Project object for each project which is to participate in the build, as follows:</p>
+<ul>
+<li>Create a <a href="https://docs.gradle.org/current/dsl/org.gradle.api.initialization.Settings.html" target="_blank" rel="external"><code>Settings</code></a> instance for the build.</li>
+<li>Evaluate the settings.gradle script, if present, against the <a href="https://docs.gradle.org/current/dsl/org.gradle.api.initialization.Settings.html" target="_blank" rel="external"><code>Settings</code></a> object to configure it.</li>
+<li>Use the configured <a href="https://docs.gradle.org/current/dsl/org.gradle.api.initialization.Settings.html" target="_blank" rel="external"><code>Settings</code></a> object to create the hierarchy of Project instances.</li>
+<li>Finally, evaluate each Project by executing its build.gradle file, if present, against the project. The projects are evaluated in breadth-wise order, such that a project is evaluated before its child projects. This order can be overridden by calling <code>Project.evaluationDependsOnChildren()</code> or by adding an explicit evaluation dependency using <code>Project.evaluationDependsOn(java.lang.String).</code></li>
+</ul>
+<p>Project和<code>build.gradle</code>文件是一一对应的。在build初始化阶段，Gradle为每一个参与Build的project创建一个<code>Project</code>对象。</p>
+<ul>
+<li>为此次build创建一个<code>Settings</code>实例</li>
+<li>Evaluate <code>settings.gradle</code>脚本，如果存在，修改前面<code>Settings</code>实例的属性</li>
+<li>根据前面配置过的<code>Settings</code>实例创建<code>Project</code>实例的关系图</li>
+<li>最后，通过执行它的<code>build.gradle</code>文件来evaluate每个Project。这个evaluate按照广度优先的顺序，这样可以让子Project在父Project之后evaluate。这个顺序也可以修改。</li>
+</ul>
+<h4 id="Project对象"><a href="#Project对象" class="headerlink" title="Project对象"></a>Project对象</h4><p>每一个build.gradle文件都会转换成一个Project对象。在Gradle术语中，Project对象对应的是<strong>Build Script</strong>。</p>
+<p><strong>Build scripts are code</strong></p>
+<p>Project包含若干Tasks。另外，由于Project对应具体的工程，所以需要为Project加载所需要的插件(<code>apply plugin: &#39;xxx&#39;</code>)。其实，一个Project包含多少Task往往是插件决定的。</p>
+<p>所以，在Project中，我们要:</p>
+<ul>
+<li>加载插件。</li>
+<li>配置插件的行为，就相当于设置配置文件</li>
+</ul>
+<p>Project API 文档: </p>
+<p><strong><a href="https://docs.gradle.org/current/javadoc/org/gradle/api/Project.html" target="_blank" rel="external">https://docs.gradle.org/current/javadoc/org/gradle/api/Project.html</a></strong></p>
+<ol>
+<li>加载插件</li>
+</ol>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">apply <span class="string">plugin:</span> <span class="string">'com.android.library'</span>    &lt;==如果是编译Library，则加载此插件</div><div class="line">apply <span class="string">plugin:</span> <span class="string">'com.android.application'</span>  &lt;==如果是编译Android APP，则加载此插件</div></pre></td></tr></table></figure>
+<p>这是每个Android项目都会见到的代码，这个代码调用<code>apply</code>函数，看一下上面的文档，在<code>Method Summary</code>最底部才能看到<code>apply</code>函数，原来是继承自<code>PluginAware</code>接口。</p>
+<p><img src="https://raw.githubusercontent.com/yunair/blog/gh-pages/media/gradle/apply.png" alt="PluginAware apply方法"></p>
+<p>那么，上面那个<code>apply</code>方法是上图所示的第几个方法呢？点击查看详细情况，发现第三个<code>apply</code>函数的解释是:</p>
+<p>The following options are available:</p>
+<ul>
+<li>from: A script to apply. Accepts any path supported by Project.uri(Object).</li>
+<li>plugin: The id or implementation class of the plugin to apply.</li>
+<li>to: The target delegate object or objects. The default is this plugin aware object. Use this to configure objects other than this object.</li>
+</ul>
+<p>除了最常见的<code>apply plugin: &#39;xxx&#39;</code>,我们经常使用的<code>apply from: &#39;xxx&#39;</code>也在此。</p>
+<p><code>apply plugin: &#39;xxx&#39;</code>加载二进制插件，也就是把对应的jar包下载到了本地。至于我们使用的<code>apply from: &#39;xxx&#39;</code>就是加载对应的文件。</p>
+<ol>
+<li>配置属性</li>
+</ol>
+<p>这一点大家只要去看对应plugin的文档即可，文档内提到有哪些属性，则就可以配置哪些属性。</p>
+<p>Gradle官方提供的plugin都可以在这里找到对应的文档（比如我们日常用的plugin: ‘maven’）<br><strong><a href="https://docs.gradle.org/current/userguide/userguide.html" target="_blank" rel="external">https://docs.gradle.org/current/userguide/userguide.html</a></strong></p>
+<p>Android library和application文档见:<br><strong><a href="http://google.github.io/android-gradle-dsl/current/index.html" target="_blank" rel="external">http://google.github.io/android-gradle-dsl/current/index.html</a></strong></p>
+<p>其他的第三方plugin,则直接找他们的文档即可。</p>
+<p>Project 的一些其它说明:</p>
+<h5 id="Extra-属性"><a href="#Extra-属性" class="headerlink" title="Extra 属性"></a>Extra 属性</h5><p>所有额外的属性都需要通过命名空间<code>ext</code>来定义。一旦额外属性被定义了，它可以被所属对象直接访问(读写)(在Project中定义的话，就可以在Project，Task和子Project中访问了)<br>只有初始声明的时候需要命名空间。(当然，如果和其它属性重名还需要全称来指定)</p>
+<p>All extra properties must be defined through the <code>ext</code> namespace. Once an extra property has been defined,<br>it is available directly on the owning object (in the below case the Project, Task, and sub-projects respectively) and<br>can be read and updated. Only the initial declaration that needs to be done via the namespace.</p>
+<p>最后就是查找顺序，放在这里供大家参考，就不翻译了。</p>
+<h5 id="Properties"><a href="#Properties" class="headerlink" title="Properties"></a>Properties</h5><p>A project has 5 property ‘scopes’, which it searches for properties. You can access these properties by name in your build file, or by calling the project’s Project.property(java.lang.String) method. The scopes are:</p>
+<ul>
+<li>The <code>Project</code> object itself. This scope includes any property getters and setters declared by the Project implementation class. For example, Project.getRootProject() is accessible as the rootProject property. The properties of this scope are readable or writable depending on the presence of the corresponding getter or setter method.</li>
+<li>The <code>extra</code> properties of the project. Each project maintains a map of extra properties, which can contain any arbitrary name -&gt; value pair. Once defined, the properties of this scope are readable and writable. See extra properties for more details.</li>
+<li>The <code>extensions</code> added to the project by the plugins. Each extension is available as a read-only property with the same name as the extension.</li>
+<li>The <code>convention</code> properties added to the project by the plugins. A plugin can add properties and methods to a project through the project’s Convention object. The properties of this scope may be readable or writable, depending on the convention objects.</li>
+<li>The tasks of the project. A task is accessible by using its name as a property name. The properties of this scope are read-only. For example, a task called compile is accessible as the compile property.</li>
+<li>The extra properties and convention properties inherited from the project’s parent, recursively up to the root project. The properties of this scope are read-only.<br>When reading a property, the project searches the above scopes in order, and returns the value from the first scope it finds the property in. If not found, an exception is thrown. See Project.property(java.lang.String) for more details.</li>
+</ul>
+<p>When writing a property, the project searches the above scopes in order, and sets the property in the first scope it finds the property in. If not found, an exception is thrown. See Project.setProperty(java.lang.String, java.lang.Object) for more details.</p>
+<h5 id="Dynamic-Methods"><a href="#Dynamic-Methods" class="headerlink" title="Dynamic Methods"></a>Dynamic Methods</h5><p>A project has 5 method ‘scopes’, which it searches for methods:</p>
+<ul>
+<li>The <code>Project</code> object itself.</li>
+<li>The build file. The project searches for a matching method declared in the build file.</li>
+<li>The <code>extensions</code> added to the project by the plugins. Each extension is available as a method which takes a closure or Action as a parameter.</li>
+<li>The <code>convention</code> methods added to the project by the plugins. A plugin can add properties and method to a project through the project’s Convention object.</li>
+<li>The tasks of the project. A method is added for each task, using the name of the task as the method name and taking a single closure or Action parameter. The method calls the Task.configure(groovy.lang.Closure) method for the associated task with the provided closure. For example, if the project has a task called compile, then a method is added with the following signature: void compile(Closure configureClosure).</li>
+<li>The methods of the parent project, recursively up to the root project.</li>
+<li>A property of the project whose value is a closure. The closure is treated as a method and called with the provided parameters. The property is located as described above.</li>
+</ul>
+<p>参考: <a href="http://blog.csdn.net/innost/article/details/48228651" target="_blank" rel="external">深入理解Android之Gradle</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/12/10/OkHttp源码解析-(下)/" rel="next" title="OkHttp源码解析-(下)">
+                <i class="fa fa-chevron-left"></i> OkHttp源码解析-(下)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/05/29/AndroidPlugin概述/" rel="prev" title="Android Plugin 概述">
+                Android Plugin 概述 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="Air" />
+          <p class="site-author-name" itemprop="name">Air</p>
+           
+              <p class="site-description motion-element" itemprop="description">Write Something I Want</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">18</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/yunair" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Groovy"><span class="nav-number">1.</span> <span class="nav-text">Groovy</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#字符串"><span class="nav-number">1.1.</span> <span class="nav-text">字符串</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#函数"><span class="nav-number">1.2.</span> <span class="nav-text">函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#闭包-Closure"><span class="nav-number">1.3.</span> <span class="nav-text">闭包(Closure)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Gradle-基于3-2-1版本"><span class="nav-number">2.</span> <span class="nav-text">Gradle (基于3.2.1版本)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Gradle工作流程"><span class="nav-number">2.1.</span> <span class="nav-text">Gradle工作流程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#写Gradle代码"><span class="nav-number">2.2.</span> <span class="nav-text">写Gradle代码</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Project对象"><span class="nav-number">2.2.1.</span> <span class="nav-text">Project对象</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Extra-属性"><span class="nav-number">2.2.1.1.</span> <span class="nav-text">Extra 属性</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Properties"><span class="nav-number">2.2.1.2.</span> <span class="nav-text">Properties</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Dynamic-Methods"><span class="nav-number">2.2.1.3.</span> <span class="nav-text">Dynamic Methods</span></a></li></ol></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2015 - 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Air</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (search_path.endsWith("json")) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

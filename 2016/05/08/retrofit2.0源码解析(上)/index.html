@@ -1,0 +1,1080 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="square, retrofit," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="前言​    千呼万唤始出来的Retrofit2.0正式版终于出来了，首先我们来看一看 Jake Wharton 的演讲，这次演讲主要讲了1.0版本的好处和问题，以及2.0版本的优势，对于好处，我们在1.0版本的使用过程中相信都已体会过了，在这里我就不重新提了，那么这第一篇就主要讲一下1.0版本的问题，和2.0在设计上是如何解决这些问题的。至于源代码的分析和对比将会放在第二篇中讲。 Retrofi">
+<meta name="keywords" content="square, retrofit">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Retrofit2源码分析-(上)">
+<meta property="og:url" content="http://yoursite.com/2016/05/08/retrofit2.0源码解析(上)/index.html">
+<meta property="og:site_name" content="Air Little Place">
+<meta property="og:description" content="前言​    千呼万唤始出来的Retrofit2.0正式版终于出来了，首先我们来看一看 Jake Wharton 的演讲，这次演讲主要讲了1.0版本的好处和问题，以及2.0版本的优势，对于好处，我们在1.0版本的使用过程中相信都已体会过了，在这里我就不重新提了，那么这第一篇就主要讲一下1.0版本的问题，和2.0在设计上是如何解决这些问题的。至于源代码的分析和对比将会放在第二篇中讲。 Retrofi">
+<meta property="og:updated_time" content="2017-06-01T00:21:10.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Retrofit2源码分析-(上)">
+<meta name="twitter:description" content="前言​    千呼万唤始出来的Retrofit2.0正式版终于出来了，首先我们来看一看 Jake Wharton 的演讲，这次演讲主要讲了1.0版本的好处和问题，以及2.0版本的优势，对于好处，我们在1.0版本的使用过程中相信都已体会过了，在这里我就不重新提了，那么这第一篇就主要讲一下1.0版本的问题，和2.0在设计上是如何解决这些问题的。至于源代码的分析和对比将会放在第二篇中讲。 Retrofi">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+
+
+
+
+  <title>Retrofit2源码分析-(上) | Air Little Place</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Air Little Place</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/05/08/retrofit2.0源码解析(上)/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Air">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Air Little Place">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Retrofit2源码分析-(上)</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-05-08T00:00:00+08:00">
+                2016-05-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>​    千呼万唤始出来的Retrofit2.0正式版终于出来了，首先我们来看一看 Jake Wharton 的演讲，这次演讲主要讲了1.0版本的好处和问题，以及2.0版本的优势，对于好处，我们在1.0版本的使用过程中相信都已体会过了，在这里我就不重新提了，那么这第一篇就主要讲一下1.0版本的问题，和2.0在设计上是如何解决这些问题的。至于源代码的分析和对比将会放在第二篇中讲。</p>
+<h3 id="Retrofit1-问题"><a href="#Retrofit1-问题" class="headerlink" title="Retrofit1 问题"></a>Retrofit1 问题</h3><ul>
+<li>无法同时获取响应返回的原始数据，比如请求头或者请求的URL，和反序列化的响应返回的body。</li>
+<li>如果你写了一个请求，有时同步执行，有时异步执行，你就需要写两个基本一样的请求。（如果使用RxJava可以实现，但是你要知道如何创建Observables）</li>
+<li>converter的工作方式事实上稍微有点低效。</li>
+<li>严重限制了我们把自定义类作为参数加入请求的能力。</li>
+</ul>
+<h3 id="Retrofit2"><a href="#Retrofit2" class="headerlink" title="Retrofit2"></a>Retrofit2</h3><h4 id="Call"><a href="#Call" class="headerlink" title="Call"></a>Call</h4><p>内置和OkHttp的<code>Call</code>类型一样语义的Call类型，不同的是它能做一些额外的事情，比如反序列化对象，相反OkHttp只返回原始的内容给你，这就是Retrofit2实现一个类似的<code>Call</code>而不是用OkHttp中的<code>Call</code>的原因。它是一个请求/响应对，每一个<code>Call</code>实例只能使用一次，它有Java的clone方法来创建新的实例（这个操作很廉价）。另一个巨大的好处是它把同步和异步的执行统一在了一起，这样就解决了Retrofit1中同步请求和异步请求要写两个的问题，同时，它可以被取消，这个是Retrofit1中不存在的特性。接下来我们看一下它的使用:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">interface</span> <span class="title">GitHubService</span> </span>&#123;</div><div class="line">	<span class="meta">@GET</span>(<span class="string">"/repos/&#123;owner&#125;/&#123;repo&#125;/contributors"</span>)</div><div class="line">	Call&lt;List&lt;Contributor&gt;&gt; repoContributors(</div><div class="line">  	<span class="meta">@Path</span>(<span class="string">"owner"</span>) String owner,</div><div class="line">  	<span class="meta">@Path</span>(<span class="string">"repo"</span>) String repo);</div><div class="line">	&#125;</div><div class="line">	Call&lt;List&lt;Contributor&gt;&gt; call =</div><div class="line">	gitHubService.repoContributors(<span class="string">"square"</span>, <span class="string">"retrofit"</span>)</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<h4 id="参数化Response对象"><a href="#参数化Response对象" class="headerlink" title="参数化Response对象"></a>参数化Response对象</h4><p>通过Response，你可以获取请求的元数据，包括 response code, message, 和headers。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Response</span>&lt;<span class="title">T</span>&gt; </span>&#123;</div><div class="line">  <span class="function"><span class="keyword">int</span> <span class="title">code</span><span class="params">()</span></span>;</div><div class="line">  <span class="function">String <span class="title">message</span><span class="params">()</span></span>;</div><div class="line">  <span class="function">Headers <span class="title">headers</span><span class="params">()</span></span>;</div><div class="line"></div><div class="line">  <span class="function"><span class="keyword">boolean</span> <span class="title">isSuccess</span><span class="params">()</span></span>; </div><div class="line">  <span class="function">T <span class="title">body</span><span class="params">()</span></span>;</div><div class="line">  <span class="function">ResponseBody <span class="title">errorBody</span><span class="params">()</span></span>; </div><div class="line">  com.squareup.okhttp.<span class="function">Response <span class="title">raw</span><span class="params">()</span></span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>只有响应的Http code是200的情况下才会进行反序列化。如果响            应没有成功，我们不知道响应是什么类型。将回返回<code>ResponseBody</code>类型，它将Content-Type，Content-Length，还有原始的body进行了封装，让你可以对响应做出想要的处理。</p>
+<h4 id="动态URL参数"><a href="#动态URL参数" class="headerlink" title="动态URL参数"></a>动态URL参数</h4><p>有这样一种情况，请求列表的时候通常都要给服务端传入page，告诉服务端你要第几页数据，如果服务端将page相关的信息放在了响应头中，比如下一页page是什么，总共有几页等等，甚至服务端返回你接下来需要请求的URL。例如Github的API，Retrofit1很难处理这种情况。我们有一个新的<code>@Url</code>注解，允许你在参数中传入Url。如下所示:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@GET</span></div><div class="line">Call&lt;List&lt;Contributor&gt;&gt; repoContributorsPaginate(</div><div class="line">      <span class="meta">@Url</span> String url);</div></pre></td></tr></table></figure>
+<h4 id="多样的，高效的Converters"><a href="#多样的，高效的Converters" class="headerlink" title="多样的，高效的Converters"></a>多样的，高效的Converters</h4><p>Retrofit1有一个Converter的问题，当然，对于大多数人来说这都不算是问题，但对于一个库来说，它就成了问题。考虑下面一种场景，服务端有两套API，只是返回值的类型不同，比如一个返回json，一个返回xml，可能是如下的url:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@GET</span>(<span class="string">"/some/xml/endpoint"</span>)</div><div class="line"><span class="meta">@GET</span>(<span class="string">"/some/json/endpoint"</span>)</div></pre></td></tr></table></figure>
+<p>在Retrofit1中，你不得不定义两个接口，初始化两个<code>RestAdapter</code>，因为它只有一个Converter，每一个Converter和一个<code>RestAdapter</code>绑定在一起，但是，我们认为这些操作同属于一组API，而不是分离的API，所以，API的返回类型不应该成为你组织<code>Service</code>的方式。</p>
+<p>我们会按你添加的顺序来一个个的问Converter是否可以序列化该返回值，如果它的回答是yes，那么就交给该Converter来序列化返回值。</p>
+<p>两点需要注意的地方:</p>
+<ul>
+<li>由于JSON没有任何要求或者限制，所以我们无法知道它是否可以被JSON Converter序列化，所以JSON Converter永远会回答yes，在这种情况下，JSON Converter应该是你添加的最后一个Converter。</li>
+<li>和Retrofit1不同的是，Retrofit2本身提供内置的Converter，但是只是提供了三种基础的Converter，像Json之类的Converter不会内置，所以你需要明确的声明你所用的Converter。当然，我们提供了一些Converter，但是你需要把这些Converter作为独立的依赖加入项目中。</li>
+</ul>
+<h4 id="多种多样插件形式的执行机制"><a href="#多种多样插件形式的执行机制" class="headerlink" title="多种多样插件形式的执行机制"></a>多种多样插件形式的执行机制</h4><p>之前，我们只有死板的执行机制。现在我们把它弄成了插件形式的，它的工作方式和Covnerter类似。<br>你可以加入你自己的方式，或者选择一个我们提供的已有的方式，我们依旧提供RxJava这个执行方式，但是它和Retrofit2库分离，需要单独的引入。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">interface</span> <span class="title">GitHubService</span> </span>&#123;</div><div class="line">  <span class="meta">@GET</span>(<span class="string">"/repos/&#123;owner&#125;/&#123;repo&#125;/contributors"</span>)</div><div class="line">  Call&lt;List&lt;Contributor&gt;&gt; repoContributors(..);</div><div class="line"></div><div class="line">  <span class="meta">@GET</span>(<span class="string">"/repos/&#123;owner&#125;/&#123;repo&#125;/contributors"</span>)</div><div class="line">  Observable&lt;List&lt;Contributor&gt;&gt; repoContributors2(..);</div><div class="line"></div><div class="line">  <span class="meta">@GET</span>(<span class="string">"/repos/&#123;owner&#125;/&#123;repo&#125;/contributors"</span>)</div><div class="line">  Future&lt;List&lt;Contributor&gt;&gt; repoContributors3(..);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>我们单纯的查看返回类型，对于第一个函数来说，我们对执行机制的询问过程是这样的。<code>call —&gt; RxJava? No! —&gt; Call? Yes!</code></p>
+<p>对于第三个Future,将会抛出一个异常，因为你没有加入你的执行机制，导致了执行机制无法执行。该过程是<code>Future —&gt; RxJava? No! —&gt; Call? No! —&gt; Throw!</code>。如果你想添加自己的执行机制，只要在初始化Retrofit对象的时候使用<code>addCallAdapterFactory()</code>，添加你自己的执行机制即可。</p>
+<p>这个执行机制(Execution Mechanism)翻译到中文不是很合适，按我的理解，这个所谓的执行方式，就是生成的函数有个默认的返回值，但是返回值类型不一定是你需要的，所以，使用这个对象将生成函数的返回值转化成你需要的类型。</p>
+<h4 id="由OkHttp提供底层技术支持"><a href="#由OkHttp提供底层技术支持" class="headerlink" title="由OkHttp提供底层技术支持"></a>由OkHttp提供底层技术支持</h4><p>就是说引入Retrofit2会默认引入OkHttp到你的项目中。</p>
+<h4 id="极好的效率（这个我没找到相应的测试，只是Jake-Wharton在演讲中提到了）"><a href="#极好的效率（这个我没找到相应的测试，只是Jake-Wharton在演讲中提到了）" class="headerlink" title="极好的效率（这个我没找到相应的测试，只是Jake Wharton在演讲中提到了）"></a>极好的效率（这个我没找到相应的测试，只是Jake Wharton在演讲中提到了）</h4>
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/square-retrofit/" rel="tag"># square, retrofit</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/03/06/Android管理任务栈之——launchMode/" rel="next" title="Android管理任务栈之——launchMode">
+                <i class="fa fa-chevron-left"></i> Android管理任务栈之——launchMode
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/05/22/retrofit2.0源码解析(下)/" rel="prev" title="Retrofit2源码分析-(下)">
+                Retrofit2源码分析-(下) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="Air" />
+          <p class="site-author-name" itemprop="name">Air</p>
+           
+              <p class="site-description motion-element" itemprop="description">Write Something I Want</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">18</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/yunair" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Retrofit1-问题"><span class="nav-number">2.</span> <span class="nav-text">Retrofit1 问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Retrofit2"><span class="nav-number">3.</span> <span class="nav-text">Retrofit2</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Call"><span class="nav-number">3.1.</span> <span class="nav-text">Call</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#参数化Response对象"><span class="nav-number">3.2.</span> <span class="nav-text">参数化Response对象</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#动态URL参数"><span class="nav-number">3.3.</span> <span class="nav-text">动态URL参数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#多样的，高效的Converters"><span class="nav-number">3.4.</span> <span class="nav-text">多样的，高效的Converters</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#多种多样插件形式的执行机制"><span class="nav-number">3.5.</span> <span class="nav-text">多种多样插件形式的执行机制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#由OkHttp提供底层技术支持"><span class="nav-number">3.6.</span> <span class="nav-text">由OkHttp提供底层技术支持</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#极好的效率（这个我没找到相应的测试，只是Jake-Wharton在演讲中提到了）"><span class="nav-number">3.7.</span> <span class="nav-text">极好的效率（这个我没找到相应的测试，只是Jake Wharton在演讲中提到了）</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2015 - 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Air</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (search_path.endsWith("json")) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

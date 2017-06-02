@@ -1,0 +1,1416 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="AndFix," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="我们接着分析阿里开源的AndFix库，上次留下了三个坑，一个方法，两个类，不知道你们是否想急切了解呢？loadPatch()方法和AndFixManager和Patch类。 分析loadPatch()方法的时候离不开AndFixManager这个类，所以，我会在分析loadPatch()方法的时候分析AndFixManager这个类。Patch类相当于一个容器，把修复bug所需的信息放在其中，Pa">
+<meta name="keywords" content="AndFix">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AndFix解析——(中)">
+<meta property="og:url" content="http://yoursite.com/2015/10/10/AndFix-解析(中)/index.html">
+<meta property="og:site_name" content="Air Little Place">
+<meta property="og:description" content="我们接着分析阿里开源的AndFix库，上次留下了三个坑，一个方法，两个类，不知道你们是否想急切了解呢？loadPatch()方法和AndFixManager和Patch类。 分析loadPatch()方法的时候离不开AndFixManager这个类，所以，我会在分析loadPatch()方法的时候分析AndFixManager这个类。Patch类相当于一个容器，把修复bug所需的信息放在其中，Pa">
+<meta property="og:updated_time" content="2017-06-01T00:10:22.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="AndFix解析——(中)">
+<meta name="twitter:description" content="我们接着分析阿里开源的AndFix库，上次留下了三个坑，一个方法，两个类，不知道你们是否想急切了解呢？loadPatch()方法和AndFixManager和Patch类。 分析loadPatch()方法的时候离不开AndFixManager这个类，所以，我会在分析loadPatch()方法的时候分析AndFixManager这个类。Patch类相当于一个容器，把修复bug所需的信息放在其中，Pa">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+
+
+
+
+  <title>AndFix解析——(中) | Air Little Place</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Air Little Place</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2015/10/10/AndFix-解析(中)/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Air">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Air Little Place">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">AndFix解析——(中)</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2015-10-10T00:00:00+08:00">
+                2015-10-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>我们接着分析阿里开源的AndFix库，上次留下了三个坑，一个方法，两个类，不知道你们是否想急切了解呢？<br><code>loadPatch()</code>方法和<code>AndFixManager</code>和<code>Patch</code>类。</p>
+<p>分析<code>loadPatch()</code>方法的时候离不开<code>AndFixManager</code>这个类，所以，我会在分析<code>loadPatch()</code>方法的时候分析<code>AndFixManager</code>这个类。<br><code>Patch</code>类相当于一个容器，把修复bug所需的信息放在其中，<code>Patch</code>类相对来说比较独立，不需要牵扯到另外两个坑，所以，就先把这个坑埋了。</p>
+<p>要分析<code>Patch</code>类，就不能不分析阿里提供的打包.apatch的工具<code>apkpatch-1.0.2.jar</code>，<code>Patch</code>获取的信息其实就是<code>apkpatch</code>打包时放入其中的信息。<br>我下面对<code>apkpatch.jar</code>的分析以这个版本的源码为准。</p>
+<p>分析源码，那些try-catch-finally和逻辑无关，所以，我会把这些代码从源码中删掉的，除非有提示用户的操作</p>
+<p>我们先来看看<code>Patch</code>类</p>
+<h3 id="class-Patch"><a href="#class-Patch" class="headerlink" title="class Patch"></a>class Patch</h3><p>从前一篇的分析中，我们看到调用了<code>Patch</code>的构造函数，那我们就从构造函数开始看。</p>
+<h4 id="Patch-Constructor"><a href="#Patch-Constructor" class="headerlink" title="Patch Constructor"></a>Patch Constructor</h4><pre><code class="java"><span class="function"><span class="keyword">public</span> <span class="title">Patch</span><span class="params">(File file)</span> <span class="keyword">throws</span> IOException </span>{
+    <span class="keyword">this</span>.mFile = file;
+    <span class="keyword">this</span>.init();
+}
+</code></pre>
+<h4 id="Patch-init"><a href="#Patch-init" class="headerlink" title="Patch init()"></a>Patch init()</h4><p>将传入的文件保存在类变量中，并调用<code>init()</code>函数，那么<code>init()</code>函数干什么呢？<br>代码里异常和清理的代码我给删掉了，毕竟，这和我们对源码的分析关系不大，那么我们看一下剩下的代码</p>
+<pre><code class="java"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">()</span></span>{
+    JarFile jarFile = <span class="keyword">new</span> JarFile(<span class="keyword">this</span>.mFile);
+    JarEntry entry = jarFile.getJarEntry(ENTRY_NAME);
+    InputStream inputStream = jarFile.getInputStream(entry);
+    Manifest manifest = <span class="keyword">new</span> Manifest(inputStream);
+    Attributes main = manifest.getMainAttributes();
+    <span class="keyword">this</span>.mName = main.getValue(PATCH_NAME);
+    <span class="keyword">this</span>.mTime = <span class="keyword">new</span> Date(main.getValue(CREATED_TIME));
+    <span class="keyword">this</span>.mClassesMap = <span class="keyword">new</span> HashMap();
+    Iterator it = main.keySet().iterator();
+
+    <span class="keyword">while</span>(it.hasNext()) {
+        Name attrName = (Name)it.next();
+        String name = attrName.toString();
+        <span class="keyword">if</span>(name.endsWith(CLASSES)) {
+            List strings = Arrays.asList(main.getValue(attrName).split(<span class="string">","</span>));
+            <span class="keyword">if</span>(name.equalsIgnoreCase(PATCH_CLASSES)) {
+                <span class="keyword">this</span>.mClassesMap.put(<span class="keyword">this</span>.mName, strings);
+            } <span class="keyword">else</span> {
+                <span class="keyword">this</span>.mClassesMap.put(name.trim().substring(<span class="number">0</span>, name.length() - <span class="number">8</span>), strings);
+            }
+        }
+    }
+}
+</code></pre>
+<p>先分析上面的代码，通过JarFile, JarEntry, Manifest, Attributes一层层的获取jar文件中值，并放入对应的类变量中<br>这些值是从哪里来的呢？是从生成这个.apatch文件的时候写入的，即<code>apkpatch.jar</code>文件中写入的。<br>虽然这个文件后缀名是apatch，不是jar，但是它生成的时候是使用Attributes，Manifest，jarEntry将数据写入的，<br>其实依旧是jar格式，修改了扩展名而已</p>
+<p>上面的那些常量都是什么呢，我们来看看这个类的类变量，就是一些对应的字符串。</p>
+<pre><code class="java"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String ENTRY_NAME = <span class="string">"META-INF/PATCH.MF"</span>;
+<span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String CLASSES = <span class="string">"-Classes"</span>;
+<span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String PATCH_CLASSES = <span class="string">"Patch-Classes"</span>;
+<span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String CREATED_TIME = <span class="string">"Created-Time"</span>;
+<span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String PATCH_NAME = <span class="string">"Patch-Name"</span>;
+<span class="keyword">private</span> <span class="keyword">final</span> File mFile;
+<span class="keyword">private</span> String mName;
+<span class="keyword">private</span> Date mTime;
+<span class="keyword">private</span> Map&lt;String, List&lt;String&gt;&gt; mClassesMap;
+</code></pre>
+<p>看完了Patch类，是不是还一头雾水呢, 其他的好理解， mClassesMap里面的各种类名是从哪里来，里面的类作用又是什么呢？<br>这里，我们就需要进入<code>apkpatch.jar</code>一探究竟。</p>
+<h3 id="apkpatch-jar"><a href="#apkpatch-jar" class="headerlink" title="apkpatch.jar"></a>apkpatch.jar</h3><p>对于Jar文件，我们可以使用<code>jd-gui</code>文件打开，阿里这里并没有对这个jar文件加密，所以我们可以直接看，对于Jar文件，我们从<code>Main()</code>方法开始看起。<br>在<code>package com.euler.patch;</code>里面，有一个<code>Main</code>类，其中有那个我们常见的<code>main()</code>方法，那么我们就进入看一看。<br>代码比较长，我们一段一段来看</p>
+<h4 id="Main-Main"><a href="#Main-Main" class="headerlink" title="Main Main()"></a>Main Main()</h4><pre><code class="java"><span class="comment">//CommandLineParser，CommandLine， Option, Options，OptionBuilder,  PosixParser等等类都是</span>
+<span class="comment">//org.apache.commons.cli这个包中的类，负责解析命令行传给程序的参数，所以下面的很多内容应该就不用我过多解释了</span>
+CommandLineParser parser = <span class="keyword">new</span> PosixParser();
+CommandLine commandLine = <span class="keyword">null</span>;
+<span class="comment">//option()方法就是将命令行需要解析的参数加入其中，有三种解析方式</span>
+<span class="comment">//private static final Options allOptions = new Options();</span>
+<span class="comment">//private static final Options patchOptions = new Options();</span>
+<span class="comment">//private static final Options mergeOptions = new Options();</span>
+option();
+<span class="keyword">try</span> {
+  commandLine = parser.parse(allOptions, args);
+} <span class="keyword">catch</span> (ParseException e) {
+  System.err.println(e.getMessage());
+  <span class="comment">//提示用户如何使用这个jar包</span>
+  usage(commandLine);
+  <span class="keyword">return</span>;
+}
+
+<span class="keyword">if</span> ((!commandLine.hasOption(<span class="string">'k'</span>)) &amp;&amp; (!commandLine.hasOption(<span class="string">"keystore"</span>))) {
+  usage(commandLine);
+  <span class="keyword">return</span>;
+}
+<span class="keyword">if</span> ((!commandLine.hasOption(<span class="string">'p'</span>)) &amp;&amp; (!commandLine.hasOption(<span class="string">"kpassword"</span>))) {
+  usage(commandLine);
+  <span class="keyword">return</span>;
+}
+<span class="keyword">if</span> ((!commandLine.hasOption(<span class="string">'a'</span>)) &amp;&amp; (!commandLine.hasOption(<span class="string">"alias"</span>))) {
+  usage(commandLine);
+  <span class="keyword">return</span>;
+}
+<span class="keyword">if</span> ((!commandLine.hasOption(<span class="string">'e'</span>)) &amp;&amp; (!commandLine.hasOption(<span class="string">"epassword"</span>))) {
+  usage(commandLine);
+  <span class="keyword">return</span>;
+}
+</code></pre>
+<p>这一部分主要是查看命令行是否有那些参数，如果没有要求的参数，则提示用户需要哪些参数。</p>
+<p>接下来注意一下你下载<code>apkpatch</code>这个文件的时间，根据github的历史提交记录，如果你2015年10月以后下载的，可以忽视掉这个提醒，如果你是10月之前下载的那个工具，建议你更新一下这个工具，否则可能会导致<code>-o</code>所在的文件夹被清空。</p>
+<p>好了，提醒完了，我们继续</p>
+<pre><code class="java">String keystore = commandLine.getOptionValue(<span class="string">'k'</span>);
+String password = commandLine.getOptionValue(<span class="string">'p'</span>);
+String alias = commandLine.getOptionValue(<span class="string">'a'</span>);
+String entry = commandLine.getOptionValue(<span class="string">'e'</span>);
+String name = <span class="string">"main"</span>;
+<span class="keyword">if</span> ((commandLine.hasOption(<span class="string">'n'</span>)) || (commandLine.hasOption(<span class="string">"name"</span>))){
+  name = commandLine.getOptionValue(<span class="string">'n'</span>);
+}
+</code></pre>
+<p>对于我们的release版应用来说，我们会指定<code>storeFile， storePassword, keyAlias, keyPassword</code>,<br>这些即是上面<code>keystore, password, alias, entry</code>对应的值。至于name，这是最后生成的文件的名称，基本可以不用管。</p>
+<p>下面，我们看一下<code>main()</code>函数中最后的一个if-else</p>
+<pre><code class="java"><span class="keyword">if</span> ((commandLine.hasOption(<span class="string">'m'</span>)) || (commandLine.hasOption(<span class="string">"merge"</span>))) {
+    String[] merges = commandLine.getOptionValues(<span class="string">'m'</span>);
+    File[] files = <span class="keyword">new</span> File[merges.length];
+    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; merges.length; i++) {
+      files[i] = <span class="keyword">new</span> File(merges[i]);
+    }
+    MergePatch mergePatch = <span class="keyword">new</span> MergePatch(files, name, out, keystore,
+      password, alias, entry);
+    mergePatch.doMerge();
+} <span class="keyword">else</span> {
+    <span class="keyword">if</span> ((!commandLine.hasOption(<span class="string">'f'</span>)) &amp;&amp; (!commandLine.hasOption(<span class="string">"from"</span>))) {
+      usage(commandLine);
+      <span class="keyword">return</span>;
+    }
+    <span class="keyword">if</span> ((!commandLine.hasOption(<span class="string">'t'</span>)) &amp;&amp; (!commandLine.hasOption(<span class="string">"to"</span>))) {
+      usage(commandLine);
+      <span class="keyword">return</span>;
+    }
+
+    File from = <span class="keyword">new</span> File(commandLine.getOptionValue(<span class="string">"f"</span>));
+    File to = <span class="keyword">new</span> File(commandLine.getOptionValue(<span class="string">'t'</span>));
+    <span class="keyword">if</span> ((!commandLine.hasOption(<span class="string">'n'</span>)) &amp;&amp; (!commandLine.hasOption(<span class="string">"name"</span>))) {
+      name = from.getName().split(<span class="string">"\\."</span>)[<span class="number">0</span>];
+}
+</code></pre>
+<p>在此，我选择不分析<code>MergePatch</code>这个部分，毕竟，你只有先生成了，后面才可能需要做merge操作。<br>from指修复bug后的apk，to指之前有bug的apk。所以这部分的分析就结束了。</p>
+<p><code>main()</code>函数里最后一部分内容</p>
+<pre><code class="java">ApkPatch apkPatch = <span class="keyword">new</span> ApkPatch(from, to, name, out, keystore,
+  password, alias, entry);
+apkPatch.doPatch();
+</code></pre>
+<p>将那些参数传给ApkPatch去初始化，然后调用<code>doPatch()</code>方法</p>
+<h4 id="ApkPatch"><a href="#ApkPatch" class="headerlink" title="ApkPatch"></a>ApkPatch</h4><h5 id="ApkPatch-Constructor"><a href="#ApkPatch-Constructor" class="headerlink" title="ApkPatch Constructor"></a>ApkPatch Constructor</h5><p>我们一步步来看，首先是调用构造函数</p>
+<pre><code class="java"><span class="function"><span class="keyword">public</span> <span class="title">ApkPatch</span><span class="params">(File from, File to, String name, File out, String keystore, String password, String alias, String entry)</span></span>{
+    <span class="keyword">super</span>(name, out, keystore, password, alias, entry);
+    <span class="keyword">this</span>.from = from;
+    <span class="keyword">this</span>.to = to;
+}
+</code></pre>
+<p>这些代码大家都经常写了，我们跟着进入看看父类的构造函数做了什么，</p>
+<h4 id="Build"><a href="#Build" class="headerlink" title="Build"></a>Build</h4><h5 id="Build-Constructor"><a href="#Build-Constructor" class="headerlink" title="Build Constructor"></a>Build Constructor</h5><p><code>public class ApkPatch extends Build</code> ApkPatch的函数头，说明它是<code>Build</code>类的子类</p>
+<pre><code class="java"><span class="function"><span class="keyword">public</span> <span class="title">Build</span><span class="params">(String name, File out, String keystore, String password, String alias, String entry)</span>
+</span>{
+    <span class="keyword">this</span>.name = name;
+    <span class="keyword">this</span>.out = out;
+    <span class="keyword">this</span>.keystore = keystore;
+    <span class="keyword">this</span>.password = password;
+    <span class="keyword">this</span>.alias = alias;
+    <span class="keyword">this</span>.entry = entry;
+    <span class="keyword">if</span> (!out.exists())
+      out.mkdirs();
+    <span class="keyword">else</span> <span class="keyword">if</span> (!out.isDirectory())
+      <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">"output path must be directory."</span>);
+    <span class="keyword">try</span>{
+      FileUtils.cleanDirectory(out);
+    } <span class="keyword">catch</span> (IOException e) {
+      <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(e);
+    }
+}
+</code></pre>
+<p>在这里，看到了我之前提到的<code>-o</code>操作的问题，会清空那个文件夹内的内容。</p>
+<p>好了，我们接下来就可以看看最后一个方法，<code>doPatch()</code>方法了。</p>
+<h5 id="ApkPatch-doPatch"><a href="#ApkPatch-doPatch" class="headerlink" title="ApkPatch doPatch()"></a>ApkPatch doPatch()</h5><pre><code class="java"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doPatch</span><span class="params">()</span> </span>{
+    File smaliDir = <span class="keyword">new</span> File(<span class="keyword">this</span>.out, <span class="string">"smali"</span>);
+    smaliDir.mkdir();
+
+    File dexFile = <span class="keyword">new</span> File(<span class="keyword">this</span>.out, <span class="string">"diff.dex"</span>);
+    File outFile = <span class="keyword">new</span> File(<span class="keyword">this</span>.out, <span class="string">"diff.apatch"</span>);
+    <span class="comment">//DiffInfo是一个容器类，主要保存了新加的和修改的 类，方法和字段。</span>
+    DiffInfo info = <span class="keyword">new</span> DexDiffer().diff(<span class="keyword">this</span>.from, <span class="keyword">this</span>.to);
+
+    <span class="keyword">this</span>.classes = buildCode(smaliDir, dexFile, info);
+
+    build(outFile, dexFile);
+
+    release(<span class="keyword">this</span>.out, dexFile, outFile);
+}
+</code></pre>
+<p>在out文件夹内生成了一个<code>smali</code>文件夹，还有<code>diff.dex</code>, <code>diff.apatch</code>文件。<br>看到diff()方法，应该能想到就是比较两个文件的不同，所以DiffInfo就是储存两个文件不同的一个容器类，<br>由于篇幅原因，这里就不深入其中了，有兴趣的同学可以深入其中看一下。</p>
+<p>但是，在这个<code>diff()</code>方法中，有一个重要的问题需要大家注意，就是其中只针对<code>classes.dex</code>做了diff，如果你使用了Google的Multidex，那么结果就是你其它dex文件中的任何bug，依旧无法修复，因为这个生成的<code>DiffInfo</code>中没有其它dex的信息，这个时候就需要大家使用JavaAssist之类的工具修改阿里的这个jar文件，然后达到你自己的修复非<code>classes.dex</code>文件中bug的目的，问题出在<code>DexFileFactory.class</code>类中。</p>
+<p>接下来，我们可以看到调用了三个方法，<code>buildCode(smaliDir, dexFile, info);</code><br><code>build(outFile, dexFile);``release(this.out, dexFile, outFile);</code><br>一个个的跟进去看一看。</p>
+<h5 id="ApkPatch-buildCode-smaliDir-dexFile-info"><a href="#ApkPatch-buildCode-smaliDir-dexFile-info" class="headerlink" title="ApkPatch buildCode(smaliDir, dexFile, info)"></a>ApkPatch buildCode(smaliDir, dexFile, info)</h5><pre><code class="java"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> Set&lt;String&gt; <span class="title">buildCode</span><span class="params">(File smaliDir, File dexFile, DiffInfo info)</span>
+    <span class="keyword">throws</span> IOException, RecognitionException, FileNotFoundException</span>{
+    Set classes = <span class="keyword">new</span> HashSet();
+    Set list = <span class="keyword">new</span> HashSet();
+    <span class="comment">//从这里可以看出，list保存了DiffInfo容器中的新添加的classes和被修改过的classes</span>
+    list.addAll(info.getAddedClasses());
+    list.addAll(info.getModifiedClasses());
+
+    baksmaliOptions options = <span class="keyword">new</span> baksmaliOptions();
+
+    options.deodex = <span class="keyword">false</span>;
+    options.noParameterRegisters = <span class="keyword">false</span>;
+    options.useLocalsDirective = <span class="keyword">true</span>;
+    options.useSequentialLabels = <span class="keyword">true</span>;
+    options.outputDebugInfo = <span class="keyword">true</span>;
+    options.addCodeOffsets = <span class="keyword">false</span>;
+    options.jobs = -<span class="number">1</span>;
+    options.noAccessorComments = <span class="keyword">false</span>;
+    options.registerInfo = <span class="number">0</span>;
+    options.ignoreErrors = <span class="keyword">false</span>;
+    options.inlineResolver = <span class="keyword">null</span>;
+    options.checkPackagePrivateAccess = <span class="keyword">false</span>;
+    <span class="keyword">if</span> (!options.noAccessorComments) {
+      options.syntheticAccessorResolver = <span class="keyword">new</span> SyntheticAccessorResolver(list);
+    }
+    ClassFileNameHandler outFileNameHandler = <span class="keyword">new</span> ClassFileNameHandler(
+      smaliDir, <span class="string">".smali"</span>);
+    ClassFileNameHandler inFileNameHandler = <span class="keyword">new</span> ClassFileNameHandler(
+      smaliDir, <span class="string">".smali"</span>);
+    DexBuilder dexBuilder = DexBuilder.makeDexBuilder();
+
+    <span class="keyword">for</span> (DexBackedClassDef classDef : list) {
+      String className = classDef.getType();
+      <span class="comment">//将相关的类信息写入outFileNameHandler</span>
+      baksmali.disassembleClass(classDef, outFileNameHandler, options);
+      File smaliFile = inFileNameHandler.getUniqueFilenameForClass(
+        TypeGenUtil.newType(className));
+      classes.add(TypeGenUtil.newType(className)
+        .substring(<span class="number">1</span>, TypeGenUtil.newType(className).length() - <span class="number">1</span>)
+        .replace(<span class="string">'/'</span>, <span class="string">'.'</span>));
+      SmaliMod.assembleSmaliFile(smaliFile, dexBuilder, <span class="keyword">true</span>, <span class="keyword">true</span>);
+    }
+    dexBuilder.writeTo(<span class="keyword">new</span> FileDataStore(dexFile));
+
+    <span class="keyword">return</span> classes;
+}
+</code></pre>
+<p>看到baksmali，反编译过apk的同学一定不陌生，这就是dex的打包工具，还有对应的解包工具smali，就到这里，这方面不继续深入了。<br>如果想深入了解dex打包解包工具的源码，参见<a href="http://sunzeduo.blog.51cto.com/2758509/1540085" target="_blank" rel="external">This Blog</a></p>
+<p>可以看到，这个方法的返回值将DiffInfo中新添加的classes和修改过的classes做了一个重命名，然后保存了起来，同时，将相关内容写入smali文件中。<br>这个重命名是一个怎样的重命名呢，看一下生成的smali文件夹里任意一个smali文件，我就拿Demo里的<code>MainActivity.smali</code>来说明<br>这个类在文件中的类名是<code>Lcom/euler/andfix/MainActivity;</code>，看到这个名字，再看下面这个方法就很清晰了</p>
+<pre><code class="java">classes.add(TypeGenUtil.newType(className)
+.substring(<span class="number">1</span>, TypeGenUtil.newType(className).length() - <span class="number">1</span>)
+.replace(<span class="string">'/'</span>, <span class="string">'.'</span>));
+</code></pre>
+<p>就是把<code>Lcom/euler/andfix/MainActivity;</code>替换成<code>com.euler.andfix.MainActivity_CF;</code><br>那个_CF哪里来的呢，就是那个<code>TypeGenUtil</code>类做的操作了。<br>这个类就一个方法，该方法进对String进行了操作，我们来看一看源码</p>
+<pre><code class="java"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> String <span class="title">newType</span><span class="params">(String type)</span></span>{
+    <span class="keyword">return</span> type.substring(<span class="number">0</span>, type.length() - <span class="number">1</span>) + <span class="string">"_CF;"</span>;
+}
+</code></pre>
+<p>可以看到，去掉了类名多余的那个’;’，然后在后面加了个_CF后缀。重命名应该是为了不合之前安装的dex文件的名字冲突。</p>
+<p>(new FileDataStore(file) 作用就是清空file里的内容)<br>最后，将dexFile文件清空，把dexBuilder的内容写入其中。</p>
+<p>到这里，<code>buildCode(smaliDir, dexFile, info)</code>方法就结束了, 看看下一个方法<code>build(outFile, dexFile);</code></p>
+<h5 id="ApkPatch-build-outFile-dexFile"><a href="#ApkPatch-build-outFile-dexFile" class="headerlink" title="ApkPatch build(outFile, dexFile)"></a>ApkPatch build(outFile, dexFile)</h5><p>上一个方法已经把内容填充到dexFile内了，我们来看看它的源码。</p>
+<pre><code class="java"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">build</span><span class="params">(File outFile, File dexFile)</span>
+    <span class="keyword">throws</span> KeyStoreException, FileNotFoundException, IOException, NoSuchAlgorithmException, CertificateException, UnrecoverableEntryException</span>{
+    <span class="comment">//获取应用签名相关信息</span>
+    KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+    KeyStore.PrivateKeyEntry privateKeyEntry = <span class="keyword">null</span>;
+    InputStream is = <span class="keyword">new</span> FileInputStream(<span class="keyword">this</span>.keystore);
+    keyStore.load(is, <span class="keyword">this</span>.password.toCharArray());
+    privateKeyEntry = (KeyStore.PrivateKeyEntry)keyStore.getEntry(<span class="keyword">this</span>.alias,
+      <span class="keyword">new</span> KeyStore.PasswordProtection(<span class="keyword">this</span>.entry.toCharArray()));
+
+    PatchBuilder builder = <span class="keyword">new</span> PatchBuilder(outFile, dexFile,
+      privateKeyEntry, System.out);
+
+    <span class="comment">//将getMeta()中获取的Manifest内容写入"META-INF/PATCH.MF"文件中</span>
+    builder.writeMeta(getMeta());
+
+    <span class="comment">//单纯调用了close()命令, 将异常处理放在子函数中。</span>
+    <span class="comment">//这里做了一个异常分层，即不同抽象层次的子函数需要处理的异常不一样</span>
+    <span class="comment">//具体请参阅《Code Complete》(代码大全)在恰当的抽象层次抛出异常</span>
+    builder.sealPatch();
+}
+</code></pre>
+<p>要打包了，打包完是要签名的，所以需要获取签名的相关信息，这一部分就不详细讲解了。<br>这里提一下<code>getMeta()</code>函数，因为开头我们提到的<code>Patch</code> <code>init()</code> 函数内<br>这句<code>List strings = Arrays.asList(main.getValue(attrName).split(&quot;,&quot;));</code>中的那个strings就是从这里写入的</p>
+<pre><code class="java"> <span class="function"><span class="keyword">protected</span> Manifest <span class="title">getMeta</span><span class="params">()</span>
+</span>{
+    Manifest manifest = <span class="keyword">new</span> Manifest();
+    Attributes main = manifest.getMainAttributes();
+    main.putValue(<span class="string">"Manifest-Version"</span>, <span class="string">"1.0"</span>);
+    main.putValue(<span class="string">"Created-By"</span>, <span class="string">"1.0 (ApkPatch)"</span>);
+    main.putValue(<span class="string">"Created-Time"</span>, 
+      <span class="keyword">new</span> Date(System.currentTimeMillis()).toGMTString());
+    main.putValue(<span class="string">"From-File"</span>, <span class="keyword">this</span>.from.getName());
+    main.putValue(<span class="string">"To-File"</span>, <span class="keyword">this</span>.to.getName());
+    main.putValue(<span class="string">"Patch-Name"</span>, <span class="keyword">this</span>.name);
+    main.putValue(<span class="string">"Patch-Classes"</span>, Formater.dotStringList(<span class="keyword">this</span>.classes));
+    <span class="keyword">return</span> manifest;
+}
+</code></pre>
+<p>那个classes就是我们那个将类名修改后保存起来的<code>Set</code>，<br><code>Formater.dotStringList(this.classes));</code>这个方法就是遍历<code>Set</code>，并将其中用<code>&#39;,&#39;</code>作为分隔符，将整个<code>Set</code>中保存的<code>String</code>拼接<br>所以在<code>Patch</code> <code>init()</code>方法内，就可以反过来组成一个<code>List</code>。</p>
+<p>那么，我们来看看中间那条没注释的语句，通过<code>PatchBuilder()</code>的构造函数生成<code>PatchBuilder</code>，我们来看看<code>PatchBuilder</code>的构造函数</p>
+<h5 id="PatchBuilder-Constructor"><a href="#PatchBuilder-Constructor" class="headerlink" title="PatchBuilder Constructor"></a>PatchBuilder Constructor</h5><pre><code class="java"><span class="function"><span class="keyword">public</span> <span class="title">PatchBuilder</span><span class="params">(File outFile, File dexFile, KeyStore.PrivateKeyEntry key, PrintStream verboseStream)</span></span>{
+    <span class="keyword">this</span>.mBuilder = <span class="keyword">new</span> SignedJarBuilder(<span class="keyword">new</span> FileOutputStream(outFile, <span class="keyword">false</span>), key.getPrivateKey(),
+        (X509Certificate)key.getCertificate());
+    <span class="keyword">this</span>.mBuilder.writeFile(dexFile, <span class="string">"classes.dex"</span>);
+}
+</code></pre>
+<p>这个就是把dexFile里的内容，经过修改，加上签名，写入classes.dex文件中，但是这里实在看不出来其中的细节，<br>所以，我们要进入<code>SignedJarBuilder</code>类一探究竟</p>
+<p>先看它的构造函数。</p>
+<h5 id="SignedJarBuilder-Constructor"><a href="#SignedJarBuilder-Constructor" class="headerlink" title="SignedJarBuilder Constructor"></a>SignedJarBuilder Constructor</h5><pre><code class="java"><span class="function"><span class="keyword">public</span> <span class="title">SignedJarBuilder</span><span class="params">(OutputStream out, PrivateKey key, X509Certificate certificate)</span>
+    <span class="keyword">throws</span> IOException, NoSuchAlgorithmException</span>{
+    <span class="keyword">this</span>.mOutputJar = <span class="keyword">new</span> JarOutputStream(<span class="keyword">new</span> BufferedOutputStream(out));
+    <span class="comment">//设置压缩级别</span>
+    <span class="keyword">this</span>.mOutputJar.setLevel(<span class="number">9</span>);
+    <span class="keyword">this</span>.mKey = key;
+    <span class="keyword">this</span>.mCertificate = certificate;
+    <span class="keyword">if</span> ((<span class="keyword">this</span>.mKey != <span class="keyword">null</span>) &amp;&amp; (<span class="keyword">this</span>.mCertificate != <span class="keyword">null</span>)) {
+      <span class="keyword">this</span>.mManifest = <span class="keyword">new</span> Manifest();
+      Attributes main = <span class="keyword">this</span>.mManifest.getMainAttributes();
+      main.putValue(<span class="string">"Manifest-Version"</span>, <span class="string">"1.0"</span>);
+      main.putValue(<span class="string">"Created-By"</span>, <span class="string">"1.0 (ApkPatch)"</span>);
+      <span class="keyword">this</span>.mBase64Encoder = <span class="keyword">new</span> BASE64Encoder();
+      <span class="keyword">this</span>.mMessageDigest = MessageDigest.getInstance(<span class="string">"SHA1"</span>);
+    }
+}
+</code></pre>
+<p>这个方法做了一些初始化，做了一些赋值操作，大家经常写类似的代码，就不进行分析了，只是为了让大家看<code>writeFile(File, String)</code>的时候容易理解一些。</p>
+<h5 id="SignedJarBuilder-writeFile-File-String"><a href="#SignedJarBuilder-writeFile-File-String" class="headerlink" title="SignedJarBuilder writeFile(File, String)"></a>SignedJarBuilder writeFile(File, String)</h5><p><code>writeFile(File, String)</code>做了什么呢？</p>
+<pre><code class="java"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">writeFile</span><span class="params">(File inputFile, String jarPath)</span></span>{
+    FileInputStream fis = <span class="keyword">new</span> FileInputStream(inputFile);
+    JarEntry entry = <span class="keyword">new</span> JarEntry(jarPath);
+    entry.setTime(inputFile.lastModified());
+    writeEntry(fis, entry);
+}
+</code></pre>
+<p>这个方法调用了<code>writeEntry(InputStream, JarEntry)</code>方法, 来看一看它的源码</p>
+<h5 id="SignedJarBuilder-writeEntry-InputStream-JarEntry"><a href="#SignedJarBuilder-writeEntry-InputStream-JarEntry" class="headerlink" title="SignedJarBuilder writeEntry(InputStream, JarEntry)"></a>SignedJarBuilder writeEntry(InputStream, JarEntry)</h5><pre><code class="java"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">writeEntry</span><span class="params">(InputStream input, JarEntry entry)</span>
+  <span class="keyword">throws</span> IOException</span>{
+    <span class="keyword">this</span>.mOutputJar.putNextEntry(entry);
+    <span class="keyword">int</span> count;
+    <span class="keyword">while</span> ((count = input.read(<span class="keyword">this</span>.mBuffer)) != -<span class="number">1</span>)
+    {
+      <span class="keyword">int</span> count;
+      <span class="keyword">this</span>.mOutputJar.write(<span class="keyword">this</span>.mBuffer, <span class="number">0</span>, count);
+
+      <span class="keyword">if</span> (<span class="keyword">this</span>.mMessageDigest != <span class="keyword">null</span>) {
+        <span class="comment">//将mBuffer中的内容放入mMessageDigest内部数组</span>
+        <span class="keyword">this</span>.mMessageDigest.update(<span class="keyword">this</span>.mBuffer, <span class="number">0</span>, count);
+      }
+    }
+
+    <span class="keyword">this</span>.mOutputJar.closeEntry();
+    <span class="keyword">if</span> (<span class="keyword">this</span>.mManifest != <span class="keyword">null</span>)
+    {
+      Attributes attr = <span class="keyword">this</span>.mManifest.getAttributes(entry.getName());
+      <span class="keyword">if</span> (attr == <span class="keyword">null</span>) {
+        attr = <span class="keyword">new</span> Attributes();
+        <span class="keyword">this</span>.mManifest.getEntries().put(entry.getName(), attr);
+      }
+      attr.putValue(<span class="string">"SHA1-Digest"</span>, <span class="keyword">this</span>.mBase64Encoder.encode(<span class="keyword">this</span>.mMessageDigest.digest()));
+    }
+}
+</code></pre>
+<p>mBuffer是4096 bytes的数组。<br>这段代码主要从input中读取一个buffer的数据，然后写入entry中，这里应该就可以理解我上面说的dexFile里的内容，写入classes.dex文件中了吧。</p>
+<p><code>build(outFile, dexFile);</code>结束了，看看最后一个方法<code>release(this.out, dexFile, outFile)</code></p>
+<h5 id="ApkPatch-release-this-out-dexFile-outFile"><a href="#ApkPatch-release-this-out-dexFile-outFile" class="headerlink" title="ApkPatch release(this.out, dexFile, outFile)"></a>ApkPatch release(this.out, dexFile, outFile)</h5><pre><code class="java"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">release</span><span class="params">(File outDir, File dexFile, File outFile)</span> <span class="keyword">throws</span> NoSuchAlgorithmException, FileNotFoundException, IOException
+</span>{
+    MessageDigest messageDigest = MessageDigest.getInstance(<span class="string">"md5"</span>);
+    FileInputStream fileInputStream = <span class="keyword">new</span> FileInputStream(dexFile);
+    <span class="keyword">byte</span>[] buffer = <span class="keyword">new</span> <span class="keyword">byte</span>[<span class="number">8192</span>];
+    <span class="keyword">int</span> len = <span class="number">0</span>;
+    <span class="keyword">while</span> ((len = fileInputStream.read(buffer)) &gt; <span class="number">0</span>) {
+      messageDigest.update(buffer, <span class="number">0</span>, len);
+    }
+
+    String md5 = HexUtil.hex(messageDigest.digest());
+    fileInputStream.close();
+    outFile.renameTo(<span class="keyword">new</span> File(outDir, <span class="keyword">this</span>.name + <span class="string">"-"</span> + md5 + <span class="string">".apatch"</span>));
+}
+</code></pre>
+<p>最后就是把dexFile进行了md5加密，并把<code>build(outFile, dexFile);</code>函数中生成的outFile重命名。这样，AndFix框架所需要的补丁文件就生成了。</p>
+<p>还记得上面提到的Patch类中读取Manifest的那些属性吗？在<code>build(outFile, dexFile);</code>函数中，那个<code>getMeta()</code>函数把它读取的属性写到了文件中。</p>
+<p>到这里，第二篇分析也结束了，下一篇将会进入Android代码中一探它做了什么的究竟。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/AndFix/" rel="tag"># AndFix</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/09/25/AndFix-解析(上)/" rel="next" title="AndFix解析——(上)">
+                <i class="fa fa-chevron-left"></i> AndFix解析——(上)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015/10/23/AndFix-解析(下)/" rel="prev" title="AndFix解析——(下)">
+                AndFix解析——(下) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="Air" />
+          <p class="site-author-name" itemprop="name">Air</p>
+           
+              <p class="site-description motion-element" itemprop="description">Write Something I Want</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">18</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/yunair" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#class-Patch"><span class="nav-number">1.</span> <span class="nav-text">class Patch</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Patch-Constructor"><span class="nav-number">1.1.</span> <span class="nav-text">Patch Constructor</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Patch-init"><span class="nav-number">1.2.</span> <span class="nav-text">Patch init()</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#apkpatch-jar"><span class="nav-number">2.</span> <span class="nav-text">apkpatch.jar</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Main-Main"><span class="nav-number">2.1.</span> <span class="nav-text">Main Main()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ApkPatch"><span class="nav-number">2.2.</span> <span class="nav-text">ApkPatch</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#ApkPatch-Constructor"><span class="nav-number">2.2.1.</span> <span class="nav-text">ApkPatch Constructor</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Build"><span class="nav-number">2.3.</span> <span class="nav-text">Build</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Build-Constructor"><span class="nav-number">2.3.1.</span> <span class="nav-text">Build Constructor</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#ApkPatch-doPatch"><span class="nav-number">2.3.2.</span> <span class="nav-text">ApkPatch doPatch()</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#ApkPatch-buildCode-smaliDir-dexFile-info"><span class="nav-number">2.3.3.</span> <span class="nav-text">ApkPatch buildCode(smaliDir, dexFile, info)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#ApkPatch-build-outFile-dexFile"><span class="nav-number">2.3.4.</span> <span class="nav-text">ApkPatch build(outFile, dexFile)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#PatchBuilder-Constructor"><span class="nav-number">2.3.5.</span> <span class="nav-text">PatchBuilder Constructor</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#SignedJarBuilder-Constructor"><span class="nav-number">2.3.6.</span> <span class="nav-text">SignedJarBuilder Constructor</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#SignedJarBuilder-writeFile-File-String"><span class="nav-number">2.3.7.</span> <span class="nav-text">SignedJarBuilder writeFile(File, String)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#SignedJarBuilder-writeEntry-InputStream-JarEntry"><span class="nav-number">2.3.8.</span> <span class="nav-text">SignedJarBuilder writeEntry(InputStream, JarEntry)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#ApkPatch-release-this-out-dexFile-outFile"><span class="nav-number">2.3.9.</span> <span class="nav-text">ApkPatch release(this.out, dexFile, outFile)</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2015 - 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Air</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (search_path.endsWith("json")) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

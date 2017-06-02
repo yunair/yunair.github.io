@@ -1,0 +1,1146 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="square, retrofit," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="引言  上篇我们主要看了一下Retrofit的设计者对Retrofit1.+版本设计的评价（好的方面和坏的方面），同时也讲了Retrofit2都这些问题时如何解决的，这篇，我们就一起深入去了解一下。 网络请求  一个网络连接需要构造请求，发送请求，处理服务端返回内容三个步骤组成，但是处理服务端返回内容是用库的人的工作，所以一个网络请求库只要做到前两步并将服务端返回内容转化为使用库的人需要的格式即可">
+<meta name="keywords" content="square, retrofit">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Retrofit2源码分析-(下)">
+<meta property="og:url" content="http://yoursite.com/2016/05/22/retrofit2.0源码解析(下)/index.html">
+<meta property="og:site_name" content="Air Little Place">
+<meta property="og:description" content="引言  上篇我们主要看了一下Retrofit的设计者对Retrofit1.+版本设计的评价（好的方面和坏的方面），同时也讲了Retrofit2都这些问题时如何解决的，这篇，我们就一起深入去了解一下。 网络请求  一个网络连接需要构造请求，发送请求，处理服务端返回内容三个步骤组成，但是处理服务端返回内容是用库的人的工作，所以一个网络请求库只要做到前两步并将服务端返回内容转化为使用库的人需要的格式即可">
+<meta property="og:image" content="https://raw.githubusercontent.com/yunair/blog/gh-pages/media/retrofit/retrofit2.png">
+<meta property="og:updated_time" content="2017-06-01T00:12:36.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Retrofit2源码分析-(下)">
+<meta name="twitter:description" content="引言  上篇我们主要看了一下Retrofit的设计者对Retrofit1.+版本设计的评价（好的方面和坏的方面），同时也讲了Retrofit2都这些问题时如何解决的，这篇，我们就一起深入去了解一下。 网络请求  一个网络连接需要构造请求，发送请求，处理服务端返回内容三个步骤组成，但是处理服务端返回内容是用库的人的工作，所以一个网络请求库只要做到前两步并将服务端返回内容转化为使用库的人需要的格式即可">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/yunair/blog/gh-pages/media/retrofit/retrofit2.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+
+
+
+
+  <title>Retrofit2源码分析-(下) | Air Little Place</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Air Little Place</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/05/22/retrofit2.0源码解析(下)/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Air">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Air Little Place">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Retrofit2源码分析-(下)</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-05-22T00:00:00+08:00">
+                2016-05-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h3><p>  上篇我们主要看了一下Retrofit的设计者对Retrofit1.+版本设计的评价（好的方面和坏的方面），同时也讲了Retrofit2都这些问题时如何解决的，这篇，我们就一起深入去了解一下。</p>
+<h3 id="网络请求"><a href="#网络请求" class="headerlink" title="网络请求"></a>网络请求</h3><p>  一个网络连接需要构造请求，发送请求，处理服务端返回内容三个步骤组成，但是处理服务端返回内容是用库的人的工作，所以一个网络请求库只要做到前两步并将服务端返回内容转化为使用库的人需要的格式即可。</p>
+<p>对于这三个步骤，两个版本的区别在于</p>
+<h4 id="构造请求"><a href="#构造请求" class="headerlink" title="构造请求:"></a>构造请求:</h4><ol>
+<li>Retrofit2新加了<code>@Url</code>注解。</li>
+<li>新加了对某个请求单独加入Http请求头，<code>@Headers</code>(用于方法)/<code>@Header</code>(用于函数参数)。</li>
+</ol>
+<h4 id="发送请求"><a href="#发送请求" class="headerlink" title="发送请求:"></a>发送请求:</h4><ol>
+<li>将网络请求交给了OkHttp</li>
+</ol>
+<h4 id="将服务端返回内容转化为你需要的格式"><a href="#将服务端返回内容转化为你需要的格式" class="headerlink" title="将服务端返回内容转化为你需要的格式:"></a>将服务端返回内容转化为你需要的格式:</h4><ol>
+<li>Retrofit2将可以同时拿到返回内容的Header和Body，Retrofit1则不可以</li>
+<li>使用Call返回值类型将同步和异步请求统一</li>
+<li>可以添加多个Converter</li>
+<li>可以添加多个返回值类型的解析机制，在Retrofit2中称为<code>CallAdapterFactory</code>使用<code>addCallAdapterFactory()</code></li>
+</ol>
+<p>我们接下来跟着官方的例子来看一下这些修改时如何实现的。</p>
+<h3 id="源码分析"><a href="#源码分析" class="headerlink" title="源码分析"></a>源码分析</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">Retrofit retrofit = <span class="keyword">new</span> Retrofit.Builder()</div><div class="line">    .baseUrl(<span class="string">"https://api.github.com/"</span>)</div><div class="line">    .addConverterFactory(GsonConverterFactory.create())</div><div class="line">    .addCallAdapterFactory(RxJavaCallAdapterFactory.create())</div><div class="line">    .build();</div><div class="line"></div><div class="line">GitHubService service = retrofit.create(GitHubService.class);</div><div class="line">Call&lt;List&lt;Repo&gt;&gt; repos = service.listRepos(<span class="string">"octocat"</span>);</div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">GitHubService</span> </span>&#123;</div><div class="line">  <span class="meta">@GET</span>(<span class="string">"users/&#123;user&#125;/repos"</span>)</div><div class="line">  Call&lt;List&lt;Repo&gt;&gt; listRepos(<span class="meta">@Path</span>(<span class="string">"user"</span>) String user);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>从这里可以看出，通过<code>Retrofit</code>对象的<code>create()</code>方法创建出<code>GithubService</code>接口的实现，然后通过该实现进行网路请求，那么我们看看<code>create()</code>方法，</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> &lt;T&gt; <span class="function">T <span class="title">create</span><span class="params">(<span class="keyword">final</span> Class&lt;T&gt; service)</span> </span>&#123;</div><div class="line">    Utils.validateServiceInterface(service);</div><div class="line">    <span class="keyword">if</span> (validateEagerly) &#123;</div><div class="line">      eagerlyValidateMethods(service);</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> (T) Proxy.newProxyInstance(service.getClassLoader(), </div><div class="line">                        <span class="keyword">new</span> Class&lt;?&gt;[] &#123;service&#125;,<span class="keyword">new</span> InvocationHandler() &#123;</div><div class="line">          <span class="keyword">private</span> <span class="keyword">final</span> Platform platform = Platform.get();</div><div class="line"></div><div class="line">          <span class="meta">@Override</span> <span class="function"><span class="keyword">public</span> Object <span class="title">invoke</span><span class="params">(Object proxy, Method method, Object... args)</span></span></div><div class="line">              <span class="keyword">throws</span> Throwable &#123;</div><div class="line">            <span class="comment">// If the method is a method from Object then defer to normal invocation.</span></div><div class="line">            <span class="keyword">if</span> (method.getDeclaringClass() == Object.class) &#123;</div><div class="line">              <span class="keyword">return</span> method.invoke(<span class="keyword">this</span>, args);</div><div class="line">            &#125;</div><div class="line">            <span class="keyword">if</span> (platform.isDefaultMethod(method)) &#123;</div><div class="line">              <span class="keyword">return</span> platform.invokeDefaultMethod(method, service, proxy, args);</div><div class="line">            &#125;</div><div class="line">            ServiceMethod serviceMethod = loadServiceMethod(method);</div><div class="line">            OkHttpCall okHttpCall = <span class="keyword">new</span> OkHttpCall&lt;&gt;(serviceMethod, args);</div><div class="line">            <span class="keyword">return</span> serviceMethod.callAdapter.adapt(okHttpCall);</div><div class="line">          &#125;</div><div class="line">        &#125;);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>熟悉Retrofit1的同学可以看出这里有3点不同的地方，不熟悉也没关系，因为相同的地方就是验证接口的有效性和使用动态代理生成接口对应的实现类。接下来讲一下这三点不同。</p>
+<ol>
+<li>添加了<code>validateEagerly</code>参数，让客户端调用网络请求的时候不需要在反射生成的代理类中才进行初始化;提前初始化，提前验证接口是否合法，不需要在调用时才知道。</li>
+<li>添加了一个暂时不用的方法，为以后使用做扩展<code>platform.isDefaultMethod(method)</code>。</li>
+<li>将初始化过的方法交给<code>OkHttpCall</code>去执行，执行完后，通过设置的<code>CallAdapter</code>将返回值转化为你要的返回类型对象，当你通过该对象调用它的方法的时候，将把请求交给<code>OkHttp</code>去执行。</li>
+</ol>
+<p>分开来讲一下，先看第二点：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">boolean</span> <span class="title">isDefaultMethod</span><span class="params">(Method method)</span> </span>&#123;</div><div class="line">   <span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>可以看出这个方法压根就没有用，所以我不是很了解放在这里一个不需要的方法意义是什么。</p>
+<p>再看第一点：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">if</span> (validateEagerly) &#123;</div><div class="line">   eagerlyValidateMethods(service);</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">eagerlyValidateMethods</span><span class="params">(Class&lt;?&gt; service)</span> </span>&#123;</div><div class="line">  <span class="comment">//和Retrofit1一样，通过反射确定客户端的平台，使用不同的方式处理</span></div><div class="line">  Platform platform = Platform.get();</div><div class="line">  <span class="keyword">for</span> (Method method : service.getDeclaredMethods()) &#123;</div><div class="line">    <span class="keyword">if</span> (!platform.isDefaultMethod(method)) &#123;</div><div class="line">      loadServiceMethod(method);</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line"><span class="comment">//和Retrofit1一样，使用Map做了一个缓存，有的话直接取，</span></div><div class="line"><span class="comment">//否则遍历该方法的信息，创建ServiceMethod对象</span></div><div class="line"><span class="function">ServiceMethod <span class="title">loadServiceMethod</span><span class="params">(Method method)</span> </span>&#123;</div><div class="line">    ServiceMethod result;</div><div class="line">    <span class="keyword">synchronized</span> (serviceMethodCache) &#123;</div><div class="line">      result = serviceMethodCache.get(method);</div><div class="line">      <span class="keyword">if</span> (result == <span class="keyword">null</span>) &#123;</div><div class="line">        result = <span class="keyword">new</span> ServiceMethod.Builder(<span class="keyword">this</span>, method).build();</div><div class="line">        serviceMethodCache.put(method, result);</div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> result;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>看一下第三点：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">ServiceMethod serviceMethod = loadServiceMethod(method);</div><div class="line">   OkHttpCall okHttpCall = <span class="keyword">new</span> OkHttpCall&lt;&gt;(serviceMethod, args);</div><div class="line">   <span class="keyword">return</span> serviceMethod.callAdapter.adapt(okHttpCall);</div></pre></td></tr></table></figure>
+<p><code>serviceMethod.callAdapter.adapt()</code>方法将<code>Call</code>对象转化为你写的返回值类型对象，即你在接口中所需的除<code>Call&lt;T&gt;</code>类型外，都需要对应的<code>CallAdapter</code>来进行转化。<code>OkHttpCall</code>实现了<code>Call&lt;T&gt;</code>接口，也就是前一篇讲到的，加入了<code>Call&lt;T&gt;</code>返回值类型。默认的<code>CallAdapter</code>支持转化成<code>Call</code>类型对象，如果需要其他的类型，你就需要调用<code>addCallAdapterFactory()</code>方法来添加新类型了。然后通过<code>OkHttp</code>进行网络请求。</p>
+<p>到这里大体上就讲完了，接下来就重新回到前面讲的，对一个网络请求的三个步骤进行分析，看看代码中具体是如何实现的（老规矩，忽视不重要的错误处理）。</p>
+<h4 id="构造请求-1"><a href="#构造请求-1" class="headerlink" title="构造请求:"></a>构造请求:</h4><p>这一点的重点在<code>ServiceMethod</code>这个类，前面讲到了这个类初始化的地方，那么就从<br><code>new ServiceMethod.Builder(this, method).build()</code>开始。<br>构造函数就初始化了一些类变量，来看一下<code>build()</code>方法:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> ServiceMethod <span class="title">build</span><span class="params">()</span> </span>&#123;</div><div class="line">	<span class="comment">// </span></div><div class="line">    callAdapter = createCallAdapter();</div><div class="line">    <span class="comment">// 把函数返回值类型中泛型内的类型拿出来，</span></div><div class="line">    <span class="comment">// 比如接口方法中某个方法返回Call&lt;Repo&gt;，这个方法执行结果是Repo</span></div><div class="line">    responseType = callAdapter.responseType();</div><div class="line">    </div><div class="line">    responseConverter = createResponseConverter();</div><div class="line">    <span class="keyword">for</span> (Annotation annotation : methodAnnotations) &#123;</div><div class="line">      <span class="comment">//解析定义的Http注解，如GET，HTTP，FormUrlEncoded，Multipart，Headers</span></div><div class="line">      <span class="comment">//如果存在Headers注解，Headers注解内的内容不能为空</span></div><div class="line">      parseMethodAnnotation(annotation);</div><div class="line">    &#125;</div><div class="line">	<span class="comment">// parameterAnnotationsArrays = method.getParameterAnnotations(),</span></div><div class="line">	<span class="comment">// 即参数中的注解，二维注解数组Annotation[][]</span></div><div class="line">    <span class="keyword">int</span> parameterCount = parameterAnnotationsArray.length;</div><div class="line">    <span class="comment">// ParameterHandler这个类如名字所示，负责处理有注解的函数参数</span></div><div class="line">    parameterHandlers = <span class="keyword">new</span> ParameterHandler&lt;?&gt;[parameterCount];</div><div class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> p = <span class="number">0</span>; p &lt; parameterCount; p++) &#123;</div><div class="line">      <span class="comment">// parameterType = method.getGenericParameterTypes()</span></div><div class="line">      Type parameterType = parameterTypes[p];</div><div class="line">      <span class="comment">// 这个方法就是检测方法参数类型是否是可以处理的类型</span></div><div class="line">      <span class="comment">// 这个方法可以学到如何遍历所有的参数类型，包括泛型类型参数</span></div><div class="line">	  <span class="keyword">if</span> (Utils.hasUnresolvableType(parameterType)) &#123;</div><div class="line">	            <span class="keyword">throw</span> parameterError(p, <span class="string">"Parameter type must not include a type variable or wildcard: %s"</span>,</div><div class="line">	                parameterType);</div><div class="line">	          &#125;</div><div class="line"></div><div class="line">      Annotation[] parameterAnnotations = parameterAnnotationsArray[p];</div><div class="line">      <span class="comment">// 这里处理Retrofit2定义的所有@Target(PARAMETER)的参数，返回对应的ParameterHandler</span></div><div class="line">      parameterHandlers[p] = parseParameter(p, parameterType, parameterAnnotations);</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    <span class="keyword">return</span> <span class="keyword">new</span> ServiceMethod&lt;&gt;(<span class="keyword">this</span>);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>除了<code>createCallAdapter()</code>，<code>createResponseConverter()</code>这两个方法，这两个方法我们一会再说，按名字理解就是创建<code>CallAdapter</code>和<code>ResponseConverter</code>，这两个东西的作用就是将方法的返回值转化成你要的。</p>
+<p>剩下的关键方法都在方法中做了注释，这样，<code>ServiceMethod</code>类对象就生成了。<br>到了这里，先不继续进行，先看一下<code>parseMethodAnnotation(annotation)</code>方法中使用的<code>parseHttpMethodAndPath()</code>方法，这个方法中会做一些验证，这个验证个人觉得有些不好理解，所以放出源代码，并将注释写在方法中。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">parseHttpMethodAndPath</span><span class="params">(String httpMethod, String value, <span class="keyword">boolean</span> hasBody)</span> </span>&#123;</div><div class="line">  <span class="keyword">this</span>.httpMethod = httpMethod;</div><div class="line">  <span class="keyword">this</span>.hasBody = hasBody;</div><div class="line"></div><div class="line">  <span class="keyword">if</span> (value.isEmpty()) &#123;</div><div class="line">    <span class="keyword">return</span>;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  <span class="comment">// Get the relative URL path and existing query string, if present.</span></div><div class="line">  <span class="keyword">int</span> question = value.indexOf(<span class="string">'?'</span>);</div><div class="line">  <span class="keyword">if</span> (question != -<span class="number">1</span> &amp;&amp; question &lt; value.length() - <span class="number">1</span>) &#123;</div><div class="line">    <span class="comment">// Ensure the query string does not have any named parameters.</span></div><div class="line">    String queryParams = value.substring(question + <span class="number">1</span>);</div><div class="line">    Matcher queryParamMatcher = PARAM_URL_REGEX.matcher(queryParams);</div><div class="line">    <span class="keyword">if</span> (queryParamMatcher.find()) &#123;<span class="comment">// url中?之后的的String不允许存在"&#123;&#125;"</span></div><div class="line">      <span class="keyword">throw</span> methodError(<span class="string">"URL query string \"%s\" must not have replace block. "</span></div><div class="line">          + <span class="string">"For dynamic query parameters use @Query."</span>, queryParams);</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  <span class="keyword">this</span>.relativeUrl = value;</div><div class="line">  <span class="keyword">this</span>.relativeUrlParamNames = parsePathParameters(value);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>好了， 这点不好理解的地方也过去了。既然生成了<code>ServiceMethod</code>，那么我们继续往下看：<br>构造函数生成了<code>OkHttpCall</code>对象，最后，通过<code>ServiceMethod</code>的<code>CallAdapter</code>对象将<code>OkHttpCall</code>对象转化为你在网络请求接口中声明的返回值类型。</p>
+<p>在这里，我们再看一下上面提到但没分析的那两个方法<code>createCallAdapter()</code>和<code>createResponseConverter()</code>。先看<code>createCallAdapter()</code>:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">private</span> CallAdapter&lt;?&gt; createCallAdapter() &#123;</div><div class="line">  <span class="comment">// 返回方法声明的返回类型</span></div><div class="line">  Type returnType = method.getGenericReturnType();</div><div class="line">  </div><div class="line">  <span class="keyword">if</span> (returnType == <span class="keyword">void</span>.class) &#123;</div><div class="line">    <span class="keyword">throw</span> methodError(<span class="string">"Service methods cannot return void."</span>);</div><div class="line">  &#125;</div><div class="line">  Annotation[] annotations = method.getAnnotations();</div><div class="line">  <span class="keyword">return</span> retrofit.callAdapter(returnType, annotations);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这个方法就获取了方法的返回值类型和方法的注解，最后调用<code>Retrofit</code>对象的<code>callAdapter()</code>方法找到对应的callAdapter，好了，我们继续,<br>retrofit对象的<code>callAdapter()</code>方法就一句代码，<code>return nextCallAdapter(null, returnType, annotations);</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> CallAdapter&lt;?&gt; nextCallAdapter(CallAdapter.Factory skipPast, Type returnType,</div><div class="line">    Annotation[] annotations) &#123;</div><div class="line">  checkNotNull(returnType, <span class="string">"returnType == null"</span>);</div><div class="line">  checkNotNull(annotations, <span class="string">"annotations == null"</span>);</div><div class="line">  <span class="comment">// List&lt;CallAdapter.Factory&gt; adapterFactories,你调用addCallAdapterFactory()就将你的CallAdapterFactory加入到了这个列表中</span></div><div class="line">  <span class="comment">//即使你不调用addCallAdapterFactory()方法，系统也会加入一个默认的CallAdapterFactory,就是在第一篇文章中提到的Call返回值类型。</span></div><div class="line">  <span class="keyword">int</span> start = adapterFactories.indexOf(skipPast) + <span class="number">1</span>;</div><div class="line">  <span class="keyword">for</span> (<span class="keyword">int</span> i = start, count = adapterFactories.size(); i &lt; count; i++) &#123;</div><div class="line">    CallAdapter&lt;?&gt; adapter = adapterFactories.get(i).get(returnType, annotations, <span class="keyword">this</span>);</div><div class="line">    <span class="keyword">if</span> (adapter != <span class="keyword">null</span>) &#123; <span class="comment">// 如果返回值类型和adapter能处理的相同，则不为null</span></div><div class="line">      <span class="keyword">return</span> adapter;</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">  <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">"..."</span>);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这里将注解传给<code>callAdapter()</code>是为了我们使用更好的扩展。<br>这个扩展具体指什么呢？前面我们提到，可以添加多个<code>Converter</code>和<code>CallAdapter</code>。<br>这里就是给你这样一种能力，如果你有自定义注解，在这里你就可以拿到自己定义的注解来处理。<br><code>callAdapter()</code>方法直接从<code>adapterFactories</code>列表中获取目标类型，即直接获取你需要该方法返回什么类型的值。<br>可以看到，这里就是找哪个<code>CallAdapter</code>可以处理用户声明的该方法返回值类型，这样一个<code>CallAdapter</code>对象就生成了。</p>
+<p>接下来看看<code>createResponseConverter()</code>方法，在第一篇的介绍中提到<code>Converter</code>和<code>CallAdapter</code>类似，那么我猜测代码中的创建过程应该也是类似的，来仔细瞧一瞧是不是这样。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">private</span> Converter&lt;ResponseBody, T&gt; <span class="title">createResponseConverter</span><span class="params">()</span> </span>&#123;</div><div class="line">  Annotation[] annotations = method.getAnnotations();</div><div class="line">  <span class="keyword">try</span> &#123;</div><div class="line">    <span class="keyword">return</span> retrofit.responseBodyConverter(responseType, annotations);</div><div class="line">  &#125; <span class="keyword">catch</span> (RuntimeException e) &#123; <span class="comment">// Wide exception range because factories are user code.</span></div><div class="line">    <span class="keyword">throw</span> methodError(e, <span class="string">"Unable to create converter for %s"</span>, responseType);</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>和上面一样，调用了retrofit对象的方法，<code>responseBodyConverter()</code>方法同样一句代码:<br><code>return nextResponseBodyConverter(null, type, annotations);</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> &lt;T&gt; <span class="function">Converter&lt;ResponseBody, T&gt; <span class="title">nextResponseBodyConverter</span><span class="params">(Converter.Factory skipPast,</span></span></div><div class="line">    Type type, Annotation[] annotations) &#123;</div><div class="line">  checkNotNull(type, <span class="string">"type == null"</span>);</div><div class="line">  checkNotNull(annotations, <span class="string">"annotations == null"</span>);</div><div class="line">  <span class="comment">// List&lt;Converter.Factory&gt; converterFactories,你调用addConverterFactory()方法就是将你的Converter.Factory加入这个列表中，因为列表有序，所以从前往后找，JSON没有明显的特征，所以需要将JSON放在最后</span></div><div class="line">  <span class="comment">// 即使你不调用addConverterFactory()方法，会加入内置的Converter.Factory</span></div><div class="line">  <span class="comment">// 下面是加入内置Converter.Factory的方法和注释。</span></div><div class="line">   <span class="comment">// Add the built-in converter factory first. This prevents overriding its behavior but also</span></div><div class="line">      <span class="comment">// ensures correct behavior when using converters that consume all types.</span></div><div class="line">      <span class="comment">// converterFactories.add(new BuiltInConverters());</span></div><div class="line">  <span class="keyword">int</span> start = converterFactories.indexOf(skipPast) + <span class="number">1</span>;</div><div class="line">  <span class="keyword">for</span>(<span class="keyword">int</span> i = start, count = converterFactories.size(); i &lt; count; i++)&#123;</div><div class="line">    <span class="comment">//将ResponseBody转化为你需要的类型</span></div><div class="line">    Converter&lt;ResponseBody, ?&gt; converter =</div><div class="line">        converterFactories.get(i).responseBodyConverter(type, annotations, <span class="keyword">this</span>);</div><div class="line">    <span class="keyword">if</span> (converter != <span class="keyword">null</span>) &#123; <span class="comment">// 如果能处理对应的type，则不为null</span></div><div class="line">      <span class="comment">//noinspection unchecked</span></div><div class="line">      <span class="keyword">return</span> (Converter&lt;ResponseBody, T&gt;) converter;</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">  <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">"..."</span>);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>除了这个ResponseBodyConverter，还有一个RequestBodyConverter，其实这个也是从<code>converterFactories</code>里面寻找处理请求参数的Converter。</p>
+<p>到这里，<code>Retrofit</code>对象的<code>create()</code>方法就分析完了，<code>CallAdapter</code>将<code>OkHttpCall</code>对象转化成了你想要的对象，此时就可以拿你想要的对象进行操作了，也就是构造请求完成了。</p>
+<h4 id="发送请求-1"><a href="#发送请求-1" class="headerlink" title="发送请求:"></a>发送请求:</h4><p>当用户调用接口中方法的时候，底层直接通过OkHttp进行发送请求。</p>
+<h4 id="将服务端返回内容转化为你需要的格式-1"><a href="#将服务端返回内容转化为你需要的格式-1" class="headerlink" title="将服务端返回内容转化为你需要的格式:"></a>将服务端返回内容转化为你需要的格式:</h4><p>OkHttp接收到请求后，通过<code>Converter</code>将服务端返回内容转化为你需要的格式。所以到这里源码的流程已经走完了。</p>
+<p>可以看出其实这个框架在构造请求的完成的时候工作也完成了。</p>
+<p>接下来有一些需要注意的地方:</p>
+<ol>
+<li>接口中任何一个方法的只允许被一个Http方法注解(即[GET, POST, PUT, DELETE, PATCH, HEAD, OPTIONS, HTTP]这个列表中的元素每个方法只能使用一个)</li>
+<li>网络请求只要服务端有数据返回，就不算failure，Retrotfit1的时候404和500都算failure。所以当你使用Callback时，在<code>onResponse</code>函数里，使用<code>response.isSuccessful()</code>确定服务端返回正常数据还是服务端错误信息。</li>
+<li>Url的拼接规则变了，初始化Retrofit对象的时候baseUrl最后一定要加’/‘。详细的内容查看下面的表格:</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">BaseUrl</th>
+<th style="text-align:center">AnnotationUrl</th>
+<th style="text-align:center">RequestUrl</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><a href="https://api.github.com/repo/" target="_blank" rel="external">https://api.github.com/repo/</a></td>
+<td style="text-align:center">/square/end</td>
+<td style="text-align:center"><a href="https://api.github.com/square/end" target="_blank" rel="external">https://api.github.com/square/end</a></td>
+</tr>
+<tr>
+<td style="text-align:center"><a href="https://api.github.com/repo/" target="_blank" rel="external">https://api.github.com/repo/</a></td>
+<td style="text-align:center">square/end</td>
+<td style="text-align:center"><a href="https://api.github.com/repo/square/end" target="_blank" rel="external">https://api.github.com/repo/square/end</a></td>
+</tr>
+<tr>
+<td style="text-align:center"><a href="https://api.github.com/repo/" target="_blank" rel="external">https://api.github.com/repo/</a></td>
+<td style="text-align:center"><a href="http://z.cn/end" target="_blank" rel="external">http://z.cn/end</a></td>
+<td style="text-align:center"><a href="http://z.cn/end" target="_blank" rel="external">http://z.cn/end</a></td>
+</tr>
+</tbody>
+</table>
+<p>最后放一张流程图，来源[Retrofit分析-漂亮的解耦套路][2]，是一个很棒的流程图，可以加深对此源码分析的理解。</p>
+<p><img src="https://raw.githubusercontent.com/yunair/blog/gh-pages/media/retrofit/retrofit2.png" alt=""></p>
+<p>最后是一些参考资料:</p>
+<ol>
+<li><a href="http://www.jianshu.com/p/308f3c54abdd" target="_blank" rel="external">你真的会用Retrofit2吗?</a> 对Retrofit2中用到的注解进行了分类，可以让你更清晰的使用对应的注解；提供了自定义<code>ConverterFactory</code>和<code>CallAdapterFactory</code>的思路。</li>
+</ol>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/square-retrofit/" rel="tag"># square, retrofit</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/05/08/retrofit2.0源码解析(上)/" rel="next" title="Retrofit2源码分析-(上)">
+                <i class="fa fa-chevron-left"></i> Retrofit2源码分析-(上)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/10/11/Jenkins使用/" rel="prev" title="Jenkins的使用">
+                Jenkins的使用 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="Air" />
+          <p class="site-author-name" itemprop="name">Air</p>
+           
+              <p class="site-description motion-element" itemprop="description">Write Something I Want</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">18</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/yunair" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#引言"><span class="nav-number">1.</span> <span class="nav-text">引言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#网络请求"><span class="nav-number">2.</span> <span class="nav-text">网络请求</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#构造请求"><span class="nav-number">2.1.</span> <span class="nav-text">构造请求:</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#发送请求"><span class="nav-number">2.2.</span> <span class="nav-text">发送请求:</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#将服务端返回内容转化为你需要的格式"><span class="nav-number">2.3.</span> <span class="nav-text">将服务端返回内容转化为你需要的格式:</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#源码分析"><span class="nav-number">3.</span> <span class="nav-text">源码分析</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#构造请求-1"><span class="nav-number">3.1.</span> <span class="nav-text">构造请求:</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#发送请求-1"><span class="nav-number">3.2.</span> <span class="nav-text">发送请求:</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#将服务端返回内容转化为你需要的格式-1"><span class="nav-number">3.3.</span> <span class="nav-text">将服务端返回内容转化为你需要的格式:</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2015 - 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Air</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (search_path.endsWith("json")) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
