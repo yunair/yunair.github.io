@@ -397,7 +397,7 @@
 <li>Retrofit这个版本不支持在接口中写入整个url，如果endpoint不一样就要重新创建一个<code>RestAdapter</code>，但悲剧的是创建一个<code>RestAdapter</code>的代价是很大的，<br>那么修改RestMethodInfo就可以达到在HTTP方法注解中使用整个url的目的。</li>
 </ol>
 <p>到这里我们对这个库的源码分析就完了，接下来以一副图来结束这个专题。</p>
-<p><img src="https://raw.githubusercontent.com/yunair/blog/gh-pages/media/retrofit/retrofit1.9.png" alt=""></p>
+<p><img src="../media/retrofit/retrofit1.9.png" alt=""></p>
 <p>这样看来，Retrofit本身就是一个胶水层，同时像插槽一样留出一些插口给大家使用，简化了网络请求。</p>
 <p>参考: <a href="http://www.cnblogs.com/angeldevil/p/3757335.html" target="_blank" rel="external">快速Android开发系列网络篇之Retrofit</a></p>
 
@@ -739,12 +739,12 @@
 <p>然后，当我们以错误的方式绘制布局的时候</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> View <span class="title">getView</span><span class="params">(<span class="keyword">int</span> position, View convertView, ViewGroup parent)</span> </span>&#123;</div><div class="line">    <span class="keyword">if</span> (convertView == <span class="keyword">null</span>) &#123;</div><div class="line">        convertView = inflate(R.layout.item_row, <span class="keyword">null</span>);</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> convertView;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p>我们得到的结果看起来像这样：</p>
-<p><img src="https://raw.githubusercontent.com/yunair/blog/gh-pages/media/layout/image1.png" alt=""></p>
+<p><img src="../media/layout/image1.png" alt=""></p>
 <p>我们设置的固定高度出了什么情况？</p>
 <p>如果我们替换绘制布局的方式：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> View <span class="title">getView</span><span class="params">(<span class="keyword">int</span> position, View convertView, ViewGroup parent)</span> </span>&#123;</div><div class="line">    <span class="keyword">if</span> (convertView == <span class="keyword">null</span>) &#123;</div><div class="line">        convertView = inflate(R.layout.item_row, parent, <span class="keyword">false</span>);</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> convertView;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p>我们得到的结果就如我们希望的那样。</p>
-<p><img src="https://raw.githubusercontent.com/yunair/blog/gh-pages/media/layout/Image2.png" alt=""></p>
+<p><img src="../media/layout/Image2.png" alt=""></p>
 <h3 id="每个规则都有例外（文中的例外在现在的Android版本已经不存在了，所以这一节就不翻译了）"><a href="#每个规则都有例外（文中的例外在现在的Android版本已经不存在了，所以这一节就不翻译了）" class="headerlink" title="每个规则都有例外（文中的例外在现在的Android版本已经不存在了，所以这一节就不翻译了）"></a>每个规则都有例外（文中的例外在现在的Android版本已经不存在了，所以这一节就不翻译了）</h3><p>所以，下一次你想给 <em>inflate()</em>方法传 <em>null</em>的时候，你需要停下来并问一问你自己“我真的不知道这个视图的根视图是什么吗？(这句话我没有理解作者的意思，就按我觉得翻译了，do I really not know where this view will end up?)”</p>
 <p>最后，当第三个参数为true时，你可以使用两个参数版本的<em>inflate()</em> 来省它。当第三个参数为false的时候，你不应该将 <em>null</em> 传给第二个参数来省略它。</p>
 
@@ -2066,7 +2066,7 @@ apkPatch.doPatch();
             
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-count">6</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>

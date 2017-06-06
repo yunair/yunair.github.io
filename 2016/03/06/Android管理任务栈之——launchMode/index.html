@@ -99,14 +99,14 @@
 <meta property="og:url" content="http://yoursite.com/2016/03/06/Android管理任务栈之——launchMode/index.html">
 <meta property="og:site_name" content="Air Little Place">
 <meta property="og:description" content="前言之前遇到了一个问题，大概是有4个Activity，分别为A, B, C, D Activity，当你的Activity跳转, A -&amp;gt; B -&amp;gt; C -&amp;gt; D 跳转，此时，你需要从D跳回B，不能把Cfinish()掉，因为用户中途可能会返回C，而不继续进行下一步操作；直接跳也不可以，因为默认情况下跳到B的时候，用户点返回会返回D而不是A，这个时候我知道了LaunchMode，">
-<meta property="og:image" content="https://raw.githubusercontent.com/yunair/blog/gh-pages/media/launchMode/ActivityStack--standard.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/yunair/blog/gh-pages/media/launchMode/ActivityStack--singleTop.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/yunair/blog/gh-pages/media/launchMode/ActivityStack--singleInstance.png">
-<meta property="og:updated_time" content="2017-06-01T00:12:01.000Z">
+<meta property="og:image" content="http://yoursite.com/2016/03/06/media/launchMode/ActivityStack--standard.png">
+<meta property="og:image" content="http://yoursite.com/2016/03/06/media/launchMode/ActivityStack--singleTop.png">
+<meta property="og:image" content="http://yoursite.com/2016/03/06/media/launchMode/ActivityStack--singleInstance.png">
+<meta property="og:updated_time" content="2017-06-06T11:08:44.178Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Android管理任务栈之——launchMode">
 <meta name="twitter:description" content="前言之前遇到了一个问题，大概是有4个Activity，分别为A, B, C, D Activity，当你的Activity跳转, A -&amp;gt; B -&amp;gt; C -&amp;gt; D 跳转，此时，你需要从D跳回B，不能把Cfinish()掉，因为用户中途可能会返回C，而不继续进行下一步操作；直接跳也不可以，因为默认情况下跳到B的时候，用户点返回会返回D而不是A，这个时候我知道了LaunchMode，">
-<meta name="twitter:image" content="https://raw.githubusercontent.com/yunair/blog/gh-pages/media/launchMode/ActivityStack--standard.png">
+<meta name="twitter:image" content="http://yoursite.com/2016/03/06/media/launchMode/ActivityStack--standard.png">
 
 
 
@@ -403,7 +403,7 @@
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">Run #8: ActivityRecord&#123;11e0192c u0 com.air.activitylaunchmodetestdemo/.MainActivity t1211&#125;</div><div class="line">Run #7: ActivityRecord&#123;ac97db9 u0 com.air.activitylaunchmodetestdemo/.MainActivity t1211&#125;</div></pre></td></tr></table></figure>
 <p>因为没有在<code>startActivity()</code>之后执行<code>finish()</code>方法，现在我们有了两个<code>MainActivity</code>实例，此时如果退出应用，要点两次后退键才可以。如果我再次点击按钮执行<code>startActivity(new Intent(this, MainActivity.class))</code>的时候，可以想象新的任务栈该变成什么了。</p>
 <p> 接下来我们以图的形式说明该LaunchMode情况下，任务栈的样子。</p>
-<p> <img src="https://raw.githubusercontent.com/yunair/blog/gh-pages/media/launchMode/ActivityStack--standard.png" alt="ActivityStack--standard"></p>
+<p> <img src="../media/launchMode/ActivityStack--standard.png" alt="ActivityStack--standard"></p>
 <p>就像上图画的那样，每启动一个新的Activity，就会添加到栈上，无论即将启动的Activity是否是同一个Activity。</p>
 <ul>
 <li>“singleTop”</li>
@@ -417,7 +417,7 @@
 </ul>
 <p>上面介绍的两个launchMode的作用不能实现栈中只存在一个<code>Activity</code>实例，但是有些时候，就像我在开头举的那个例子，业务逻辑中间要跳好几层，最终只想跳到入口界面，即栈中只需要存在一个相应的<code>Activity</code>，而不是多个。</p>
 <p>总结一个singleTask的作用，若一个<code>Activity</code>的launchMode被指定为singleTask，则在对应的栈中只会存在一个实例。若这个实例不存在，则新建实例；若存在，则把在栈中该实例之上的其他实例移除出栈，并调用该<code>Activity</code>的<code>onNewIntent()</code>方法，将intent传入。 </p>
-<p><img src="https://raw.githubusercontent.com/yunair/blog/gh-pages/media/launchMode/ActivityStack--singleTop.png" alt="ActivityStack--singleTop"></p>
+<p><img src="../media/launchMode/ActivityStack--singleTop.png" alt="ActivityStack--singleTop"></p>
 <p>我们来通过代码验证一下：启动了四个<code>Activity</code>，</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Run #7: ActivityRecord&#123;b53e419 u0 com.air.activitylaunchmodetestdemo/.BActivity t3909&#125;</div><div class="line">Run #6: ActivityRecord&#123;7a83deb u0 com.air.activitylaunchmodetestdemo/.AActivity t3909&#125;</div><div class="line">Run #5: ActivityRecord&#123;df9c4ad u0 com.air.activitylaunchmodetestdemo/.CActivity t3909&#125;</div><div class="line">Run #4: ActivityRecord&#123;e7c438 u0 com.air.activitylaunchmodetestdemo/.MainActivity t3909&#125;</div></pre></td></tr></table></figure>
 <p>CActivity为launchMode为singleTask的<code>Activity</code>，此时，从BActivity启动CActivity，通过前面的介绍，我们猜测会调用CActivity的<code>onNewIntent()</code>方法，并且，在栈中，CActivity之上的<code>Activity</code>都会被移除，此时，执行<code>startActivity()</code>方法，最新的栈内容如下：</p>
@@ -429,7 +429,7 @@
 </ul>
 <p>这个或许可以称之为singleTask模式的加强版，对于设置了singleTask的<code>Activity</code>，我们可以让它加入到在我们当前的任务栈中，也可以新建一个任务栈，把它放入(设置taskAffinity的情况下)。但是，对于singleInstance的<code>Activity</code>，我们只能新建一个任务栈，并把它放入，没有任何<code>Activity</code>可以和它在一个栈中。</p>
 <p> 那么对于我们开发的应用，其中有一个<code>Activity</code>需要给其他应用使用，比如浏览器，你从自己的应用点开一个链接，使用浏览器应用开启网页，你单机后退，直接退到了你的应用，而不是你之前浏览的其他页面，如果你在浏览器中访问的连接可以访问你的应用，那么，此时点击后退你会发现，居然在你应用所在的栈中进行了回退操作，而不是退到浏览器页面，然后你退出应用，发现这个时候反倒打开了浏览器页面，这样说有点绕，我们以图的形势来展示一下。</p>
-<p><img src="https://raw.githubusercontent.com/yunair/blog/gh-pages/media/launchMode/ActivityStack--singleInstance.png" alt="ActivityStack--singleInstance"></p>
+<p><img src="../media/launchMode/ActivityStack--singleInstance.png" alt="ActivityStack--singleInstance"></p>
 <p>至于常用场景，我本以为支付、分享之类的很可能会使用，但是我反编译微信查看其manifest文件的时候，发现它并没有使用这个launchMode，所以暂时这里空着，如果你有什么使用场景，可以给我留言。</p>
 <p>参考文章：</p>
 <ol>
@@ -574,7 +574,7 @@
             
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-count">6</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>

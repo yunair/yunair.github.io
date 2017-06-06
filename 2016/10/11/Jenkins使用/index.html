@@ -100,19 +100,19 @@
 <meta property="og:url" content="http://yoursite.com/2016/10/11/Jenkins使用/index.html">
 <meta property="og:site_name" content="Air Little Place">
 <meta property="og:description" content="前提: 使用Git作为公司的版本控制工具，使用GitLab作为对应的服务器 首先安装Jenkins plugins, 下面列出两个关键的Plugins GitLab Plugin Git plugin 打包APK对于APK的打包，相信大家公司内部都有不同的测试环境，不同的功能需要在不同的测试环境上测试，不同的功能又对应不同的分支，如果开发人员负责根据测试人员的需求打包的话，测试人员麻烦，开发人员也">
-<meta property="og:image" content="https://raw.githubusercontent.com/yunair/blog/gh-pages/media/jenkins/build_params.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/yunair/blog/gh-pages/media/jenkins/url.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/yunair/blog/gh-pages/media/jenkins/git_branch.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/yunair/blog/gh-pages/media/jenkins/scm_git.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/yunair/blog/gh-pages/media/jenkins/change_env.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/yunair/blog/gh-pages/media/jenkins/build_env_inject.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/yunair/blog/gh-pages/media/jenkins/post_build_action.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/yunair/blog/gh-pages/media/jenkins/build_trigger.png">
-<meta property="og:updated_time" content="2017-06-01T00:12:56.818Z">
+<meta property="og:image" content="http://yoursite.com/img/jenkins/build_params.png">
+<meta property="og:image" content="http://yoursite.com/img/jenkins/url.png">
+<meta property="og:image" content="http://yoursite.com/img/jenkins/git_branch.png">
+<meta property="og:image" content="http://yoursite.com/img/jenkins/scm_git.png">
+<meta property="og:image" content="http://yoursite.com/img/jenkins/change_env.png">
+<meta property="og:image" content="http://yoursite.com/img/jenkins/build_env_inject.png">
+<meta property="og:image" content="http://yoursite.com/img/jenkins/post_build_action.png">
+<meta property="og:image" content="http://yoursite.com/img/jenkins/build_trigger.png">
+<meta property="og:updated_time" content="2017-06-06T11:22:01.120Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Jenkins的使用">
 <meta name="twitter:description" content="前提: 使用Git作为公司的版本控制工具，使用GitLab作为对应的服务器 首先安装Jenkins plugins, 下面列出两个关键的Plugins GitLab Plugin Git plugin 打包APK对于APK的打包，相信大家公司内部都有不同的测试环境，不同的功能需要在不同的测试环境上测试，不同的功能又对应不同的分支，如果开发人员负责根据测试人员的需求打包的话，测试人员麻烦，开发人员也">
-<meta name="twitter:image" content="https://raw.githubusercontent.com/yunair/blog/gh-pages/media/jenkins/build_params.png">
+<meta name="twitter:image" content="http://yoursite.com/img/jenkins/build_params.png">
 
 
 
@@ -377,22 +377,22 @@
 <p><a href="https://wiki.jenkins-ci.org/display/JENKINS/GitLab+Plugin" target="_blank" rel="external">GitLab Plugin</a></p>
 <p><a href="https://wiki.jenkins-ci.org/display/JENKINS/Git+Plugin" target="_blank" rel="external">Git plugin</a></p>
 <h3 id="打包APK"><a href="#打包APK" class="headerlink" title="打包APK"></a>打包APK</h3><p>对于APK的打包，相信大家公司内部都有不同的测试环境，不同的功能需要在不同的测试环境上测试，不同的功能又对应不同的分支，如果开发人员负责根据测试人员的需求打包的话，测试人员麻烦，开发人员也麻烦。程序员一个极好的特质就是懒，那么，这时候，Jenkins提供的<code>This build is parameterized</code>功能就派上了用处。</p>
-<p><img src="https://raw.githubusercontent.com/yunair/blog/gh-pages/media/jenkins/build_params.png" alt=""></p>
+<p><img src="/img/jenkins/build_params.png" alt=""></p>
 <p>勾选了这个选项之后，就可以添加自己需要的参数了，比如:</p>
-<p><img src="https://raw.githubusercontent.com/yunair/blog/gh-pages/media/jenkins/url.png" alt="测试环境地址 "><br><img src="https://raw.githubusercontent.com/yunair/blog/gh-pages/media/jenkins/git_branch.png" alt="git的分支名称"></p>
+<p><img src="/img/jenkins/url.png" alt="测试环境地址 "><br><img src="/img/jenkins/git_branch.png" alt="git的分支名称"></p>
 <p>记住这个地方填写的<code>name</code>， 这里的名称将会是shell里的变量，使用$来引用对应具体的变量，下面将会看到这些变量的使用。</p>
-<p>既然环境和分支都已经可选，第二步是配置Jenkins去哪个地址拉源代码，即SCM配置，如下图:<br><img src="https://raw.githubusercontent.com/yunair/blog/gh-pages/media/jenkins/scm_git.png" alt=""></p>
+<p>既然环境和分支都已经可选，第二步是配置Jenkins去哪个地址拉源代码，即SCM配置，如下图:<br><img src="/img/jenkins/scm_git.png" alt=""></p>
 <p>可以看到，在<code>Branches to build</code>的地方，我填的内容是<code>*/$git_branch</code>，这个参数就是从前面<code>This build is parameterized</code>位置添加的参数，所以用户填了哪个分支，这里就能拿到用户填写的分支，在Build的时候也就会拉对应分支的代码。</p>
-<p>按照我们的意向拉了对应分支的代码，开头所说的另外一个问题，更改对应的环境，当然，可以使用<code>ProductFlavor</code>来解决这个问题，再最后打包的情况下选择对应的<code>ProductFlavor</code>，数量少了还好说，数量多了，就会变得很麻烦。因此，这里在<code>Build Environment</code>的地方，打勾<br><code>Executor shell script on remote host using ssh</code>，如下图<br><img src="https://raw.githubusercontent.com/yunair/blog/gh-pages/media/jenkins/change_env.png" alt=""></p>
+<p>按照我们的意向拉了对应分支的代码，开头所说的另外一个问题，更改对应的环境，当然，可以使用<code>ProductFlavor</code>来解决这个问题，再最后打包的情况下选择对应的<code>ProductFlavor</code>，数量少了还好说，数量多了，就会变得很麻烦。因此，这里在<code>Build Environment</code>的地方，打勾<br><code>Executor shell script on remote host using ssh</code>，如下图<br><img src="/img/jenkins/change_env.png" alt=""></p>
 <p>在<code>Pre build script</code>的地方，修改你工程中决定使用哪个环境的文件，这里就可以使用最开头的<code>$url_host</code>那个设定的参数。</p>
 <p>当然还有<code>Post build script</code>，需要的话就同样写一段shell来达到你的目的。</p>
 <p>有些情况下，你需要获取这次打包对应的git信息，可以看到，每个打包都有一个Git Build Data，这里面有对应的git信息，所以，勾选<code>inject environment variables to the build process</code>即可将对应的信息添加到这次打包的环境变量中。<br>这个需要<a href="https://wiki.jenkins-ci.org/display/JENKINS/EnvInject+Plugin" target="_blank" rel="external">Environment Injector Plugin</a>插件的支持。<br>这里有个问题，就是<code>Evaluated  Groovy Script</code>脚本的执行过程中，使用正常方式无法获取所有的Jenkins环境变量，那么需要使用<code>currentBuild.getEnvironment(currentListener).get(&#39;var&#39;)</code>来获取var的环境变量。currentBuild和currentListener在Evaluated  Groovy Script右边的<code>?</code>说明里</p>
-<p><img src="https://raw.githubusercontent.com/yunair/blog/gh-pages/media/jenkins/build_env_inject.png" alt=""></p>
+<p><img src="/img/jenkins/build_env_inject.png" alt=""></p>
 <p>最后，测试人员肯定希望能下载打包完成的APK，那么在最后的<code>Post-build Actions</code>即可实现该需求。</p>
-<p><img src="https://raw.githubusercontent.com/yunair/blog/gh-pages/media/jenkins/post_build_action.png" alt=""></p>
+<p><img src="/img/jenkins/post_build_action.png" alt=""></p>
 <p>在<code>Archive the artifacts</code>里面填入打包完成的apk的路径，则Jenkins会以可以下载的形式输出该Apk的链接在对应的打包完成页面。</p>
 <h3 id="打包AAR"><a href="#打包AAR" class="headerlink" title="打包AAR"></a>打包AAR</h3><p>打包AAR和打包APK的需求是不同的，对于AAR的输出，一定希望对开发透明，不需要任何人去点一下build，才去打包AAR，这个时候，我们前面安装的GitLab Plugin就十分有用。有了它，我们可以设定触发打包任务的条件:</p>
-<p><img src="https://raw.githubusercontent.com/yunair/blog/gh-pages/media/jenkins/build_trigger.png" alt=""></p>
+<p><img src="/img/jenkins/build_trigger.png" alt=""></p>
 <p>画红线的URL代表  GitLab WebHook需要回调的URL，即GitLab收到某些事件(push, merge request ..etc)，将会调用该URL，此时将会触发打包。在最下面还有个红线，就是指定相应的分支，在这些分支另在GitLab WebHook回调的时候才进行打包，公司的特殊需求即可在这里定制。</p>
 <p>有可能你想流式的打包，也可能你的aar有优先级，换句话说，A aar可能依赖B aar，那么一定要B aar打包完毕后，才能打包A aar，那样的话你就需要下面这个插件<br><a href="https://wiki.jenkins-ci.org/display/JENKINS/Parameterized+Trigger+Plugin" target="_blank" rel="external">Jenkins Parameterized Trigger plugin</a><br>这个插件将前一个打包aar的Build Env传给后一个打包aar的过程中，那样，就拥有一致的Build Env了。</p>
 
@@ -534,7 +534,7 @@
             
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-count">6</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>
