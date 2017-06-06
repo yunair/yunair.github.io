@@ -100,13 +100,13 @@
 <meta property="og:url" content="http://yoursite.com/2016/12/03/OkHttp源码解析-(上)/index.html">
 <meta property="og:site_name" content="Air Little Place">
 <meta property="og:description" content="一直都知道Retrofit-OkHttp-Okio是Square公司封装的用于网络请求的大杀器，项目中也往往都在用Retrofit，看过我之前的文章的朋友应该看到过我的Retrofit源码解析系列， 但是一直没空往下继续深入，去解析OkHttp和Okio，毕竟Retrofit2.0本身就是搭建于OkHttp之上的。 老规矩，先讲一下这个库如何用，最后渐渐的一步步走到这个库的处理过程。 如何使用Ok">
-<meta property="og:image" content="http://yoursite.com/2016/12/03/media/okhttp/OkHttp3.4.1.jpg">
-<meta property="og:image" content="http://yoursite.com/2016/12/03/media/okhttp/OkHttp3.4.1-interceptors.jpg">
-<meta property="og:updated_time" content="2017-06-06T11:07:31.000Z">
+<meta property="og:image" content="http://yoursite.com/img/okhttp/OkHttp3.4.1.jpg">
+<meta property="og:image" content="http://yoursite.com/img/okhttp/OkHttp3.4.1-interceptors.jpg">
+<meta property="og:updated_time" content="2017-06-06T11:24:05.401Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="OkHttp源码解析-(上)">
 <meta name="twitter:description" content="一直都知道Retrofit-OkHttp-Okio是Square公司封装的用于网络请求的大杀器，项目中也往往都在用Retrofit，看过我之前的文章的朋友应该看到过我的Retrofit源码解析系列， 但是一直没空往下继续深入，去解析OkHttp和Okio，毕竟Retrofit2.0本身就是搭建于OkHttp之上的。 老规矩，先讲一下这个库如何用，最后渐渐的一步步走到这个库的处理过程。 如何使用Ok">
-<meta name="twitter:image" content="http://yoursite.com/2016/12/03/media/okhttp/OkHttp3.4.1.jpg">
+<meta name="twitter:image" content="http://yoursite.com/img/okhttp/OkHttp3.4.1.jpg">
 
 
 
@@ -378,7 +378,7 @@
 <li>调用<code>OkHttpClient</code>对象的<code>newCall()</code>方法构造<code>Call</code>对象</li>
 <li>调用<code>Call</code>对象的<code>execute()</code>方法获取<code>Response</code></li>
 </ol>
-<h3 id="OkHttp-整体调用流程"><a href="#OkHttp-整体调用流程" class="headerlink" title="OkHttp 整体调用流程"></a>OkHttp 整体调用流程</h3><p><img src="../media/okhttp/OkHttp3.4.1.jpg" alt=""></p>
+<h3 id="OkHttp-整体调用流程"><a href="#OkHttp-整体调用流程" class="headerlink" title="OkHttp 整体调用流程"></a>OkHttp 整体调用流程</h3><p><img src="/img/okhttp/OkHttp3.4.1.jpg" alt=""></p>
 <p>这次先看图，有了图，跟代码的时候才不会在代码中迷失。</p>
 <h3 id="OkHttp源码解读"><a href="#OkHttp源码解读" class="headerlink" title="OkHttp源码解读"></a>OkHttp源码解读</h3><h4 id="OkHttpClient对象"><a href="#OkHttpClient对象" class="headerlink" title="OkHttpClient对象"></a><code>OkHttpClient</code>对象</h4><p>参考流程图，我们先需要一个<code>OkHttpClient</code>对象，这个对象需要许多参数，所以用建造者模式构建，当然，每个参数都提供了默认值，也可以直接用<code>OkHttpClient</code>的构造函数来使用默认的实现。</p>
 <p>这是各个参数的默认值，需要修改的通过Builder直接修改即可。</p>
@@ -402,7 +402,7 @@
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Response response = getResponseWithInterceptorChain();</div></pre></td></tr></table></figure>
 <p>这样获取的。</p>
 <p>我们通过这个方法就获取了<code>Response</code>对象，说明这个方法为我们做了真正发请求的工作，那么我们先看一张图，看这么复杂的工作，这个方法是如何实现的。</p>
-<p><img src="../media/okhttp/OkHttp3.4.1-interceptors.jpg" alt=""></p>
+<p><img src="/img/okhttp/OkHttp3.4.1-interceptors.jpg" alt=""></p>
 <p>从图中可以看到，这个执行过程像链条一样一环套一环，如果熟悉设计模式，这不就是很好的责任链模式嘛。好了，我们看一下它这里具体做了什么。</p>
 <h5 id="RealCall-getResponseWithInterceptorChain"><a href="#RealCall-getResponseWithInterceptorChain" class="headerlink" title="RealCall getResponseWithInterceptorChain()"></a>RealCall getResponseWithInterceptorChain()</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="function">Response <span class="title">getResponseWithInterceptorChain</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</div><div class="line">  <span class="comment">// Build a full stack of interceptors.</span></div><div class="line">  List&lt;Interceptor&gt; interceptors = <span class="keyword">new</span> ArrayList&lt;&gt;();</div><div class="line">  interceptors.addAll(client.interceptors());</div><div class="line">  interceptors.add(retryAndFollowUpInterceptor);</div><div class="line">  interceptors.add(<span class="keyword">new</span> BridgeInterceptor(client.cookieJar()));</div><div class="line">  interceptors.add(<span class="keyword">new</span> CacheInterceptor(client.internalCache()));</div><div class="line">  interceptors.add(<span class="keyword">new</span> ConnectInterceptor(client));</div><div class="line">  <span class="keyword">if</span> (!forWebSocket) &#123;</div><div class="line">    interceptors.addAll(client.networkInterceptors());</div><div class="line">  &#125;</div><div class="line">  interceptors.add(<span class="keyword">new</span> CallServerInterceptor(forWebSocket));</div><div class="line"></div><div class="line">  Interceptor.Chain chain = <span class="keyword">new</span> RealInterceptorChain(</div><div class="line">      interceptors, <span class="keyword">null</span>, <span class="keyword">null</span>, <span class="keyword">null</span>, <span class="number">0</span>, originalRequest);</div><div class="line">  <span class="keyword">return</span> chain.proceed(originalRequest);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p>可以看到，这其中有下面几种拦截器进行操作。</p>

@@ -828,7 +828,7 @@
 <figure class="highlight groovy"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">doLast(&#123;</div><div class="line">  println <span class="string">'Hello World!'</span></div><div class="line">&#125;)</div></pre></td></tr></table></figure>
 <h2 id="Gradle-基于3-2-1版本"><a href="#Gradle-基于3-2-1版本" class="headerlink" title="Gradle (基于3.2.1版本)"></a>Gradle (基于3.2.1版本)</h2><p>Gradle是什么:</p>
 <p><strong>Gradle是一个框架，作为框架，它负责定义流程和规则。而具体的编译工作则是通过插件(Plugin)的方式来完成的。</strong></p>
-<h3 id="Gradle工作流程"><a href="#Gradle工作流程" class="headerlink" title="Gradle工作流程"></a>Gradle工作流程</h3><p><img src="https://raw.githubusercontent.com/yunair/blog/gh-pages/media/gradle/gradle.png" alt="img"></p>
+<h3 id="Gradle工作流程"><a href="#Gradle工作流程" class="headerlink" title="Gradle工作流程"></a>Gradle工作流程</h3><p><img src="/imggradle/gradle.png" alt="img"></p>
 <p>可以看出，Gradle工作包含三个阶段：</p>
 <ul>
 <li>首先是初始化阶段(Initiliazation phase):对Android项目而言，就是evaluate <code>settings.gradle</code>，并将每个Project内的build.gradle转化为Project对象。</li>
@@ -873,7 +873,7 @@
 </ol>
 <figure class="highlight groovy"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">apply <span class="string">plugin:</span> <span class="string">'com.android.library'</span>    &lt;==如果是编译Library，则加载此插件</div><div class="line">apply <span class="string">plugin:</span> <span class="string">'com.android.application'</span>  &lt;==如果是编译Android APP，则加载此插件</div></pre></td></tr></table></figure>
 <p>这是每个Android项目都会见到的代码，这个代码调用<code>apply</code>函数，看一下上面的文档，在<code>Method Summary</code>最底部才能看到<code>apply</code>函数，原来是继承自<code>PluginAware</code>接口。</p>
-<p><img src="https://raw.githubusercontent.com/yunair/blog/gh-pages/media/gradle/apply.png" alt="PluginAware apply方法"></p>
+<p><img src="/imggradle/apply.png" alt="PluginAware apply方法"></p>
 <p>那么，上面那个<code>apply</code>方法是上图所示的第几个方法呢？点击查看详细情况，发现第三个<code>apply</code>函数的解释是:</p>
 <p>The following options are available:</p>
 <ul>
@@ -1027,7 +1027,7 @@
         
           
             <p>这篇的主要内容就是解析这一个个拦截器，所以重新将图放在这里。</p>
-<p><img src="../media/okhttp/OkHttp3.4.1-interceptors.jpg" alt=""></p>
+<p><img src="/img/okhttp/OkHttp3.4.1-interceptors.jpg" alt=""></p>
 <p>图中存在用户自定义的<code>Interceptor</code>对象，这一部分我们忽略，剩下的<code>Interceptor</code>对象还有如下几个：</p>
 <ol>
 <li>RetryAndFollowUpInterceptor: 失败重试以及重定向</li>
@@ -1197,7 +1197,7 @@
 <li>调用<code>OkHttpClient</code>对象的<code>newCall()</code>方法构造<code>Call</code>对象</li>
 <li>调用<code>Call</code>对象的<code>execute()</code>方法获取<code>Response</code></li>
 </ol>
-<h3 id="OkHttp-整体调用流程"><a href="#OkHttp-整体调用流程" class="headerlink" title="OkHttp 整体调用流程"></a>OkHttp 整体调用流程</h3><p><img src="../media/okhttp/OkHttp3.4.1.jpg" alt=""></p>
+<h3 id="OkHttp-整体调用流程"><a href="#OkHttp-整体调用流程" class="headerlink" title="OkHttp 整体调用流程"></a>OkHttp 整体调用流程</h3><p><img src="/img/okhttp/OkHttp3.4.1.jpg" alt=""></p>
 <p>这次先看图，有了图，跟代码的时候才不会在代码中迷失。</p>
 <h3 id="OkHttp源码解读"><a href="#OkHttp源码解读" class="headerlink" title="OkHttp源码解读"></a>OkHttp源码解读</h3><h4 id="OkHttpClient对象"><a href="#OkHttpClient对象" class="headerlink" title="OkHttpClient对象"></a><code>OkHttpClient</code>对象</h4><p>参考流程图，我们先需要一个<code>OkHttpClient</code>对象，这个对象需要许多参数，所以用建造者模式构建，当然，每个参数都提供了默认值，也可以直接用<code>OkHttpClient</code>的构造函数来使用默认的实现。</p>
 <p>这是各个参数的默认值，需要修改的通过Builder直接修改即可。</p>
@@ -1221,7 +1221,7 @@
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Response response = getResponseWithInterceptorChain();</div></pre></td></tr></table></figure>
 <p>这样获取的。</p>
 <p>我们通过这个方法就获取了<code>Response</code>对象，说明这个方法为我们做了真正发请求的工作，那么我们先看一张图，看这么复杂的工作，这个方法是如何实现的。</p>
-<p><img src="../media/okhttp/OkHttp3.4.1-interceptors.jpg" alt=""></p>
+<p><img src="/img/okhttp/OkHttp3.4.1-interceptors.jpg" alt=""></p>
 <p>从图中可以看到，这个执行过程像链条一样一环套一环，如果熟悉设计模式，这不就是很好的责任链模式嘛。好了，我们看一下它这里具体做了什么。</p>
 <h5 id="RealCall-getResponseWithInterceptorChain"><a href="#RealCall-getResponseWithInterceptorChain" class="headerlink" title="RealCall getResponseWithInterceptorChain()"></a>RealCall getResponseWithInterceptorChain()</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="function">Response <span class="title">getResponseWithInterceptorChain</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</div><div class="line">  <span class="comment">// Build a full stack of interceptors.</span></div><div class="line">  List&lt;Interceptor&gt; interceptors = <span class="keyword">new</span> ArrayList&lt;&gt;();</div><div class="line">  interceptors.addAll(client.interceptors());</div><div class="line">  interceptors.add(retryAndFollowUpInterceptor);</div><div class="line">  interceptors.add(<span class="keyword">new</span> BridgeInterceptor(client.cookieJar()));</div><div class="line">  interceptors.add(<span class="keyword">new</span> CacheInterceptor(client.internalCache()));</div><div class="line">  interceptors.add(<span class="keyword">new</span> ConnectInterceptor(client));</div><div class="line">  <span class="keyword">if</span> (!forWebSocket) &#123;</div><div class="line">    interceptors.addAll(client.networkInterceptors());</div><div class="line">  &#125;</div><div class="line">  interceptors.add(<span class="keyword">new</span> CallServerInterceptor(forWebSocket));</div><div class="line"></div><div class="line">  Interceptor.Chain chain = <span class="keyword">new</span> RealInterceptorChain(</div><div class="line">      interceptors, <span class="keyword">null</span>, <span class="keyword">null</span>, <span class="keyword">null</span>, <span class="number">0</span>, originalRequest);</div><div class="line">  <span class="keyword">return</span> chain.proceed(originalRequest);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p>可以看到，这其中有下面几种拦截器进行操作。</p>
@@ -1579,7 +1579,7 @@
 </tbody>
 </table>
 <p>最后放一张流程图，来源[Retrofit分析-漂亮的解耦套路][2]，是一个很棒的流程图，可以加深对此源码分析的理解。</p>
-<p><img src="../media/retrofit/retrofit2.png" alt=""></p>
+<p><img src="/img/retrofit/retrofit2.png" alt=""></p>
 <p>最后是一些参考资料:</p>
 <ol>
 <li><a href="http://www.jianshu.com/p/308f3c54abdd" target="_blank" rel="external">你真的会用Retrofit2吗?</a> 对Retrofit2中用到的注解进行了分类，可以让你更清晰的使用对应的注解；提供了自定义<code>ConverterFactory</code>和<code>CallAdapterFactory</code>的思路。</li>
@@ -1872,7 +1872,7 @@
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">Run #8: ActivityRecord&#123;11e0192c u0 com.air.activitylaunchmodetestdemo/.MainActivity t1211&#125;</div><div class="line">Run #7: ActivityRecord&#123;ac97db9 u0 com.air.activitylaunchmodetestdemo/.MainActivity t1211&#125;</div></pre></td></tr></table></figure>
 <p>因为没有在<code>startActivity()</code>之后执行<code>finish()</code>方法，现在我们有了两个<code>MainActivity</code>实例，此时如果退出应用，要点两次后退键才可以。如果我再次点击按钮执行<code>startActivity(new Intent(this, MainActivity.class))</code>的时候，可以想象新的任务栈该变成什么了。</p>
 <p> 接下来我们以图的形式说明该LaunchMode情况下，任务栈的样子。</p>
-<p> <img src="../media/launchMode/ActivityStack--standard.png" alt="ActivityStack--standard"></p>
+<p> <img src="/img/launchMode/ActivityStack--standard.png" alt="ActivityStack--standard"></p>
 <p>就像上图画的那样，每启动一个新的Activity，就会添加到栈上，无论即将启动的Activity是否是同一个Activity。</p>
 <ul>
 <li>“singleTop”</li>
@@ -1886,7 +1886,7 @@
 </ul>
 <p>上面介绍的两个launchMode的作用不能实现栈中只存在一个<code>Activity</code>实例，但是有些时候，就像我在开头举的那个例子，业务逻辑中间要跳好几层，最终只想跳到入口界面，即栈中只需要存在一个相应的<code>Activity</code>，而不是多个。</p>
 <p>总结一个singleTask的作用，若一个<code>Activity</code>的launchMode被指定为singleTask，则在对应的栈中只会存在一个实例。若这个实例不存在，则新建实例；若存在，则把在栈中该实例之上的其他实例移除出栈，并调用该<code>Activity</code>的<code>onNewIntent()</code>方法，将intent传入。 </p>
-<p><img src="../media/launchMode/ActivityStack--singleTop.png" alt="ActivityStack--singleTop"></p>
+<p><img src="/img/launchMode/ActivityStack--singleTop.png" alt="ActivityStack--singleTop"></p>
 <p>我们来通过代码验证一下：启动了四个<code>Activity</code>，</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Run #7: ActivityRecord&#123;b53e419 u0 com.air.activitylaunchmodetestdemo/.BActivity t3909&#125;</div><div class="line">Run #6: ActivityRecord&#123;7a83deb u0 com.air.activitylaunchmodetestdemo/.AActivity t3909&#125;</div><div class="line">Run #5: ActivityRecord&#123;df9c4ad u0 com.air.activitylaunchmodetestdemo/.CActivity t3909&#125;</div><div class="line">Run #4: ActivityRecord&#123;e7c438 u0 com.air.activitylaunchmodetestdemo/.MainActivity t3909&#125;</div></pre></td></tr></table></figure>
 <p>CActivity为launchMode为singleTask的<code>Activity</code>，此时，从BActivity启动CActivity，通过前面的介绍，我们猜测会调用CActivity的<code>onNewIntent()</code>方法，并且，在栈中，CActivity之上的<code>Activity</code>都会被移除，此时，执行<code>startActivity()</code>方法，最新的栈内容如下：</p>
@@ -1898,7 +1898,7 @@
 </ul>
 <p>这个或许可以称之为singleTask模式的加强版，对于设置了singleTask的<code>Activity</code>，我们可以让它加入到在我们当前的任务栈中，也可以新建一个任务栈，把它放入(设置taskAffinity的情况下)。但是，对于singleInstance的<code>Activity</code>，我们只能新建一个任务栈，并把它放入，没有任何<code>Activity</code>可以和它在一个栈中。</p>
 <p> 那么对于我们开发的应用，其中有一个<code>Activity</code>需要给其他应用使用，比如浏览器，你从自己的应用点开一个链接，使用浏览器应用开启网页，你单机后退，直接退到了你的应用，而不是你之前浏览的其他页面，如果你在浏览器中访问的连接可以访问你的应用，那么，此时点击后退你会发现，居然在你应用所在的栈中进行了回退操作，而不是退到浏览器页面，然后你退出应用，发现这个时候反倒打开了浏览器页面，这样说有点绕，我们以图的形势来展示一下。</p>
-<p><img src="../media/launchMode/ActivityStack--singleInstance.png" alt="ActivityStack--singleInstance"></p>
+<p><img src="/img/launchMode/ActivityStack--singleInstance.png" alt="ActivityStack--singleInstance"></p>
 <p>至于常用场景，我本以为支付、分享之类的很可能会使用，但是我反编译微信查看其manifest文件的时候，发现它并没有使用这个launchMode，所以暂时这里空着，如果你有什么使用场景，可以给我留言。</p>
 <p>参考文章：</p>
 <ol>

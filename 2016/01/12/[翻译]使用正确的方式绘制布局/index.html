@@ -99,13 +99,13 @@
 <meta property="og:url" content="http://yoursite.com/2016/01/12/[翻译]使用正确的方式绘制布局/index.html">
 <meta property="og:site_name" content="Air Little Place">
 <meta property="og:description" content="原文 ： https://possiblemobile.com/2013/05/layout-inflation-as-intended/ 绘制(inflation，翻译下同)布局(Layout)是在Android的Context中使用的术语，它的作用是解析一个XML布局资源并且把这个资源转换到视图对象的层级(hierarchy)中这在Android SDK中很长用，但你会很惊奇的发现有一种错误的">
-<meta property="og:image" content="http://yoursite.com/2016/01/12/media/layout/image1.png">
-<meta property="og:image" content="http://yoursite.com/2016/01/12/media/layout/Image2.png">
-<meta property="og:updated_time" content="2017-06-06T11:09:23.977Z">
+<meta property="og:image" content="http://yoursite.com/img/layout/image1.png">
+<meta property="og:image" content="http://yoursite.com/img/layout/Image2.png">
+<meta property="og:updated_time" content="2017-06-06T11:24:00.305Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="(翻译)使用正确的方式绘制布局">
 <meta name="twitter:description" content="原文 ： https://possiblemobile.com/2013/05/layout-inflation-as-intended/ 绘制(inflation，翻译下同)布局(Layout)是在Android的Context中使用的术语，它的作用是解析一个XML布局资源并且把这个资源转换到视图对象的层级(hierarchy)中这在Android SDK中很长用，但你会很惊奇的发现有一种错误的">
-<meta name="twitter:image" content="http://yoursite.com/2016/01/12/media/layout/image1.png">
+<meta name="twitter:image" content="http://yoursite.com/img/layout/image1.png">
 
 
 
@@ -393,12 +393,12 @@
 <p>然后，当我们以错误的方式绘制布局的时候</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> View <span class="title">getView</span><span class="params">(<span class="keyword">int</span> position, View convertView, ViewGroup parent)</span> </span>&#123;</div><div class="line">    <span class="keyword">if</span> (convertView == <span class="keyword">null</span>) &#123;</div><div class="line">        convertView = inflate(R.layout.item_row, <span class="keyword">null</span>);</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> convertView;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p>我们得到的结果看起来像这样：</p>
-<p><img src="../media/layout/image1.png" alt=""></p>
+<p><img src="/img/layout/image1.png" alt=""></p>
 <p>我们设置的固定高度出了什么情况？</p>
 <p>如果我们替换绘制布局的方式：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> View <span class="title">getView</span><span class="params">(<span class="keyword">int</span> position, View convertView, ViewGroup parent)</span> </span>&#123;</div><div class="line">    <span class="keyword">if</span> (convertView == <span class="keyword">null</span>) &#123;</div><div class="line">        convertView = inflate(R.layout.item_row, parent, <span class="keyword">false</span>);</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> convertView;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p>我们得到的结果就如我们希望的那样。</p>
-<p><img src="../media/layout/Image2.png" alt=""></p>
+<p><img src="/img/layout/Image2.png" alt=""></p>
 <h3 id="每个规则都有例外（文中的例外在现在的Android版本已经不存在了，所以这一节就不翻译了）"><a href="#每个规则都有例外（文中的例外在现在的Android版本已经不存在了，所以这一节就不翻译了）" class="headerlink" title="每个规则都有例外（文中的例外在现在的Android版本已经不存在了，所以这一节就不翻译了）"></a>每个规则都有例外（文中的例外在现在的Android版本已经不存在了，所以这一节就不翻译了）</h3><p>所以，下一次你想给 <em>inflate()</em>方法传 <em>null</em>的时候，你需要停下来并问一问你自己“我真的不知道这个视图的根视图是什么吗？(这句话我没有理解作者的意思，就按我觉得翻译了，do I really not know where this view will end up?)”</p>
 <p>最后，当第三个参数为true时，你可以使用两个参数版本的<em>inflate()</em> 来省它。当第三个参数为false的时候，你不应该将 <em>null</em> 传给第二个参数来省略它。</p>
 
