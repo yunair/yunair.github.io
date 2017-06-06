@@ -828,7 +828,7 @@
 <figure class="highlight groovy"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">doLast(&#123;</div><div class="line">  println <span class="string">'Hello World!'</span></div><div class="line">&#125;)</div></pre></td></tr></table></figure>
 <h2 id="Gradle-基于3-2-1版本"><a href="#Gradle-基于3-2-1版本" class="headerlink" title="Gradle (基于3.2.1版本)"></a>Gradle (基于3.2.1版本)</h2><p>Gradle是什么:</p>
 <p><strong>Gradle是一个框架，作为框架，它负责定义流程和规则。而具体的编译工作则是通过插件(Plugin)的方式来完成的。</strong></p>
-<h3 id="Gradle工作流程"><a href="#Gradle工作流程" class="headerlink" title="Gradle工作流程"></a>Gradle工作流程</h3><p><img src="/imggradle/gradle.png" alt="img"></p>
+<h3 id="Gradle工作流程"><a href="#Gradle工作流程" class="headerlink" title="Gradle工作流程"></a>Gradle工作流程</h3><p><img src="/img/gradle/gradle.png" alt="img"></p>
 <p>可以看出，Gradle工作包含三个阶段：</p>
 <ul>
 <li>首先是初始化阶段(Initiliazation phase):对Android项目而言，就是evaluate <code>settings.gradle</code>，并将每个Project内的build.gradle转化为Project对象。</li>
@@ -873,7 +873,7 @@
 </ol>
 <figure class="highlight groovy"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">apply <span class="string">plugin:</span> <span class="string">'com.android.library'</span>    &lt;==如果是编译Library，则加载此插件</div><div class="line">apply <span class="string">plugin:</span> <span class="string">'com.android.application'</span>  &lt;==如果是编译Android APP，则加载此插件</div></pre></td></tr></table></figure>
 <p>这是每个Android项目都会见到的代码，这个代码调用<code>apply</code>函数，看一下上面的文档，在<code>Method Summary</code>最底部才能看到<code>apply</code>函数，原来是继承自<code>PluginAware</code>接口。</p>
-<p><img src="/imggradle/apply.png" alt="PluginAware apply方法"></p>
+<p><img src="/img/gradle/apply.png" alt="PluginAware apply方法"></p>
 <p>那么，上面那个<code>apply</code>方法是上图所示的第几个方法呢？点击查看详细情况，发现第三个<code>apply</code>函数的解释是:</p>
 <p>The following options are available:</p>
 <ul>
