@@ -13,6 +13,13 @@
 
 
 
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-max-osx.min.css?v=1.0.2" rel="stylesheet">
+
 
 
 
@@ -97,15 +104,15 @@
 <meta name="keywords" content="retrofit,square">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Retrofit2源码分析-(下)">
-<meta property="og:url" content="http://yoursite.com/2016/05/22/retrofit2.0源码解析(下)/index.html">
+<meta property="og:url" content="http://air.com/2016/05/22/retrofit2.0源码解析(下)/index.html">
 <meta property="og:site_name" content="Air Little Place">
 <meta property="og:description" content="引言  上篇我们主要看了一下Retrofit的设计者对Retrofit1.+版本设计的评价（好的方面和坏的方面），同时也讲了Retrofit2都这些问题时如何解决的，这篇，我们就一起深入去了解一下。 网络请求  一个网络连接需要构造请求，发送请求，处理服务端返回内容三个步骤组成，但是处理服务端返回内容是用库的人的工作，所以一个网络请求库只要做到前两步并将服务端返回内容转化为使用库的人需要的格式即可">
-<meta property="og:image" content="http://yoursite.com/img/retrofit/retrofit2.png">
+<meta property="og:image" content="http://air.com/img/retrofit/retrofit2.png">
 <meta property="og:updated_time" content="2017-06-14T13:51:28.243Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Retrofit2源码分析-(下)">
 <meta name="twitter:description" content="引言  上篇我们主要看了一下Retrofit的设计者对Retrofit1.+版本设计的评价（好的方面和坏的方面），同时也讲了Retrofit2都这些问题时如何解决的，这篇，我们就一起深入去了解一下。 网络请求  一个网络连接需要构造请求，发送请求，处理服务端返回内容三个步骤组成，但是处理服务端返回内容是用库的人的工作，所以一个网络请求库只要做到前两步并将服务端返回内容转化为使用库的人需要的格式即可">
-<meta name="twitter:image" content="http://yoursite.com/img/retrofit/retrofit2.png">
+<meta name="twitter:image" content="http://air.com/img/retrofit/retrofit2.png">
 
 
 
@@ -209,26 +216,6 @@
         </li>
       
         
-        <li class="menu-item menu-item-categories">
-          <a href="/categories" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
-            
-            分类
-          </a>
-        </li>
-      
-        
-        <li class="menu-item menu-item-about">
-          <a href="/about" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
-            
-            关于
-          </a>
-        </li>
-      
-        
         <li class="menu-item menu-item-archives">
           <a href="/archives" rel="section">
             
@@ -245,6 +232,16 @@
               <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
             
             标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
           </a>
         </li>
       
@@ -311,7 +308,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/05/22/retrofit2.0源码解析(下)/">
+    <link itemprop="mainEntityOfPage" href="http://air.com/2016/05/22/retrofit2.0源码解析(下)/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Air">

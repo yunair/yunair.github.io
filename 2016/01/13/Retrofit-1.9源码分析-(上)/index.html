@@ -13,6 +13,13 @@
 
 
 
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-max-osx.min.css?v=1.0.2" rel="stylesheet">
+
 
 
 
@@ -97,7 +104,7 @@
 <meta name="keywords" content="retrofit,square">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Retrofit-1.9源码分析-(上)">
-<meta property="og:url" content="http://yoursite.com/2016/01/13/Retrofit-1.9源码分析-(上)/index.html">
+<meta property="og:url" content="http://air.com/2016/01/13/Retrofit-1.9源码分析-(上)/index.html">
 <meta property="og:site_name" content="Air Little Place">
 <meta property="og:description" content="Retrofit项目的GitHub Retrofit 官网介绍Type-safe HTTP client for Android and Java。 接下来的这几篇文章的分析都是基于1.9版本的。 看过我前面文章的开发者们应该知道，我不喜欢把一篇文章写的很长，所以这个分析依旧会有好几篇，好了，我们开始第一篇的分析。 看到一个库，我们要首先会用，然后再去深入其中，研究其中的源代码。 那我们来看看这个">
 <meta property="og:updated_time" content="2017-06-14T13:51:42.102Z">
@@ -207,26 +214,6 @@
         </li>
       
         
-        <li class="menu-item menu-item-categories">
-          <a href="/categories" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
-            
-            分类
-          </a>
-        </li>
-      
-        
-        <li class="menu-item menu-item-about">
-          <a href="/about" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
-            
-            关于
-          </a>
-        </li>
-      
-        
         <li class="menu-item menu-item-archives">
           <a href="/archives" rel="section">
             
@@ -243,6 +230,16 @@
               <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
             
             标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
           </a>
         </li>
       
@@ -309,7 +306,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/01/13/Retrofit-1.9源码分析-(上)/">
+    <link itemprop="mainEntityOfPage" href="http://air.com/2016/01/13/Retrofit-1.9源码分析-(上)/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Air">

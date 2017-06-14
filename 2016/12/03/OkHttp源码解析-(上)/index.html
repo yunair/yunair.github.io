@@ -13,6 +13,13 @@
 
 
 
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-max-osx.min.css?v=1.0.2" rel="stylesheet">
+
 
 
 
@@ -97,16 +104,16 @@
 <meta name="keywords" content="square,okhttp">
 <meta property="og:type" content="article">
 <meta property="og:title" content="OkHttp源码解析-(上)">
-<meta property="og:url" content="http://yoursite.com/2016/12/03/OkHttp源码解析-(上)/index.html">
+<meta property="og:url" content="http://air.com/2016/12/03/OkHttp源码解析-(上)/index.html">
 <meta property="og:site_name" content="Air Little Place">
 <meta property="og:description" content="一直都知道Retrofit-OkHttp-Okio是Square公司封装的用于网络请求的大杀器，项目中也往往都在用Retrofit，看过我之前的文章的朋友应该看到过我的Retrofit源码解析系列， 但是一直没空往下继续深入，去解析OkHttp和Okio，毕竟Retrofit2.0本身就是搭建于OkHttp之上的。 老规矩，先讲一下这个库如何用，最后渐渐的一步步走到这个库的处理过程。 如何使用Ok">
-<meta property="og:image" content="http://yoursite.com/img/okhttp/OkHttp3.4.1.jpg">
-<meta property="og:image" content="http://yoursite.com/img/okhttp/OkHttp3.4.1-interceptors.jpg">
+<meta property="og:image" content="http://air.com/img/okhttp/OkHttp3.4.1.jpg">
+<meta property="og:image" content="http://air.com/img/okhttp/OkHttp3.4.1-interceptors.jpg">
 <meta property="og:updated_time" content="2017-06-14T13:51:37.114Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="OkHttp源码解析-(上)">
 <meta name="twitter:description" content="一直都知道Retrofit-OkHttp-Okio是Square公司封装的用于网络请求的大杀器，项目中也往往都在用Retrofit，看过我之前的文章的朋友应该看到过我的Retrofit源码解析系列， 但是一直没空往下继续深入，去解析OkHttp和Okio，毕竟Retrofit2.0本身就是搭建于OkHttp之上的。 老规矩，先讲一下这个库如何用，最后渐渐的一步步走到这个库的处理过程。 如何使用Ok">
-<meta name="twitter:image" content="http://yoursite.com/img/okhttp/OkHttp3.4.1.jpg">
+<meta name="twitter:image" content="http://air.com/img/okhttp/OkHttp3.4.1.jpg">
 
 
 
@@ -210,26 +217,6 @@
         </li>
       
         
-        <li class="menu-item menu-item-categories">
-          <a href="/categories" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
-            
-            分类
-          </a>
-        </li>
-      
-        
-        <li class="menu-item menu-item-about">
-          <a href="/about" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
-            
-            关于
-          </a>
-        </li>
-      
-        
         <li class="menu-item menu-item-archives">
           <a href="/archives" rel="section">
             
@@ -246,6 +233,16 @@
               <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
             
             标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
           </a>
         </li>
       
@@ -312,7 +309,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/12/03/OkHttp源码解析-(上)/">
+    <link itemprop="mainEntityOfPage" href="http://air.com/2016/12/03/OkHttp源码解析-(上)/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Air">

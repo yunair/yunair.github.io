@@ -13,6 +13,13 @@
 
 
 
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-max-osx.min.css?v=1.0.2" rel="stylesheet">
+
 
 
 
@@ -97,7 +104,7 @@
 <meta name="keywords" content="AndFix">
 <meta property="og:type" content="article">
 <meta property="og:title" content="AndFix解析——(下)">
-<meta property="og:url" content="http://yoursite.com/2015/10/23/AndFix-解析(下)/index.html">
+<meta property="og:url" content="http://air.com/2015/10/23/AndFix-解析(下)/index.html">
 <meta property="og:site_name" content="Air Little Place">
 <meta property="og:description" content="我们接着分析阿里开源的AndFix库，上一篇分析了Patch类，这个类相当于我们提供补丁的容器，容器里有了东西，我们要对容器进行操作了, 于是开始了我们这次的分析。 在第二篇里，我们添了Patch类的那个坑，那么这篇文章我们就把最后两个坑填一填，即loadPatch()方法和AndFixManager类。 在阿里给的Demo里，我们还有最后的loadPatch()方法没有深入，所以先从loadPa">
 <meta property="og:updated_time" content="2017-06-01T00:10:25.000Z">
@@ -207,26 +214,6 @@
         </li>
       
         
-        <li class="menu-item menu-item-categories">
-          <a href="/categories" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
-            
-            分类
-          </a>
-        </li>
-      
-        
-        <li class="menu-item menu-item-about">
-          <a href="/about" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
-            
-            关于
-          </a>
-        </li>
-      
-        
         <li class="menu-item menu-item-archives">
           <a href="/archives" rel="section">
             
@@ -243,6 +230,16 @@
               <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
             
             标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
           </a>
         </li>
       
@@ -309,7 +306,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2015/10/23/AndFix-解析(下)/">
+    <link itemprop="mainEntityOfPage" href="http://air.com/2015/10/23/AndFix-解析(下)/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Air">
