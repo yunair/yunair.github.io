@@ -115,7 +115,7 @@
 <meta property="og:image" content="http://air.com/img/jenkins/build_env_inject.png">
 <meta property="og:image" content="http://air.com/img/jenkins/post_build_action.png">
 <meta property="og:image" content="http://air.com/img/jenkins/build_trigger.png">
-<meta property="og:updated_time" content="2017-06-06T11:24:09.000Z">
+<meta property="og:updated_time" content="2017-07-31T14:36:29.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Jenkins的使用">
 <meta name="twitter:description" content="前提: 使用Git作为公司的版本控制工具，使用GitLab作为对应的服务器 首先安装Jenkins plugins, 下面列出两个关键的Plugins GitLab Plugin Git plugin 打包APK对于APK的打包，相信大家公司内部都有不同的测试环境，不同的功能需要在不同的测试环境上测试，不同的功能又对应不同的分支，如果开发人员负责根据测试人员的需求打包的话，测试人员麻烦，开发人员也">
@@ -160,6 +160,15 @@
 
 
 
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-103683322-1', 'auto');
+  ga('send', 'pageview');
+</script>
 
 
 
@@ -358,6 +367,17 @@
 
           
             
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2016/10/11/Jenkins使用/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2016/10/11/Jenkins使用/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
           
 
           
@@ -391,6 +411,7 @@
 <p>既然环境和分支都已经可选，第二步是配置Jenkins去哪个地址拉源代码，即SCM配置，如下图:<br><img src="/img/jenkins/scm_git.png" alt=""></p>
 <p>可以看到，在<code>Branches to build</code>的地方，我填的内容是<code>*/$git_branch</code>，这个参数就是从前面<code>This build is parameterized</code>位置添加的参数，所以用户填了哪个分支，这里就能拿到用户填写的分支，在Build的时候也就会拉对应分支的代码。</p>
 <p>按照我们的意向拉了对应分支的代码，开头所说的另外一个问题，更改对应的环境，当然，可以使用<code>ProductFlavor</code>来解决这个问题，再最后打包的情况下选择对应的<code>ProductFlavor</code>，数量少了还好说，数量多了，就会变得很麻烦。因此，这里在<code>Build Environment</code>的地方，打勾<br><code>Executor shell script on remote host using ssh</code>，如下图<br><img src="/img/jenkins/change_env.png" alt=""></p>
+<p>这里需要插件<a href="https://wiki.jenkins.io/display/JENKINS/SSH+plugin?focusedCommentId=43713480" target="_blank" rel="external">SSH Plugin</a>的支持</p>
 <p>在<code>Pre build script</code>的地方，修改你工程中决定使用哪个环境的文件，这里就可以使用最开头的<code>$url_host</code>那个设定的参数。</p>
 <p>当然还有<code>Post build script</code>，需要的话就同样写一段shell来达到你的目的。</p>
 <p>有些情况下，你需要获取这次打包对应的git信息，可以看到，每个打包都有一个Git Build Data，这里面有对应的git信息，所以，勾选<code>inject environment variables to the build process</code>即可将对应的信息添加到这次打包的环境变量中。<br>这个需要<a href="https://wiki.jenkins-ci.org/display/JENKINS/EnvInject+Plugin" target="_blank" rel="external">Environment Injector Plugin</a>插件的支持。<br>这里有个问题，就是<code>Evaluated  Groovy Script</code>脚本的执行过程中，使用正常方式无法获取所有的Jenkins环境变量，那么需要使用<code>currentBuild.getEnvironment(currentListener).get(&#39;var&#39;)</code>来获取var的环境变量。currentBuild和currentListener在Evaluated  Groovy Script右边的<code>?</code>说明里</p>
@@ -481,6 +502,13 @@
 
           
   <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
     
   </div>
 
@@ -723,6 +751,26 @@
 
   
 
+    
+      <script id="dsq-count-scr" src="https://yunair.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'http://air.com/2016/10/11/Jenkins使用/';
+          this.page.identifier = '2016/10/11/Jenkins使用/';
+          this.page.title = 'Jenkins的使用';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://yunair.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
 
 
 
@@ -741,10 +789,6 @@
   
 
 
-
-
-
-  
 
 
 
