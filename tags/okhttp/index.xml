@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>okhttp on Air Little Place</title>
+    <link>http://blog.airzone.world/tags/okhttp/</link>
+    <description>Recent content in okhttp on Air Little Place</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Sat, 10 Dec 2016 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="http://blog.airzone.world/tags/okhttp/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>OkHttp源码解析-(下)</title>
+      <link>http://blog.airzone.world/post/okhttp%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90-%E4%B8%8B/</link>
+      <pubDate>Sat, 10 Dec 2016 00:00:00 +0000</pubDate>
+      
+      <guid>http://blog.airzone.world/post/okhttp%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90-%E4%B8%8B/</guid>
+      <description>这篇的主要内容就是解析这一个个拦截器，所以重新将图放在这里。 图中存在用户自定义的Interceptor对象，这一部分我们忽略，剩下的Inte</description>
+    </item>
+    
+    <item>
+      <title>OkHttp源码解析-(上)</title>
+      <link>http://blog.airzone.world/post/okhttp%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90-%E4%B8%8A/</link>
+      <pubDate>Sat, 03 Dec 2016 00:00:00 +0000</pubDate>
+      
+      <guid>http://blog.airzone.world/post/okhttp%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90-%E4%B8%8A/</guid>
+      <description>一直都知道Retrofit-OkHttp-Okio是Square公司封装的用于网络请求的大杀器，项目中也往往都在用Retrofit，看过我之</description>
+    </item>
+    
+  </channel>
+</rss>

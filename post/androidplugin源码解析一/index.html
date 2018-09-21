@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>AndroidPlugin源码解析-(一) - Air Little Place</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="Air" />
+  <meta name="description" content="前言 上一篇我们知道com.android.application plugin 对应的类为com.android.build.gradle.AppPlug" />
+
+  <meta name="keywords" content="blog" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.49-DEV" />
+
+
+<link rel="canonical" href="http://blog.airzone.world/post/androidplugin%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%B8%80/" />
+
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+
+<link href="/dist/even.min.css?v=3.2.0" rel="stylesheet">
+<link href="/lib/fancybox/jquery.fancybox-3.1.20.min.css" rel="stylesheet">
+
+
+
+
+<meta property="og:title" content="AndroidPlugin源码解析-(一)" />
+<meta property="og:description" content="前言 上一篇我们知道com.android.application plugin 对应的类为com.android.build.gradle.AppPlug" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://blog.airzone.world/post/androidplugin%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%B8%80/" /><meta property="article:published_time" content="2017-05-30T00:00:00&#43;00:00"/>
+<meta property="article:modified_time" content="2017-05-30T00:00:00&#43;00:00"/>
+<meta itemprop="name" content="AndroidPlugin源码解析-(一)">
+<meta itemprop="description" content="前言 上一篇我们知道com.android.application plugin 对应的类为com.android.build.gradle.AppPlug">
+
+
+<meta itemprop="datePublished" content="2017-05-30T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2017-05-30T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="3325">
+
+
+
+<meta itemprop="keywords" content="AndroidPlugin," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="AndroidPlugin源码解析-(一)"/>
+<meta name="twitter:description" content="前言 上一篇我们知道com.android.application plugin 对应的类为com.android.build.gradle.AppPlug"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">Air</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">Air</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">AndroidPlugin源码解析-(一)</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2017-05-30 </span>
+        
+        <span class="more-meta"> 约 3325 字 </span>
+        <span class="more-meta"> 预计阅读 7 分钟 </span>
+        
+      </div>
+    </header>
+
+    
+    
+<div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  
+  <div class="post-toc-content">
+    <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#前言">前言</a>
+<ul>
+<li><a href="#baseplugin-apply">BasePlugin apply</a></li>
+<li><a href="#baseplugin-configureproject">BasePlugin configureProject</a></li>
+<li><a href="#baseplugin-createextension">BasePlugin createExtension</a>
+<ul>
+<li><a href="#variantfactory-createdefaultcomponents">VariantFactory createDefaultComponents</a></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+  </div>
+</div>
+
+    
+    
+
+    
+    <div class="post-content">
+      
+
+<h2 id="前言">前言</h2>
+
+<p>上一篇我们知道<code>com.android.application</code> plugin 对应的类为<code>com.android.build.gradle.AppPlugin</code></p>
+
+<p>这个类的声明为: <code>public class AppPlugin extends BasePlugin implements Plugin&lt;Project&gt;</code></p>
+
+<p>看到最后<code>implements Plugin&lt;Project&gt;</code>，熟悉 gradle plugin 的人应该知道，
+<code>apply plugin: 'com.android.application'</code>其实就是调用<code>AppPlugin类</code>的<code>public void apply(@NonNull Project project)</code>方法。</p>
+
+<p><code>com.android.library</code> plugin 对应的类为<code>com.android.build.gradle.LibraryPlugin</code>。</p>
+
+<p>这个类的声明为: <code>public class LibraryPlugin extends BasePlugin implements Plugin&lt;Project&gt;</code></p>
+
+<p>这个两个<code>apply</code>方法的具体内容只有一点点不同，两个都调用了<code>super.apply(project)</code>方法:</p>
+
+<pre><code class="language-java">@Override
+public void apply(@NonNull Project project) {
+    super.apply(project);
+    // 下面的代码只在Library plugin中存在
+    // Default assemble task for the default-published artifact.
+    // This is needed for the prepare task on the consuming project.
+    project.getTasks().create(&quot;assembleDefault&quot;);
+}
+</code></pre>
+
+<p>接下来我们一步步的跟进:</p>
+
+<h3 id="baseplugin-apply">BasePlugin apply</h3>
+
+<p>可以看到，就是调用了 BasePlugin 的<code>apply</code>方法。我们来看一下 BasePlugin 的<code>apply</code>方法做了什么。
+老规矩，分析中会去掉日志，记录，错误检查之类的代码。</p>
+
+<pre><code class="language-java">// 去掉那些我认为不重要的代码后，整个apply方法的流程如下。
+protected void apply(@NonNull Project project) {
+    configureProject();
+    createExtension();
+    createTasks();
+    // 读取 &quot;android.additional.plugins&quot;对应的插件名称
+    // Apply additional plugins
+    for (String plugin : AndroidGradleOptions.getAdditionalPlugins(project)) {
+        project.apply(ImmutableMap.of(&quot;plugin&quot;, plugin));
+    }
+}
+</code></pre>
+
+<p>可以看到，其实整个<code>apply</code>方法分 4 步，最后一步读取插件没有什么好分析的，对于剩下三步来说本篇文章只分析前两步。</p>
+
+<h3 id="baseplugin-configureproject">BasePlugin configureProject</h3>
+
+<p>我们一个过程一个过程研究。
+先看<code>configureProject()</code></p>
+
+<pre><code class="language-java">String creator = &quot;Android Gradle &quot; Version.ANDROID_GRADLE_PLUGIN_VERSION;
+
+protected void configureProject() {
+    sdkHandler = new SdkHandler(project, getLogger());
+
+    androidBuilder = new AndroidBuilder(
+            project == project.getRootProject() ? project.getName() : project.getPath(), // project Id
+            creator, // the createdBy String for the apk manifest（打包之后的MANIFEST.MF文件可以看到）
+            new GradleProcessExecutor(project),  // An executor for external processes.
+            new GradleJavaProcessExecutor(project), // An executor for external Java-based processes.
+            extraModelInfo,
+            getLogger(),
+            isVerbose());
+
+    project.getPlugins().apply(JavaBasePlugin.class);
+    jacocoPlugin = project.getPlugins().apply(JacocoPlugin.class);
+    project.getTasks().getByName(&quot;assemble&quot;).setDescription(
+            &quot;Assembles all variants of all applications and secondary packages.&quot;);
+    // call back on execution. This is called after the whole build is done (not
+    // after the current project is done).
+    // This is will be called for each (android) projects though, so this should support
+    // being called 2+ times.
+    project.getGradle().addBuildListener(new BuildListener() {
+        private final LibraryCache libraryCache = LibraryCache.getCache();
+        @Override
+        public void buildStarted(Gradle gradle) { }
+        @Override
+        public void settingsEvaluated(Settings settings) { }
+        @Override
+        public void projectsLoaded(Gradle gradle) { }
+        @Override
+        public void projectsEvaluated(Gradle gradle) { }
+        @Override
+        public void buildFinished(BuildResult buildResult) {
+            ExecutorSingleton.shutdown();
+            sdkHandler.unload();
+            PreDexCache.getCache().clear(
+                                    new File(project.getRootProject().getBuildDir(),
+                                    FD_INTERMEDIATES + &quot;/dex-cache/cache.xml&quot;),
+                                    getLogger());
+                            JackConversionCache.getCache().clear(
+                                    new File(project.getRootProject().getBuildDir(),
+                                    FD_INTERMEDIATES + &quot;/jack-cache/cache.xml&quot;),
+                                    getLogger());
+            libraryCache.unload();
+            Main.clearInternTables();
+        }
+    });
+    project.getGradle().getTaskGraph().addTaskExecutionGraphListener(
+            new TaskExecutionGraphListener() {
+                @Override
+                public void graphPopulated(TaskExecutionGraph taskGraph) {
+                    for (Task task : taskGraph.getAllTasks()) {
+                        if (task instanceof TransformTask) {
+                            Transform transform = ((TransformTask) task).getTransform();
+                            if (transform instanceof DexTransform) {
+                                PreDexCache.getCache().load(
+                                        new File(project.getRootProject().getBuildDir(),
+                                        FD_INTERMEDIATES + &quot;/dex-cache/cache.xml&quot;));
+                                break;
+                            } else if (transform instanceof JackPreDexTransform) {
+                                JackConversionCache.getCache().load(
+                                        new File(project.getRootProject().getBuildDir(),
+                                        FD_INTERMEDIATES + &quot;/jack-cache/cache.xml&quot;));
+                                break;
+                            }
+                        }
+                    }
+                }
+            });
+}
+</code></pre>
+
+<p>这个方法主要做了如下几个操作:</p>
+
+<ul>
+<li>初始化 SdkHandler</li>
+<li>初始化 AndroidBuilder</li>
+<li>依赖 JavaBasePlugin，JacocoPlugin；这两个 Plugin 的 apply()方法我这里就不写了，大家有兴趣就像本文一样跟进去即可。</li>
+<li>给&rdquo;assemble&rdquo;任务加上说明</li>
+<li>当 Gradle Build 完成的时候做一些关闭和清理的操作</li>
+<li>在 Transform 任务真正执行之前，读取对应的 Cache。</li>
+</ul>
+
+<p>SdkHandler 主要作用是找 local.properties 文件里 SdkLocation 和 NdkLocation
+SdkLocation 的查找顺序为： 1. local.properties 文件里 sdk.dir 的配置 2. local.properties 文件里 android.dir 的配置 3. 环境变量&rdquo;ANDROID_HOME&rdquo; 4. 环境变量&rdquo;android.home&rdquo;</p>
+
+<p>NdkLocation 的查找顺序为： 1. local.properties 文件里 ndk.dir 的配置 2. 环境变量&rdquo;ANDROID_NDK_HOME&rdquo;</p>
+
+<p>AndroidBuilder 对象主要的几个参数的含义从我在代码中添加的注释即可了解。
+最后讲一下<code>TaskExecutionGraphListener</code>这个接口。
+官方文档是这样说的:</p>
+
+<blockquote>
+<p>A TaskExecutionGraphListener is notified when the TaskExecutionGraph has been populated.
+You can use this interface in your build file to perform some action based on the contents of the graph,
+before any tasks are actually executed.</p>
+</blockquote>
+
+<p>大概翻译一下，当 Gradle 将所有 task 的关系图填充之后，该接口会被调用。
+你可以在 build 文件中使用这个接口，在任意 task 真正执行之前，去完成一些基于 task 关系图内容的任务。
+所以这里可以根据对应的 Task，判断 Task 的类型，做对应的操作。</p>
+
+<h3 id="baseplugin-createextension">BasePlugin createExtension</h3>
+
+<p>继续看<code>apply</code>方法中第二个过程<code>createExtension()</code></p>
+
+<pre><code class="language-java">private void createExtension() {
+    // 保存BuildType的NamedDomainObjectContainer
+    final NamedDomainObjectContainer&lt;BuildType&gt; buildTypeContainer = project.container(
+            BuildType.class,
+            new BuildTypeFactory(instantiator, project, project.getLogger()));
+    // 保存ProductFlavor的NamedDomainObjectContainer
+    final NamedDomainObjectContainer&lt;ProductFlavor&gt; productFlavorContainer = project.container(
+            ProductFlavor.class,
+            new ProductFlavorFactory(instantiator, project, project.getLogger(), extraModelInfo));
+    // 保存SigningConfig的NamedDomainObjectContainer
+    final NamedDomainObjectContainer&lt;SigningConfig&gt;  signingConfigContainer = project.container(
+            SigningConfig.class,
+            new SigningConfigFactory(instantiator));
+    // 创建android这个extension
+    extension = project.getExtensions().create(&quot;android&quot;, getExtensionClass(),
+            project, instantiator, androidBuilder, sdkHandler,
+            buildTypeContainer, productFlavorContainer, signingConfigContainer,
+            extraModelInfo, isLibrary());
+
+    // create the default mapping configuration.
+    // 创建default-mapping和default-metadata两个configuration，并加入描述
+    // 具体的作用暂时没有看出来,如果你知道，欢迎留言告诉我
+    // 通过如下代码放在build.gradle，可以打印出当前所有的configuration
+    /**
+        configurations.names.forEach(new Consumer&lt;String&gt;() {
+                @Override
+                void accept(String s) {
+                        println &quot;configurations：&quot; + s;
+                }
+        })
+    */
+    project.getConfigurations().create(&quot;default&quot; + VariantDependencies.CONFIGURATION_MAPPING)
+            .setDescription(&quot;Configuration for default mapping artifacts.&quot;);
+    project.getConfigurations().create(&quot;default&quot; + VariantDependencies.CONFIGURATION_METADATA)
+            .setDescription(&quot;Metadata for the produced APKs.&quot;);
+    // 创建DependencyManager, 负责管理配置的所有依赖
+    dependencyManager = new DependencyManager(
+            project,
+            extraModelInfo,
+            sdkHandler);
+    // 负责管理ndk相关，这里略过不提
+    ndkHandler = new NdkHandler(
+            project.getRootDir(),
+            null, /* compileSkdVersion, this will be set in afterEvaluate */
+            &quot;gcc&quot;,/* toolchainName */
+            &quot;&quot; /*toolchainVersion*/);
+    // 负责创建taskManager
+    taskManager = createTaskManager(
+            project,
+            androidBuilder,
+            dataBindingBuilder,
+            extension,
+            sdkHandler,
+            ndkHandler,
+            dependencyManager,
+            registry);
+
+    // 负责创建variant
+    variantFactory = createVariantFactory();
+    variantManager = new VariantManager(
+            project,
+            androidBuilder,
+            extension,
+            variantFactory,
+            taskManager,
+            instantiator);
+
+    // Register a builder for the custom tooling model
+    ModelBuilder modelBuilder = new ModelBuilder(
+            androidBuilder,
+            variantManager,
+            taskManager,
+            extension,
+            extraModelInfo,
+            ndkHandler,
+            new NativeLibraryFactoryImpl(ndkHandler),
+            isLibrary(),
+            AndroidProject.GENERATION_ORIGINAL);
+    registry.register(modelBuilder);
+
+    // Register a builder for the native tooling model
+    NativeModelBuilder nativeModelBuilder = new NativeModelBuilder(variantManager);
+    registry.register(nativeModelBuilder);
+
+    // 下面三个whenObjectAdded方法从名字上就很好理解
+    // 当你添加一个对应的对象的时候，回调此方法，也就是需要在variantManager里面添加对应的对象
+
+    // map the whenObjectAdded callbacks on the containers.
+    signingConfigContainer.whenObjectAdded(new Action&lt;SigningConfig&gt;() {
+        @Override
+        public void execute(SigningConfig signingConfig) {
+            variantManager.addSigningConfig(signingConfig);
+        }
+    });
+
+    buildTypeContainer.whenObjectAdded(new Action&lt;BuildType&gt;() {
+        @Override
+        public void execute(BuildType buildType) {
+            // 默认debug签名
+            SigningConfig signingConfig = signingConfigContainer.findByName(BuilderConstants.DEBUG);
+            buildType.init(signingConfig);
+            variantManager.addBuildType(buildType);
+        }
+    });
+
+    productFlavorContainer.whenObjectAdded(new Action&lt;ProductFlavor&gt;() {
+        @Override
+        public void execute(ProductFlavor productFlavor) {
+            variantManager.addProductFlavor(productFlavor);
+        }
+    });
+
+    // 同上面类似，三个回调方法，不过是移除的时候抛出异常
+    // 这个只能讲一下注释，具体如何复现暂时我不了解
+    // map whenObjectRemoved on the containers to throw an exception.
+    signingConfigContainer.whenObjectRemoved(
+            new UnsupportedAction(&quot;Removing signingConfigs is not supported.&quot;));
+    buildTypeContainer.whenObjectRemoved(
+            new UnsupportedAction(&quot;Removing build types is not supported.&quot;));
+    productFlavorContainer.whenObjectRemoved(
+            new UnsupportedAction(&quot;Removing product flavors is not supported.&quot;));
+
+    // 最后创建了这些默认的对象
+    // create default Objects, signingConfig first as its used by the BuildTypes.
+    variantFactory.createDefaultComponents(
+            buildTypeContainer, productFlavorContainer, signingConfigContainer);
+}
+</code></pre>
+
+<p>看到这么长的代码，本想去掉点，发现这里面去什么都不合适。
+那么跟着我慢慢看一下。这里有几个地方需要解释:</p>
+
+<ul>
+<li><code>NamedDomainObjectContainer</code>是什么？</li>
+</ul>
+
+<p><code>NamedDomainObjectContainer</code>简单来说就是一个容器，里面的泛型<T>保存了容器里面需要传的类型，类似一个 List<T>。</p>
+
+<ul>
+<li>extension 的创建代表了什么?</li>
+</ul>
+
+<p>extension 的创建代表了我们在 build.gradle 文件中，可以使用</p>
+
+<pre><code class="language-gradle">android{
+
+}
+</code></pre>
+
+<p>这样的闭包来给该扩展传消息。我们在<code>{}</code>内写的任何被允许的内容，在这里都被定义好了。从<code>getExtensionClass</code>方法获取具体的 Class，
+application: 使用<code>com.android.build.gradle.AppExtension.class</code>
+library: 使用<code>com.android.build.gradle.LibraryExtension.class</code>。
+后面的值都是负责初始化这两个类的时候传入的值。</p>
+
+<ul>
+<li>TaskManager 的作用?</li>
+</ul>
+
+<p>首先这个依旧根据 application 和 library 做区分。
+application: 创建<code>ApplicationTaskManager</code>
+library: 创建<code>LibraryTaskManager</code>
+这两个类就是负责创建我们用来处理 Android 源码的 Gradle Task 的地方，比如 assemblyDebug, installDebug&hellip;
+现在这里大概了解一下这个对象，后面再细细解读此对象。</p>
+
+<ul>
+<li>VariantManager 的作用？</li>
+</ul>
+
+<p>这就是管理<code>Build Variant</code>的地方，<code>Build Variant</code>的意义就是<code>build type</code>和<code>product flavor</code>交叉形成的，换句话说就是合并这两个东东的属性形成<code>Build Variant</code>的配置。
+暂时也是单纯的提一下，后面再细细解读。</p>
+
+<p><code>ModelBuilder</code>, <code>NativeModelBuilder</code>和<code>private ToolingModelBuilderRegistry registry</code>这三个对象我们都先放一下，
+这个和 Android Plugin 本身无关，是和 gradle 的运行机制相关的东东。</p>
+
+<p>好了，这里大概梳理一下此方法的逻辑，</p>
+
+<ul>
+<li>创建<code>buildTypeContainer</code>, <code>productFlavorContainer</code>, <code>signingConfigContainer</code></li>
+<li>将 android 这个 extension 加入 build.gradle</li>
+<li>创建一些后面要使用的对象主要指<code>ModelBuilder</code>和<code>NativeModelBuilder</code>,注册到 gradle 中。</li>
+<li>给上面提到的 Container 加一些回调</li>
+<li>通过<code>variantFactory</code>给 Container 创建默认的配置</li>
+</ul>
+
+<p>看一下这个默认的配置，App 和 Library 的默认配置是相同的，都是如下代码。</p>
+
+<h4 id="variantfactory-createdefaultcomponents">VariantFactory createDefaultComponents</h4>
+
+<pre><code class="language-java">@Override
+public void createDefaultComponents(
+        @NonNull NamedDomainObjectContainer&lt;BuildType&gt; buildTypes,
+        @NonNull NamedDomainObjectContainer&lt;ProductFlavor&gt; productFlavors,
+        @NonNull NamedDomainObjectContainer&lt;SigningConfig&gt; signingConfigs) {
+    // must create signing config first so that build type 'debug' can be initialized
+    // with the debug signing config.
+    signingConfigs.create(DEBUG);
+    buildTypes.create(DEBUG);
+    buildTypes.create(RELEASE);
+}
+</code></pre>
+
+<p>可以看出来我们的 SigningConfigs 里面默认有 debug 类型。
+为什么不需要写 signingConfig 就有个默认的 debug 签名？就是这里配置的。
+同理，为什么新建工程 buildTypes 有 debug 和 release？就是这里创建的。
+这里就相当于我们在<code>build.gradle</code>文件写了如下内容:</p>
+
+<pre><code class="language-java">android{
+    signingConfigs {
+        debug {}
+    }
+
+    buildTypes {
+        debug {}
+        release {}
+    }
+}
+</code></pre>
+
+<p>这个方法到这里也就暂时过完了。所以这一篇到这里就告一段落了。</p>
+
+    </div>
+
+    
+    
+
+    
+    
+<div class="post-reward">
+  <input type="checkbox" name="reward" id="reward" hidden />
+  <label class="reward-button" for="reward">赞赏支持</label>
+  <div class="qr-code">
+    
+    
+    
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/img/reward/alipay-qr-code.png">
+        <span>支付宝打赏</span>
+      </label>
+  </div>
+</div>
+
+    <footer class="post-footer">
+      <div class="post-tags">
+          
+          <a href="/tags/androidplugin/">AndroidPlugin</a>
+          
+        </div>
+
+      
+      <nav class="post-nav">
+        
+          <a class="prev" href="/post/androidplugin%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%BA%8C/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">AndroidPlugin源码解析-(二)</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
+        
+          <a class="next" href="/post/androidplugin%E6%A6%82%E8%BF%B0/">
+            <span class="next-text nav-default">Android Plugin 概述</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+  <div id="disqus_thread"></div>
+    <script type="text/javascript">
+    (function() {
+      
+      
+      if (window.location.hostname === 'localhost') return;
+
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      var disqus_shortname = 'yunair';
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:airzhaoyn@gmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://github.com/yunair" class="iconfont icon-github" title="github"></a>
+  <a href="http://blog.airzone.world/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    
+      2015 - 
+    2018
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">Air</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+<script src="/lib/highlight/highlight.pack.js?v=20171001"></script><script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox-3.1.20.min.js"></script>
+
+
+<script type="text/javascript" src="/dist/even.min.js?v=3.2.0"></script>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-103683322-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+
+
+
+
+</body>
+</html>

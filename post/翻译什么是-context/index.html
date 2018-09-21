@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>(翻译)什么是Context - Air Little Place</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="Air" />
+  <meta name="description" content="原文 ： https://possiblemobile.com/2013/06/context/ Context 大概是 Android 应用中使用最多的元素，同时，它可能也是最被滥用的元素 Context 对象如此常见，经常在不同的类中被传来传去，它可以用于你完全不关心的场" />
+
+  <meta name="keywords" content="blog" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.49-DEV" />
+
+
+<link rel="canonical" href="http://blog.airzone.world/post/%E7%BF%BB%E8%AF%91%E4%BB%80%E4%B9%88%E6%98%AF-context/" />
+
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+
+<link href="/dist/even.min.css?v=3.2.0" rel="stylesheet">
+<link href="/lib/fancybox/jquery.fancybox-3.1.20.min.css" rel="stylesheet">
+
+
+
+
+<meta property="og:title" content="(翻译)什么是Context" />
+<meta property="og:description" content="原文 ： https://possiblemobile.com/2013/06/context/ Context 大概是 Android 应用中使用最多的元素，同时，它可能也是最被滥用的元素 Context 对象如此常见，经常在不同的类中被传来传去，它可以用于你完全不关心的场" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://blog.airzone.world/post/%E7%BF%BB%E8%AF%91%E4%BB%80%E4%B9%88%E6%98%AF-context/" /><meta property="article:published_time" content="2016-01-09T00:00:00&#43;00:00"/>
+<meta property="article:modified_time" content="2016-01-09T00:00:00&#43;00:00"/>
+<meta itemprop="name" content="(翻译)什么是Context">
+<meta itemprop="description" content="原文 ： https://possiblemobile.com/2013/06/context/ Context 大概是 Android 应用中使用最多的元素，同时，它可能也是最被滥用的元素 Context 对象如此常见，经常在不同的类中被传来传去，它可以用于你完全不关心的场">
+
+
+<meta itemprop="datePublished" content="2016-01-09T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2016-01-09T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="3186">
+
+
+
+<meta itemprop="keywords" content="翻译," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="(翻译)什么是Context"/>
+<meta name="twitter:description" content="原文 ： https://possiblemobile.com/2013/06/context/ Context 大概是 Android 应用中使用最多的元素，同时，它可能也是最被滥用的元素 Context 对象如此常见，经常在不同的类中被传来传去，它可以用于你完全不关心的场"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">Air</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">Air</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">(翻译)什么是Context</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2016-01-09 </span>
+        
+        <span class="more-meta"> 约 3186 字 </span>
+        <span class="more-meta"> 预计阅读 7 分钟 </span>
+        
+      </div>
+    </header>
+
+    
+    
+<div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  
+  <div class="post-toc-content">
+    <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#context-大概是-android-应用中使用最多的元素-同时-它可能也是最被滥用的元素">Context 大概是 Android 应用中使用最多的元素，同时，它可能也是最被滥用的元素</a></li>
+<li><a href="#context-类型">Context 类型</a></li>
+</ul></li>
+<li><a href="#保存-context-引用">保存 Context 引用</a></li>
+<li><a href="#context-能力">Context 能力</a></li>
+<li><a href="#用户界面">用户界面</a></li>
+<li><a href="#这些规则的交集">这些规则的交集</a></li>
+<li><a href="#经验之谈">经验之谈</a></li>
+</ul></li>
+</ul>
+</nav>
+  </div>
+</div>
+
+    
+    
+
+    
+    <div class="post-content">
+      
+
+<p><code>原文 ： https://possiblemobile.com/2013/06/context/</code></p>
+
+<h3 id="context-大概是-android-应用中使用最多的元素-同时-它可能也是最被滥用的元素">Context 大概是 Android 应用中使用最多的元素，同时，它可能也是最被滥用的元素</h3>
+
+<p>Context 对象如此常见，经常在不同的类中被传来传去，它可以用于你完全不关心的场景，如加载资源，启动新的 Activity，获取系统服务，获取内部文件路径，创建所有需要 Context 的视图(View)来完成任务，更关键的是，这还仅仅是 Context 的一小部分功能。我希望这篇文章能帮助你，在你的应用在你的应用中，更有效的使用 Context 对象。</p>
+
+<h3 id="context-类型">Context 类型</h3>
+
+<p>不是所有的 Context 都是相同的。获取的 Context 是由 Android 系统组件决定的，每个组件获取的 Context 对象略有不同。</p>
+
+<p><strong>Application</strong> — 在你的应用进程中，它是一个单例。 它可以通过<code>Activity</code>和<code>Service</code>中的<em>getApplication()</em> 方法获取，也可以通过任何继承了 Context 对象中的*getApplicationContext()*  方法，无论从哪里获得<code>Application</code>对象，只要在应用进程中，你获得的都是同一个实例。</p>
+
+<p><strong>Activity/Service</strong> — （这里前半部分我不按原文翻译，因为最新的 Android 源码已经不像作者写文章的时候那样了。翻译会误导）都继承了*ContextWrapper*对象，*ContextWrapper*就像命名的那样，它的内部包裹了一个 Context，它其中的方法其实就是*Context*的方法。当系统创建一个新的<code>Activity</code>或<code>Service</code>实例的时候，它同样创建了一个新的*ContextImpl*实例来完成所有费时的操作。对于每一个<code>Activity</code>或<code>Service</code>实例对应一个独一无二的*Context*。</p>
+
+<p><strong>BroadcastReceiver</strong> — 它本身不是*Context*，但是系统会在每次广播事件到达时，给它的*onReceive()*传入一个*Context*。这个*Context*实例是一个*ReceiverRestrictedContext* ，它的两个方法不建议使用，分别是*registerReceiver()*  和  *bindService()*。每次一个接收者接收到一个广播，则会新生成一个*Context*。</p>
+
+<p><strong>ContentProvider</strong> — 同样不是一个*Context*，但是当它创建的时候会传给它一个*Context*对象，然后通过它的*getContext()*方法来访问。如果<code>ContentProvider</code>和调用者在同一个应用进程中，则它会返回相同的<code>Application</code>实例，如果两个在不同的进程中，它将会新创建一个实例，代表这个<code>ContentProvider</code>所在的包。</p>
+
+<h2 id="保存-context-引用">保存 Context 引用</h2>
+
+<p>我们需要指出的第一个问题来自于在一个对象或一个类中保存  *Context*  的引用，但是这个对象存在的时间超过了保存的拥有生命周期的  *Context*  的实例的存在时间（其实就是一个某个对象持有拥有声明周期的  *Context*  对象，生命周期结束，但那个类还继续持有  *Context*  对象，这样就造成了内存泄漏）。例如，创建一个自定义的单例，需要一个  *Context*  来读取资源或者使用<code>ContentProvider</code>，然后，在那个单例中保存了当前的<code>Activity</code>或<code>Service</code>。</p>
+
+<p><strong>Bad Singleton</strong></p>
+
+<pre><code class="language-java">public class CustomManager {
+    private static CustomManager sInstance;
+
+    public static CustomManager getInstance(Context context) {
+        if (sInstance == null) {
+            sInstance = new CustomManager(context);
+        }
+
+        return sInstance;
+    }
+
+    private Context mContext;
+
+    private CustomManager(Context context) {
+        mContext = context;
+    }
+}
+</code></pre>
+
+<p>这里的问题是我们不知道  *Context*从哪里来，同时，当<code>Activity</code>或<code>Service</code>的生命周期结束时，依旧持有它的引用是不安全的。因为单例在封闭的类中被单独的静态引用管理。这意味着我们的对象，以及所有其他被它引用的对象将不会被垃圾回收器回收。如果  *Context*是一个<code>Activity</code>，我们将会在内存中保存它所有的视图以及和它有关系的潜在的大对象；这样将会导致内存泄漏。</p>
+
+<p>为了避免这样，我们修改单例，通过引用<code>Application</code>对象的  *Context*：</p>
+
+<p><strong>Better Singleton</strong></p>
+
+<pre><code class="language-java">public class CustomManager {
+    private static CustomManager sInstance;
+
+    public static CustomManager getInstance(Context context) {
+        if (sInstance == null) {
+            //Always pass in the Application Context
+            sInstance = new CustomManager(context.getApplicationContext());
+        }
+
+        return sInstance;
+    }
+
+    private Context mContext;
+
+    private CustomManager(Context context) {
+        mContext = context;
+    }
+}
+</code></pre>
+
+<p>现在，我们不用关心这个 context 来自哪里了，因为我们持有的引用是安全的。<code>Application</code>对象的  *Context*本身就是一个单例，所以即使有其他的静态对象引用它也不会造成任何泄漏。另外一个很好的可能偶尔发生的例子是：在正在运行的后台线程或者 Pending(将要发生的) *Handler*中，保存了  *Context*  的引用。</p>
+
+<p>那么，为什么我们不能总是引用<code>Application</code>对象的  *Context*？就像我们前面提到的一样，以中间人的方式（指<code>context.getApplicationContext()</code>）实现，并且不需要担心内存泄漏？答案是像我在前言中暗示的一样，因为*Context*的类别不一样。</p>
+
+<h2 id="context-能力">Context 能力</h2>
+
+<p>依赖于  *Context*的来源，你可以安全的对给予的  *Context*对象做一些共同的操作。下面的表格说明了应用在常用的地方收到一个  *Context*，在每个情况下， *Context*对象可以用来做什么</p>
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th align="center">Application</th>
+<th align="center">Activity</th>
+<th align="center">Service</th>
+<th align="center">ContentProvider</th>
+<th align="center">BroadcastReceiver</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>Show a Dialog</td>
+<td align="center">NO</td>
+<td align="center">YES</td>
+<td align="center">NO</td>
+<td align="center">NO</td>
+<td align="center">NO</td>
+</tr>
+
+<tr>
+<td>Start an Activity</td>
+<td align="center">NO<sup class="footnote-ref" id="fnref:http-www-doubleencore-com-2013-05-layout-inflation-as-intended"><a href="#fn:http-www-doubleencore-com-2013-05-layout-inflation-as-intended">1</a></sup></td>
+<td align="center">YES</td>
+<td align="center">NO<sup class="footnote-ref" id="fnref:http-www-doubleencore-com-2013-05-layout-inflation-as-intended"><a href="#fn:http-www-doubleencore-com-2013-05-layout-inflation-as-intended">1</a></sup></td>
+<td align="center">NO<sup class="footnote-ref" id="fnref:http-www-doubleencore-com-2013-05-layout-inflation-as-intended"><a href="#fn:http-www-doubleencore-com-2013-05-layout-inflation-as-intended">1</a></sup></td>
+<td align="center">NO<sup class="footnote-ref" id="fnref:http-www-doubleencore-com-2013-05-layout-inflation-as-intended"><a href="#fn:http-www-doubleencore-com-2013-05-layout-inflation-as-intended">1</a></sup></td>
+</tr>
+
+<tr>
+<td>Layout Inflation</td>
+<td align="center">NO<sup class="footnote-ref" id="fnref:http-yunair-github-io-blog-2016-01-12-5B-E7-BF-BB-E8-AF-91-5D-E6-8C-89-E8-AE-A1-E5-88-92-E7-BB-98-E5-88-B6-E5-B8-83-E5-B1-80-html"><a href="#fn:http-yunair-github-io-blog-2016-01-12-5B-E7-BF-BB-E8-AF-91-5D-E6-8C-89-E8-AE-A1-E5-88-92-E7-BB-98-E5-88-B6-E5-B8-83-E5-B1-80-html">2</a></sup></td>
+<td align="center">YES</td>
+<td align="center">NO<sup class="footnote-ref" id="fnref:http-yunair-github-io-blog-2016-01-12-5B-E7-BF-BB-E8-AF-91-5D-E6-8C-89-E8-AE-A1-E5-88-92-E7-BB-98-E5-88-B6-E5-B8-83-E5-B1-80-html"><a href="#fn:http-yunair-github-io-blog-2016-01-12-5B-E7-BF-BB-E8-AF-91-5D-E6-8C-89-E8-AE-A1-E5-88-92-E7-BB-98-E5-88-B6-E5-B8-83-E5-B1-80-html">2</a></sup></td>
+<td align="center">NO<sup class="footnote-ref" id="fnref:http-yunair-github-io-blog-2016-01-12-5B-E7-BF-BB-E8-AF-91-5D-E6-8C-89-E8-AE-A1-E5-88-92-E7-BB-98-E5-88-B6-E5-B8-83-E5-B1-80-html"><a href="#fn:http-yunair-github-io-blog-2016-01-12-5B-E7-BF-BB-E8-AF-91-5D-E6-8C-89-E8-AE-A1-E5-88-92-E7-BB-98-E5-88-B6-E5-B8-83-E5-B1-80-html">2</a></sup></td>
+<td align="center">NO<sup class="footnote-ref" id="fnref:http-yunair-github-io-blog-2016-01-12-5B-E7-BF-BB-E8-AF-91-5D-E6-8C-89-E8-AE-A1-E5-88-92-E7-BB-98-E5-88-B6-E5-B8-83-E5-B1-80-html"><a href="#fn:http-yunair-github-io-blog-2016-01-12-5B-E7-BF-BB-E8-AF-91-5D-E6-8C-89-E8-AE-A1-E5-88-92-E7-BB-98-E5-88-B6-E5-B8-83-E5-B1-80-html">2</a></sup></td>
+</tr>
+
+<tr>
+<td>Start a Service</td>
+<td align="center">YES</td>
+<td align="center">YES</td>
+<td align="center">YES</td>
+<td align="center">YES</td>
+<td align="center">YES</td>
+</tr>
+
+<tr>
+<td>Bind to a Service</td>
+<td align="center">YES</td>
+<td align="center">YES</td>
+<td align="center">YES</td>
+<td align="center">YES</td>
+<td align="center">NO</td>
+</tr>
+
+<tr>
+<td>Send a Broadcast</td>
+<td align="center">YES</td>
+<td align="center">YES</td>
+<td align="center">YES</td>
+<td align="center">YES</td>
+<td align="center">YES</td>
+</tr>
+
+<tr>
+<td>Register BroadcastReceiver</td>
+<td align="center">YES</td>
+<td align="center">YES</td>
+<td align="center">YES</td>
+<td align="center">YES</td>
+<td align="center">NO[^3]</td>
+</tr>
+
+<tr>
+<td>Load Resource Values</td>
+<td align="center">YES</td>
+<td align="center">YES</td>
+<td align="center">YES</td>
+<td align="center">YES</td>
+<td align="center">YES</td>
+</tr>
+</tbody>
+</table>
+
+<ol>
+<li><p>在这里，一个<code>Application</code>的  *Context*  可以启动一个<code>Activity</code>，但是它需要创建一个新的任务栈。在某些情况下，这可能是很好的使用方式，但是，在你的应用中，这将会导致回退栈的行为不像标准的那样，同时一般来说它不会被推荐或者被认为是一个好习惯。</p></li>
+
+<li><p>绘制布局(Inflation Layout，在本文中把 Inflation 翻译为绘制，下同)是合法的，但是绘制的时候会使用正在运行系统的默认主题，而不会使用在你应用中定义的主题(theme)。</p></li>
+
+<li><p>当<code>BroadcastReceiver</code>是*null*的时候是允许的，在 Android 4.2 及以上版本，它被用于获取 sticky 广播(broadcast)当前的值。</p></li>
+</ol>
+
+<p>​</p>
+
+<h2 id="用户界面">用户界面</h2>
+
+<p>从上面的表格可以看出，对于<code>Application</code>的  *Context*，有一些方法并不适用；那些方法都是和 UI 相关的。实际上，唯一一个有能力处理所有和 UI 相关情况的组件是<code>Activity</code>，在其它的方法中，所有组件的功能基本都相同。</p>
+
+<p>幸运的是，在整个应用了，除了<code>Activity</code>之外的领域基本不使用这三个方法，这个应该是 Android 系统的设计者刻意为之。尝试使用<code>Application</code>的  *Context*显示一个  *Dialog*  或者启动一个<code>Activity</code>，系统将会抛出一个异常同时你的应用将会崩溃——明确的提示你有些地方出现错误。</p>
+
+<p>绘制布局的问题则不明显。如果你读过我上一篇文章<a href="http://www.doubleencore.com/2013/05/layout-inflation-as-intended/">layout inflation</a>(<a href="http://yunair.github.io/blog/2016/01/12/%5B%E7%BF%BB%E8%AF%91%5D%E6%8C%89%E8%AE%A1%E5%88%92%E7%BB%98%E5%88%B6%E5%B8%83%E5%B1%80.html">翻译</a>)， 你应该知道在一些隐藏的行为中会做一些神秘的处理；使用正确的  *Context*将会得到相同的行为(using the right *Context* is linked to another one of those behaviors 这句话自我感觉翻译不好，放原文在此)，使用<code>Application</code>的  *Context*创建*LayoutInflater*  对象然后 Inflation Layout，对于这样调用此方法，虽然 Android 系统不会发出警告，而且这个方法将会完美返回正确的视图层级(view hierarchy)，但是在此过程中，你应用的主题(themes)和风格(styles)不会被使用。这是因为在你的清单文件中(manifest)，你定义的主题(themes)只会对<code>Activity</code>的  *Context*  起作用。任何其他的  *Context*  实例在绘制你的视图的时候将会使用系统默认主题，这将会导致最终的显示效果不如你期望那样。</p>
+
+<h2 id="这些规则的交集">这些规则的交集</h2>
+
+<p>不变的是，有人会觉得这两个规则是冲突的。举个例子，你应用当前的设计是：必须保存一个长时间的</p>
+
+<p>*Context*引用，同时它必须是<code>Activity</code>的  *Context*，因为我们要用它完成的任务包括操作 UI。如果在那种情况，我强烈建议你重新思考你的设计。因为这将是教科书式的反系统设计。</p>
+
+<h2 id="经验之谈">经验之谈</h2>
+
+<p>在大多数情况下，在你封闭的组件中可以直接使用可用的*Context*对象。你可以安全的保存它的引用只要那个组件在生命周期结束后不再存在。只要你的对象需要保存的*Context*引用，并且你的对象存活的时间超出了<code>Activity</code>或<code>Service</code>的生命周期，即使这种情况偶尔出现，请使用<code>Application</code>的  *Context*。</p>
+<div class="footnotes">
+
+<hr />
+
+<ol>
+<li id="fn:http-www-doubleencore-com-2013-05-layout-inflation-as-intended"> <a class="footnote-return" href="#fnref:http-www-doubleencore-com-2013-05-layout-inflation-as-intended"><sup>[return]</sup></a></li>
+<li id="fn:http-yunair-github-io-blog-2016-01-12-5B-E7-BF-BB-E8-AF-91-5D-E6-8C-89-E8-AE-A1-E5-88-92-E7-BB-98-E5-88-B6-E5-B8-83-E5-B1-80-html"> <a class="footnote-return" href="#fnref:http-yunair-github-io-blog-2016-01-12-5B-E7-BF-BB-E8-AF-91-5D-E6-8C-89-E8-AE-A1-E5-88-92-E7-BB-98-E5-88-B6-E5-B8-83-E5-B1-80-html"><sup>[return]</sup></a></li>
+</ol>
+</div>
+
+    </div>
+
+    
+    
+
+    
+    
+<div class="post-reward">
+  <input type="checkbox" name="reward" id="reward" hidden />
+  <label class="reward-button" for="reward">赞赏支持</label>
+  <div class="qr-code">
+    
+    
+    
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/img/reward/alipay-qr-code.png">
+        <span>支付宝打赏</span>
+      </label>
+  </div>
+</div>
+
+    <footer class="post-footer">
+      <div class="post-tags">
+          
+          <a href="/tags/%E7%BF%BB%E8%AF%91/">翻译</a>
+          
+        </div>
+
+      
+      <nav class="post-nav">
+        
+          <a class="prev" href="/post/%E7%BF%BB%E8%AF%91%E4%BD%BF%E7%94%A8%E6%AD%A3%E7%A1%AE%E7%9A%84%E6%96%B9%E5%BC%8F%E7%BB%98%E5%88%B6%E5%B8%83%E5%B1%80/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">(翻译)使用正确的方式绘制布局</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
+        
+          <a class="next" href="/post/andfix-%E8%A7%A3%E6%9E%90%E4%B8%8B/">
+            <span class="next-text nav-default">AndFix解析-(下)</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+  <div id="disqus_thread"></div>
+    <script type="text/javascript">
+    (function() {
+      
+      
+      if (window.location.hostname === 'localhost') return;
+
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      var disqus_shortname = 'yunair';
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:airzhaoyn@gmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://github.com/yunair" class="iconfont icon-github" title="github"></a>
+  <a href="http://blog.airzone.world/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    
+      2015 - 
+    2018
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">Air</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+<script src="/lib/highlight/highlight.pack.js?v=20171001"></script><script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox-3.1.20.min.js"></script>
+
+
+<script type="text/javascript" src="/dist/even.min.js?v=3.2.0"></script>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-103683322-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+
+
+
+
+</body>
+</html>

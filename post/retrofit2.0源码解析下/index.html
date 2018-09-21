@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Retrofit2源码分析-(下) - Air Little Place</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="Air" />
+  <meta name="description" content="引言 上篇我们主要看了一下Retrofit的设计者对Retrofit1.&#43;版本设计的评价（好的方面和坏的方面），同时也讲了Retrofit2都" />
+
+  <meta name="keywords" content="blog" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.49-DEV" />
+
+
+<link rel="canonical" href="http://blog.airzone.world/post/retrofit2.0%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%B8%8B/" />
+
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+
+<link href="/dist/even.min.css?v=3.2.0" rel="stylesheet">
+<link href="/lib/fancybox/jquery.fancybox-3.1.20.min.css" rel="stylesheet">
+
+
+
+
+<meta property="og:title" content="Retrofit2源码分析-(下)" />
+<meta property="og:description" content="引言 上篇我们主要看了一下Retrofit的设计者对Retrofit1.&#43;版本设计的评价（好的方面和坏的方面），同时也讲了Retrofit2都" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://blog.airzone.world/post/retrofit2.0%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%B8%8B/" /><meta property="article:published_time" content="2016-05-22T00:00:00&#43;00:00"/>
+<meta property="article:modified_time" content="2016-05-22T00:00:00&#43;00:00"/>
+<meta itemprop="name" content="Retrofit2源码分析-(下)">
+<meta itemprop="description" content="引言 上篇我们主要看了一下Retrofit的设计者对Retrofit1.&#43;版本设计的评价（好的方面和坏的方面），同时也讲了Retrofit2都">
+
+
+<meta itemprop="datePublished" content="2016-05-22T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2016-05-22T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="4748">
+
+
+
+<meta itemprop="keywords" content="retrofit,square," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Retrofit2源码分析-(下)"/>
+<meta name="twitter:description" content="引言 上篇我们主要看了一下Retrofit的设计者对Retrofit1.&#43;版本设计的评价（好的方面和坏的方面），同时也讲了Retrofit2都"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">Air</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">Air</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">Retrofit2源码分析-(下)</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2016-05-22 </span>
+        
+        <span class="more-meta"> 约 4748 字 </span>
+        <span class="more-meta"> 预计阅读 10 分钟 </span>
+        
+      </div>
+    </header>
+
+    
+    
+<div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  
+  <div class="post-toc-content">
+    <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#引言">引言</a></li>
+<li><a href="#网络请求">网络请求</a>
+<ul>
+<li><a href="#构造请求">构造请求:</a></li>
+<li><a href="#发送请求">发送请求:</a></li>
+<li><a href="#将服务端返回内容转化为你需要的格式">将服务端返回内容转化为你需要的格式:</a></li>
+</ul></li>
+<li><a href="#源码分析">源码分析</a>
+<ul>
+<li><a href="#构造请求-1">构造请求:</a></li>
+<li><a href="#发送请求-1">发送请求:</a></li>
+<li><a href="#将服务端返回内容转化为你需要的格式-1">将服务端返回内容转化为你需要的格式:</a></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+  </div>
+</div>
+
+    
+    
+
+    
+    <div class="post-content">
+      
+
+<h3 id="引言">引言</h3>
+
+<p>上篇我们主要看了一下Retrofit的设计者对Retrofit1.+版本设计的评价（好的方面和坏的方面），同时也讲了Retrofit2都这些问题时如何解决的，这篇，我们就一起深入去了解一下。</p>
+
+<h3 id="网络请求">网络请求</h3>
+
+<p>一个网络连接需要构造请求，发送请求，处理服务端返回内容三个步骤组成，但是处理服务端返回内容是用库的人的工作，所以一个网络请求库只要做到前两步并将服务端返回内容转化为使用库的人需要的格式即可。</p>
+
+<p>对于这三个步骤，两个版本的区别在于</p>
+
+<h4 id="构造请求">构造请求:</h4>
+
+<ol>
+<li>Retrofit2新加了<code>@Url</code>注解。</li>
+<li>新加了对某个请求单独加入Http请求头，<code>@Headers</code>(用于方法)/<code>@Header</code>(用于函数参数)。</li>
+</ol>
+
+<h4 id="发送请求">发送请求:</h4>
+
+<ol>
+<li>将网络请求交给了OkHttp</li>
+</ol>
+
+<h4 id="将服务端返回内容转化为你需要的格式">将服务端返回内容转化为你需要的格式:</h4>
+
+<ol>
+<li>Retrofit2将可以同时拿到返回内容的Header和Body，Retrofit1则不可以</li>
+<li>使用Call返回值类型将同步和异步请求统一</li>
+<li>可以添加多个Converter</li>
+<li>可以添加多个返回值类型的解析机制，在Retrofit2中称为<code>CallAdapterFactory</code>使用<code>addCallAdapterFactory()</code></li>
+</ol>
+
+<p>我们接下来跟着官方的例子来看一下这些修改时如何实现的。</p>
+
+<h3 id="源码分析">源码分析</h3>
+
+<pre><code class="language-java">Retrofit retrofit = new Retrofit.Builder()
+    .baseUrl(&quot;https://api.github.com/&quot;)
+    .addConverterFactory(GsonConverterFactory.create())
+    .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+    .build();
+
+GitHubService service = retrofit.create(GitHubService.class);
+Call&lt;List&lt;Repo&gt;&gt; repos = service.listRepos(&quot;octocat&quot;);
+
+public interface GitHubService {
+  @GET(&quot;users/{user}/repos&quot;)
+  Call&lt;List&lt;Repo&gt;&gt; listRepos(@Path(&quot;user&quot;) String user);
+}
+</code></pre>
+
+<p>从这里可以看出，通过<code>Retrofit</code>对象的<code>create()</code>方法创建出<code>GithubService</code>接口的实现，然后通过该实现进行网路请求，那么我们看看<code>create()</code>方法，</p>
+
+<pre><code class="language-java">public &lt;T&gt; T create(final Class&lt;T&gt; service) {
+    Utils.validateServiceInterface(service);
+    if (validateEagerly) {
+      eagerlyValidateMethods(service);
+    }
+    return (T) Proxy.newProxyInstance(service.getClassLoader(), 
+                        new Class&lt;?&gt;[] {service},new InvocationHandler() {
+          private final Platform platform = Platform.get();
+
+          @Override public Object invoke(Object proxy, Method method, Object... args)
+              throws Throwable {
+            // If the method is a method from Object then defer to normal invocation.
+            if (method.getDeclaringClass() == Object.class) {
+              return method.invoke(this, args);
+            }
+            if (platform.isDefaultMethod(method)) {
+              return platform.invokeDefaultMethod(method, service, proxy, args);
+            }
+            ServiceMethod serviceMethod = loadServiceMethod(method);
+            OkHttpCall okHttpCall = new OkHttpCall&lt;&gt;(serviceMethod, args);
+            return serviceMethod.callAdapter.adapt(okHttpCall);
+          }
+        });
+}
+</code></pre>
+
+<p>熟悉Retrofit1的同学可以看出这里有3点不同的地方，不熟悉也没关系，因为相同的地方就是验证接口的有效性和使用动态代理生成接口对应的实现类。接下来讲一下这三点不同。</p>
+
+<ol>
+<li>添加了<code>validateEagerly</code>参数，让客户端调用网络请求的时候不需要在反射生成的代理类中才进行初始化;提前初始化，提前验证接口是否合法，不需要在调用时才知道。</li>
+<li>添加了一个暂时不用的方法，为以后使用做扩展<code>platform.isDefaultMethod(method)</code>。</li>
+<li>将初始化过的方法交给<code>OkHttpCall</code>去执行，执行完后，通过设置的<code>CallAdapter</code>将返回值转化为你要的返回类型对象，当你通过该对象调用它的方法的时候，将把请求交给<code>OkHttp</code>去执行。</li>
+</ol>
+
+<p>分开来讲一下，先看第二点：</p>
+
+<pre><code class="language-java"> boolean isDefaultMethod(Method method) {
+    return false;
+ }
+</code></pre>
+
+<p>可以看出这个方法压根就没有用，所以我不是很了解放在这里一个不需要的方法意义是什么。</p>
+
+<p>再看第一点：</p>
+
+<pre><code class="language-java">if (validateEagerly) {
+   eagerlyValidateMethods(service);
+}
+
+private void eagerlyValidateMethods(Class&lt;?&gt; service) {
+  //和Retrofit1一样，通过反射确定客户端的平台，使用不同的方式处理
+  Platform platform = Platform.get();
+  for (Method method : service.getDeclaredMethods()) {
+    if (!platform.isDefaultMethod(method)) {
+      loadServiceMethod(method);
+    }
+  }
+}
+//和Retrofit1一样，使用Map做了一个缓存，有的话直接取，
+//否则遍历该方法的信息，创建ServiceMethod对象
+ServiceMethod loadServiceMethod(Method method) {
+    ServiceMethod result;
+    synchronized (serviceMethodCache) {
+      result = serviceMethodCache.get(method);
+      if (result == null) {
+        result = new ServiceMethod.Builder(this, method).build();
+        serviceMethodCache.put(method, result);
+      }
+    }
+    return result;
+}
+</code></pre>
+
+<p>看一下第三点：</p>
+
+<pre><code class="language-java">	ServiceMethod serviceMethod = loadServiceMethod(method);
+    OkHttpCall okHttpCall = new OkHttpCall&lt;&gt;(serviceMethod, args);
+    return serviceMethod.callAdapter.adapt(okHttpCall);
+</code></pre>
+
+<p><code>serviceMethod.callAdapter.adapt()</code>方法将<code>Call</code>对象转化为你写的返回值类型对象，即你在接口中所需的除<code>Call&lt;T&gt;</code>类型外，都需要对应的<code>CallAdapter</code>来进行转化。<code>OkHttpCall</code>实现了<code>Call&lt;T&gt;</code>接口，也就是前一篇讲到的，加入了<code>Call&lt;T&gt;</code>返回值类型。默认的<code>CallAdapter</code>支持转化成<code>Call</code>类型对象，如果需要其他的类型，你就需要调用<code>addCallAdapterFactory()</code>方法来添加新类型了。然后通过<code>OkHttp</code>进行网络请求。</p>
+
+<p>到这里大体上就讲完了，接下来就重新回到前面讲的，对一个网络请求的三个步骤进行分析，看看代码中具体是如何实现的（老规矩，忽视不重要的错误处理）。</p>
+
+<h4 id="构造请求-1">构造请求:</h4>
+
+<p>这一点的重点在<code>ServiceMethod</code>这个类，前面讲到了这个类初始化的地方，那么就从
+<code>new ServiceMethod.Builder(this, method).build()</code>开始。
+构造函数就初始化了一些类变量，来看一下<code>build()</code>方法:</p>
+
+<pre><code class="language-java">public ServiceMethod build() {
+	// 
+    callAdapter = createCallAdapter();
+    // 把函数返回值类型中泛型内的类型拿出来，
+    // 比如接口方法中某个方法返回Call&lt;Repo&gt;，这个方法执行结果是Repo
+    responseType = callAdapter.responseType();
+    
+    responseConverter = createResponseConverter();
+    for (Annotation annotation : methodAnnotations) {
+      //解析定义的Http注解，如GET，HTTP，FormUrlEncoded，Multipart，Headers
+      //如果存在Headers注解，Headers注解内的内容不能为空
+      parseMethodAnnotation(annotation);
+    }
+	// parameterAnnotationsArrays = method.getParameterAnnotations(),
+	// 即参数中的注解，二维注解数组Annotation[][]
+    int parameterCount = parameterAnnotationsArray.length;
+    // ParameterHandler这个类如名字所示，负责处理有注解的函数参数
+    parameterHandlers = new ParameterHandler&lt;?&gt;[parameterCount];
+    for (int p = 0; p &lt; parameterCount; p++) {
+      // parameterType = method.getGenericParameterTypes()
+      Type parameterType = parameterTypes[p];
+      // 这个方法就是检测方法参数类型是否是可以处理的类型
+      // 这个方法可以学到如何遍历所有的参数类型，包括泛型类型参数
+	  if (Utils.hasUnresolvableType(parameterType)) {
+	            throw parameterError(p, &quot;Parameter type must not include a type variable or wildcard: %s&quot;,
+	                parameterType);
+	          }
+
+      Annotation[] parameterAnnotations = parameterAnnotationsArray[p];
+      // 这里处理Retrofit2定义的所有@Target(PARAMETER)的参数，返回对应的ParameterHandler
+      parameterHandlers[p] = parseParameter(p, parameterType, parameterAnnotations);
+    }
+    
+    return new ServiceMethod&lt;&gt;(this);
+}
+</code></pre>
+
+<p>除了<code>createCallAdapter()</code>，<code>createResponseConverter()</code>这两个方法，这两个方法我们一会再说，按名字理解就是创建<code>CallAdapter</code>和<code>ResponseConverter</code>，这两个东西的作用就是将方法的返回值转化成你要的。</p>
+
+<p>剩下的关键方法都在方法中做了注释，这样，<code>ServiceMethod</code>类对象就生成了。
+到了这里，先不继续进行，先看一下<code>parseMethodAnnotation(annotation)</code>方法中使用的<code>parseHttpMethodAndPath()</code>方法，这个方法中会做一些验证，这个验证个人觉得有些不好理解，所以放出源代码，并将注释写在方法中。</p>
+
+<pre><code class="language-java">private void parseHttpMethodAndPath(String httpMethod, String value, boolean hasBody) {
+  this.httpMethod = httpMethod;
+  this.hasBody = hasBody;
+
+  if (value.isEmpty()) {
+    return;
+  }
+
+  // Get the relative URL path and existing query string, if present.
+  int question = value.indexOf('?');
+  if (question != -1 &amp;&amp; question &lt; value.length() - 1) {
+    // Ensure the query string does not have any named parameters.
+    String queryParams = value.substring(question + 1);
+    Matcher queryParamMatcher = PARAM_URL_REGEX.matcher(queryParams);
+    if (queryParamMatcher.find()) {// url中?之后的的String不允许存在&quot;{}&quot;
+      throw methodError(&quot;URL query string \&quot;%s\&quot; must not have replace block. &quot;
+          + &quot;For dynamic query parameters use @Query.&quot;, queryParams);
+    }
+  }
+
+  this.relativeUrl = value;
+  this.relativeUrlParamNames = parsePathParameters(value);
+}
+</code></pre>
+
+<p>好了， 这点不好理解的地方也过去了。既然生成了<code>ServiceMethod</code>，那么我们继续往下看：
+构造函数生成了<code>OkHttpCall</code>对象，最后，通过<code>ServiceMethod</code>的<code>CallAdapter</code>对象将<code>OkHttpCall</code>对象转化为你在网络请求接口中声明的返回值类型。</p>
+
+<p>在这里，我们再看一下上面提到但没分析的那两个方法<code>createCallAdapter()</code>和<code>createResponseConverter()</code>。先看<code>createCallAdapter()</code>:</p>
+
+<pre><code class="language-java">private CallAdapter&lt;?&gt; createCallAdapter() {
+  // 返回方法声明的返回类型
+  Type returnType = method.getGenericReturnType();
+  
+  if (returnType == void.class) {
+    throw methodError(&quot;Service methods cannot return void.&quot;);
+  }
+  Annotation[] annotations = method.getAnnotations();
+  return retrofit.callAdapter(returnType, annotations);
+}
+</code></pre>
+
+<p>这个方法就获取了方法的返回值类型和方法的注解，最后调用<code>Retrofit</code>对象的<code>callAdapter()</code>方法找到对应的callAdapter，好了，我们继续,
+retrofit对象的<code>callAdapter()</code>方法就一句代码，<code>return nextCallAdapter(null, returnType, annotations);</code></p>
+
+<pre><code class="language-java">public CallAdapter&lt;?&gt; nextCallAdapter(CallAdapter.Factory skipPast, Type returnType,
+    Annotation[] annotations) {
+  checkNotNull(returnType, &quot;returnType == null&quot;);
+  checkNotNull(annotations, &quot;annotations == null&quot;);
+  // List&lt;CallAdapter.Factory&gt; adapterFactories,你调用addCallAdapterFactory()就将你的CallAdapterFactory加入到了这个列表中
+  //即使你不调用addCallAdapterFactory()方法，系统也会加入一个默认的CallAdapterFactory,就是在第一篇文章中提到的Call返回值类型。
+  int start = adapterFactories.indexOf(skipPast) + 1;
+  for (int i = start, count = adapterFactories.size(); i &lt; count; i++) {
+    CallAdapter&lt;?&gt; adapter = adapterFactories.get(i).get(returnType, annotations, this);
+    if (adapter != null) { // 如果返回值类型和adapter能处理的相同，则不为null
+      return adapter;
+    }
+  }
+  throw new IllegalArgumentException(&quot;...&quot;);
+}
+</code></pre>
+
+<p>这里将注解传给<code>callAdapter()</code>是为了我们使用更好的扩展。
+这个扩展具体指什么呢？前面我们提到，可以添加多个<code>Converter</code>和<code>CallAdapter</code>。
+这里就是给你这样一种能力，如果你有自定义注解，在这里你就可以拿到自己定义的注解来处理。
+<code>callAdapter()</code>方法直接从<code>adapterFactories</code>列表中获取目标类型，即直接获取你需要该方法返回什么类型的值。
+可以看到，这里就是找哪个<code>CallAdapter</code>可以处理用户声明的该方法返回值类型，这样一个<code>CallAdapter</code>对象就生成了。</p>
+
+<p>接下来看看<code>createResponseConverter()</code>方法，在第一篇的介绍中提到<code>Converter</code>和<code>CallAdapter</code>类似，那么我猜测代码中的创建过程应该也是类似的，来仔细瞧一瞧是不是这样。</p>
+
+<pre><code class="language-java">private Converter&lt;ResponseBody, T&gt; createResponseConverter() {
+  Annotation[] annotations = method.getAnnotations();
+  try {
+    return retrofit.responseBodyConverter(responseType, annotations);
+  } catch (RuntimeException e) { // Wide exception range because factories are user code.
+    throw methodError(e, &quot;Unable to create converter for %s&quot;, responseType);
+  }
+}
+</code></pre>
+
+<p>和上面一样，调用了retrofit对象的方法，<code>responseBodyConverter()</code>方法同样一句代码:
+<code>return nextResponseBodyConverter(null, type, annotations);</code></p>
+
+<pre><code class="language-java">public &lt;T&gt; Converter&lt;ResponseBody, T&gt; nextResponseBodyConverter(Converter.Factory skipPast,
+    Type type, Annotation[] annotations) {
+  checkNotNull(type, &quot;type == null&quot;);
+  checkNotNull(annotations, &quot;annotations == null&quot;);
+  // List&lt;Converter.Factory&gt; converterFactories,你调用addConverterFactory()方法就是将你的Converter.Factory加入这个列表中，因为列表有序，所以从前往后找，JSON没有明显的特征，所以需要将JSON放在最后
+  // 即使你不调用addConverterFactory()方法，会加入内置的Converter.Factory
+  // 下面是加入内置Converter.Factory的方法和注释。
+   // Add the built-in converter factory first. This prevents overriding its behavior but also
+      // ensures correct behavior when using converters that consume all types.
+      // converterFactories.add(new BuiltInConverters());
+  int start = converterFactories.indexOf(skipPast) + 1;
+  for(int i = start, count = converterFactories.size(); i &lt; count; i++){
+    //将ResponseBody转化为你需要的类型
+    Converter&lt;ResponseBody, ?&gt; converter =
+        converterFactories.get(i).responseBodyConverter(type, annotations, this);
+    if (converter != null) { // 如果能处理对应的type，则不为null
+      //noinspection unchecked
+      return (Converter&lt;ResponseBody, T&gt;) converter;
+    }
+  }
+  throw new IllegalArgumentException(&quot;...&quot;);
+}
+</code></pre>
+
+<p>除了这个ResponseBodyConverter，还有一个RequestBodyConverter，其实这个也是从<code>converterFactories</code>里面寻找处理请求参数的Converter。</p>
+
+<p>到这里，<code>Retrofit</code>对象的<code>create()</code>方法就分析完了，<code>CallAdapter</code>将<code>OkHttpCall</code>对象转化成了你想要的对象，此时就可以拿你想要的对象进行操作了，也就是构造请求完成了。</p>
+
+<h4 id="发送请求-1">发送请求:</h4>
+
+<p>当用户调用接口中方法的时候，底层直接通过OkHttp进行发送请求。</p>
+
+<h4 id="将服务端返回内容转化为你需要的格式-1">将服务端返回内容转化为你需要的格式:</h4>
+
+<p>OkHttp接收到请求后，通过<code>Converter</code>将服务端返回内容转化为你需要的格式。所以到这里源码的流程已经走完了。</p>
+
+<p>可以看出其实这个框架在构造请求的完成的时候工作也完成了。</p>
+
+<p>接下来有一些需要注意的地方:</p>
+
+<ol>
+<li>接口中任何一个方法的只允许被一个Http方法注解(即[GET, POST, PUT, DELETE, PATCH, HEAD, OPTIONS, HTTP]这个列表中的元素每个方法只能使用一个)</li>
+<li>网络请求只要服务端有数据返回，就不算failure，Retrotfit1的时候404和500都算failure。所以当你使用Callback时，在<code>onResponse</code>函数里，使用<code>response.isSuccessful()</code>确定服务端返回正常数据还是服务端错误信息。</li>
+<li>Url的拼接规则变了，初始化Retrofit对象的时候baseUrl最后一定要加&rsquo;/&lsquo;。详细的内容查看下面的表格:</li>
+</ol>
+
+<table>
+<thead>
+<tr>
+<th align="center">BaseUrl</th>
+<th align="center">AnnotationUrl</th>
+<th align="center">RequestUrl</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td align="center"><a href="https://api.github.com/repo/">https://api.github.com/repo/</a></td>
+<td align="center">/square/end</td>
+<td align="center"><a href="https://api.github.com/square/end">https://api.github.com/square/end</a></td>
+</tr>
+
+<tr>
+<td align="center"><a href="https://api.github.com/repo/">https://api.github.com/repo/</a></td>
+<td align="center">square/end</td>
+<td align="center"><a href="https://api.github.com/repo/square/end">https://api.github.com/repo/square/end</a></td>
+</tr>
+
+<tr>
+<td align="center"><a href="https://api.github.com/repo/">https://api.github.com/repo/</a></td>
+<td align="center"><a href="http://z.cn/end">http://z.cn/end</a></td>
+<td align="center"><a href="http://z.cn/end">http://z.cn/end</a></td>
+</tr>
+</tbody>
+</table>
+
+<p>最后放一张流程图，来源[Retrofit分析-漂亮的解耦套路][2]，是一个很棒的流程图，可以加深对此源码分析的理解。</p>
+
+<p><img src="/img/retrofit/retrofit2.png" alt="" /></p>
+
+<p>最后是一些参考资料:</p>
+
+<ol>
+<li><a href="http://www.jianshu.com/p/308f3c54abdd">你真的会用Retrofit2吗?</a> 对Retrofit2中用到的注解进行了分类，可以让你更清晰的使用对应的注解；提供了自定义<code>ConverterFactory</code>和<code>CallAdapterFactory</code>的思路。</li>
+</ol>
+
+    </div>
+
+    
+    
+
+    
+    
+<div class="post-reward">
+  <input type="checkbox" name="reward" id="reward" hidden />
+  <label class="reward-button" for="reward">赞赏支持</label>
+  <div class="qr-code">
+    
+    
+    
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/img/reward/alipay-qr-code.png">
+        <span>支付宝打赏</span>
+      </label>
+  </div>
+</div>
+
+    <footer class="post-footer">
+      <div class="post-tags">
+          
+          <a href="/tags/retrofit/">retrofit</a>
+          
+          <a href="/tags/square/">square</a>
+          
+        </div>
+
+      
+      <nav class="post-nav">
+        
+          <a class="prev" href="/post/jenkins%E4%BD%BF%E7%94%A8/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">Jenkins的使用</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
+        
+          <a class="next" href="/post/retrofit2.0%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%B8%8A/">
+            <span class="next-text nav-default">Retrofit2源码分析-(上)</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+  <div id="disqus_thread"></div>
+    <script type="text/javascript">
+    (function() {
+      
+      
+      if (window.location.hostname === 'localhost') return;
+
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      var disqus_shortname = 'yunair';
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:airzhaoyn@gmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://github.com/yunair" class="iconfont icon-github" title="github"></a>
+  <a href="http://blog.airzone.world/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    
+      2015 - 
+    2018
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">Air</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+<script src="/lib/highlight/highlight.pack.js?v=20171001"></script><script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox-3.1.20.min.js"></script>
+
+
+<script type="text/javascript" src="/dist/even.min.js?v=3.2.0"></script>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-103683322-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+
+
+
+
+</body>
+</html>

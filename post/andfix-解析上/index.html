@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>AndFix解析-(上) - Air Little Place</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="Air" />
+  <meta name="description" content="阿里巴巴前一段时间开源了他们用来解决线上紧急 bug 的一款 Android 库——AndFix 对 Android 开发者来说真是一个很好的消息。 基于自己的经验，太长的文字很少有人" />
+
+  <meta name="keywords" content="blog" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.49-DEV" />
+
+
+<link rel="canonical" href="http://blog.airzone.world/post/andfix-%E8%A7%A3%E6%9E%90%E4%B8%8A/" />
+
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+
+<link href="/dist/even.min.css?v=3.2.0" rel="stylesheet">
+<link href="/lib/fancybox/jquery.fancybox-3.1.20.min.css" rel="stylesheet">
+
+
+
+
+<meta property="og:title" content="AndFix解析-(上)" />
+<meta property="og:description" content="阿里巴巴前一段时间开源了他们用来解决线上紧急 bug 的一款 Android 库——AndFix 对 Android 开发者来说真是一个很好的消息。 基于自己的经验，太长的文字很少有人" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://blog.airzone.world/post/andfix-%E8%A7%A3%E6%9E%90%E4%B8%8A/" /><meta property="article:published_time" content="2015-09-25T00:00:00&#43;00:00"/>
+<meta property="article:modified_time" content="2015-09-25T00:00:00&#43;00:00"/>
+<meta itemprop="name" content="AndFix解析-(上)">
+<meta itemprop="description" content="阿里巴巴前一段时间开源了他们用来解决线上紧急 bug 的一款 Android 库——AndFix 对 Android 开发者来说真是一个很好的消息。 基于自己的经验，太长的文字很少有人">
+
+
+<meta itemprop="datePublished" content="2015-09-25T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2015-09-25T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="1894">
+
+
+
+<meta itemprop="keywords" content="AndFix," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="AndFix解析-(上)"/>
+<meta name="twitter:description" content="阿里巴巴前一段时间开源了他们用来解决线上紧急 bug 的一款 Android 库——AndFix 对 Android 开发者来说真是一个很好的消息。 基于自己的经验，太长的文字很少有人"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">Air</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">Air</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">AndFix解析-(上)</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2015-09-25 </span>
+        
+        <span class="more-meta"> 约 1894 字 </span>
+        <span class="more-meta"> 预计阅读 4 分钟 </span>
+        
+      </div>
+    </header>
+
+    
+    
+<div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  
+  <div class="post-toc-content">
+    <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#patchmanager-构造函数">PatchManager 构造函数</a></li>
+<li><a href="#patchmanager-init-string-version">PatchManager init(String version)</a></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+  </div>
+</div>
+
+    
+    
+
+    
+    <div class="post-content">
+      
+
+<p>阿里巴巴前一段时间开源了他们用来解决线上紧急 bug 的一款 Android 库——<code>AndFix</code></p>
+
+<p>对 Android 开发者来说真是一个很好的消息。</p>
+
+<p><strong>基于自己的经验，太长的文字很少有人可以一口气看下来的，所以我打算分成多篇来分析</strong>
+这是这个库解析的第一篇，</p>
+
+<p>我们先看一下其中的 Demo 代码，其中调用加载库的代码如下所示:</p>
+
+<pre><code class="language-java">/**
+ * sample application
+ *
+ * @author sanping.li@alipay.com
+ *
+ */
+public class MainApplication extends Application {
+	private static final String TAG = &quot;euler&quot;;
+
+	private static final String APATCH_PATH = &quot;/out.apatch&quot;;
+	/**
+	 * patch manager
+	 */
+	private PatchManager mPatchManager;
+
+	@Override
+	public void onCreate() {
+		super.onCreate();
+		// initialize
+		mPatchManager = new PatchManager(this);
+		mPatchManager.init(&quot;1.0&quot;);
+		Log.d(TAG, &quot;inited.&quot;);
+
+		// load patch
+		mPatchManager.loadPatch();
+		Log.d(TAG, &quot;apatch loaded.&quot;);
+
+		// add patch at runtime
+		try {
+			// .apatch file path
+			String patchFileString = Environment.getExternalStorageDirectory()
+					.getAbsolutePath() + APATCH_PATH;
+			mPatchManager.addPatch(patchFileString);
+			Log.d(TAG, &quot;apatch:&quot; + patchFileString + &quot; added.&quot;);
+		} catch (IOException e) {
+			Log.e(TAG, &quot;&quot;, e);
+		}
+
+	}
+}
+</code></pre>
+
+<p>可以看到代码中首先通过 PatchManager 的构造函数初始化了<code>PatchManager</code>对象，</p>
+
+<h3 id="patchmanager-构造函数">PatchManager 构造函数</h3>
+
+<p>那么<code>PatchManager</code>对象里面都有什么呢，我们深入其中了解一下。</p>
+
+<pre><code class="language-java">public PatchManager(Context context) {
+    this.mContext = context;
+	this.mAndFixManager = new AndFixManager(this.mContext);
+	this.mPatchDir = new File(this.mContext.getFilesDir(), &quot;apatch&quot;);
+	this.mPatchs = new ConcurrentSkipListSet();
+	this.mLoaders = new ConcurrentHashMap();
+}
+</code></pre>
+
+<p>原来维持了一个 Context 对象的引用，初始化了 AndFixManager 对象，mPatchDir 对象为存放 Patch 文件的文件夹，初始化了 Patch 的集合，还有持有 ClassLoader 的 Map</p>
+
+<p>其中一些内容的声明如下:</p>
+
+<pre><code class="language-java">private final Context mContext;
+private final AndFixManager mAndFixManager;
+private final File mPatchDir;
+private final SortedSet&lt;Patch&gt; mPatchs;
+private final Map&lt;String, ClassLoader&gt; mLoaders;
+</code></pre>
+
+<p>我们对构造函数的分析在这里就结束了，我们先不深入的跟进 Patch 和 AndFixManager 这两个类了。</p>
+
+<h3 id="patchmanager-init-string-version">PatchManager init(String version)</h3>
+
+<p>接下来分析<code>PatchManager</code>类中的<code>init(String version)</code>函数，
+先来看代码</p>
+
+<pre><code class="language-java">public void init(String appVersion) {
+	//如果mPatchDir不存在，则创建文件夹，如果创建失败，则打印Log
+	if(!this.mPatchDir.exists() &amp;&amp; !this.mPatchDir.mkdirs()) {
+    	Log.e(&quot;PatchManager&quot;, &quot;patch dir create error.&quot;);
+    } else if(!this.mPatchDir.isDirectory()) {
+	//如果遇到同名的文件，则将该同名文件删除
+    	this.mPatchDir.delete();
+    } else {
+	//在该文件下放入一个名为_andfix_的SharedPreferences文件，
+    	SharedPreferences sp = this.mContext.getSharedPreferences(&quot;_andfix_&quot;, 0);
+    	String ver = sp.getString(&quot;version&quot;, (String)null);
+    	if(ver != null &amp;&amp; ver.equalsIgnoreCase(appVersion)) {
+    		this.initPatchs();
+    	} else {
+    		this.cleanPatch();
+    		sp.edit().putString(&quot;version&quot;, appVersion).commit();
+    	}
+	}
+}
+</code></pre>
+
+<p>接下来我们分析上面代码中的如下代码</p>
+
+<pre><code class="language-java">//如果从_andfix_这个文件获取的ver不是null，而且这个ver和外部初始化时传进来的版本号一致
+if(ver != null &amp;&amp; ver.equalsIgnoreCase(appVersion)) {
+	this.initPatchs();
+} else {
+	this.cleanPatch();
+	sp.edit().putString(&quot;version&quot;, appVersion).commit();
+}
+</code></pre>
+
+<p>先看 else 内的内容，else 里执行力<code>cleanPatch()</code>和把外部初始化的时候传进来的版本号放入 SharedPreferences 里。
+<code>cleanPatch()</code>做了什么操作呢，我们跟进去看一看</p>
+
+<pre><code class="language-java">private void cleanPatch() {
+	//获取mPatchDir目录下所有文件
+    File[] files = this.mPatchDir.listFiles();
+    File[] arr$ = files;
+    int len$ = files.length;
+
+    for(int i$ = 0; i$ &lt; len$; ++i$) {
+        File file = arr$[i$];
+        //将此文件从OptFile文件夹删除
+        this.mAndFixManager.removeOptFile(file);
+        //这个方法的作用就是如果file是文件，则删除它，如果file是文件夹，则将它和它里面的文件都删除
+        if(!FileUtil.deleteFile(file)) {
+            Log.e(&quot;PatchManager&quot;, file.getName() + &quot; delete error.&quot;);
+        }
+    }
+}
+</code></pre>
+
+<p>如源码中的注释，就是删除了之前在那两个文件夹下的所有的补丁文件。</p>
+
+<p>现在来分析一下<code>this.initPatchs()</code>做了什么事</p>
+
+<pre><code class="language-java">private void initPatchs() {
+    File[] files = this.mPatchDir.listFiles();
+    File[] arr$ = files;
+    int len$ = files.length;
+
+    for(int i$ = 0; i$ &lt; len$; ++i$) {
+        File file = arr$[i$];
+        this.addPatch(file);
+    }
+}
+</code></pre>
+
+<p>代码很简单，就是把 mPatchDir 文件夹下的文件作为参数传给了<code>addPatch(File)</code>方法
+那<code>this.addPatch(file)</code>做了什么呢</p>
+
+<pre><code class="language-java">//把扩展名为.apatch的文件传给Patch做参数，初始化对应的Patch，
+//并把刚初始化的Patch加入到我们之前看到的Patch集合mPatchs中
+private Patch addPatch(File file) {
+    Patch patch = null;
+    //扩展名是否为&quot;.apatch&quot;
+    if(file.getName().endsWith(&quot;.apatch&quot;)) {
+        try {
+            patch = new Patch(file);
+            this.mPatchs.add(patch);
+        } catch (IOException var4) {
+            Log.e(&quot;PatchManager&quot;, &quot;addPatch&quot;, var4);
+        }
+    }
+    return patch;
+}
+</code></pre>
+
+<p>上面的代码很好理解，此时，我们已经完整的走下来了<code>init(String version)</code>这个方法。
+再次出现了 Patch 这个类，但是我们依然要把它放在一边，因为由于篇幅限制，第一篇不会分析这个类。</p>
+
+<p>接下来，我们继续跟着 demo 走，会执行两个方法，一个<code>mPatchManager.loadPatch()</code>，一个<code>mPatchManager.addPatch(patchFileString)</code>，
+<code>loadPatch()</code>方法是这个库执行替换的核心方法，我会在以后单独写一篇文章来分析，所以，在这篇文章的最后，我们跟进<code>addPatch(String)</code>这个方法一看究竟</p>
+
+<pre><code class="language-java">public void addPatch(String path) throws IOException {
+    File src = new File(path);
+    File dest = new File(this.mPatchDir, src.getName());
+    if(dest.exists()) {
+    	//在mPatchDir文件夹下存在该文件，则AndFixManager移除该文件
+        this.mAndFixManager.removeOptFile(dest);
+    }
+	//将文件从src复制到dest，只不过阿里用了NIO来复制文件
+    FileUtil.copyFile(src, dest);
+    //调用了另外一个addPatch方法，以文件作为参数
+    Patch patch = this.addPatch(dest);
+    if(patch != null) {
+    	//同样调用了loadPatch(Patch)方法
+        this.loadPatch(patch);
+    }
+
+}
+</code></pre>
+
+<p>简单来说，上面的方法就是将补丁文件复制到/data/data/{包名}/apatch 目录内，如果在 OptFile 文件夹中存在，则删除。
+然后调用另外一个<code>addPatch(File)</code>方法，然后<code>loadPatch()</code>
+下面，我们来看一下重载的<code>addPatch(File)</code>方法</p>
+
+<pre><code class="language-java">private Patch addPatch(File file) {
+    Patch patch = null;
+    if(file.getName().endsWith(&quot;.apatch&quot;)) {
+        try {
+            patch = new Patch(file);
+            //把从file文件生成的patch加入到mPatchs这个Set中
+            this.mPatchs.add(patch);
+        } catch (IOException var4) {
+            Log.e(&quot;PatchManager&quot;, &quot;addPatch&quot;, var4);
+        }
+    }
+
+    return patch;
+}
+</code></pre>
+
+<p>该方法主要做的事情在注释中即可了解，到这里，第一篇分析就结束了。</p>
+
+    </div>
+
+    
+    
+
+    
+    
+<div class="post-reward">
+  <input type="checkbox" name="reward" id="reward" hidden />
+  <label class="reward-button" for="reward">赞赏支持</label>
+  <div class="qr-code">
+    
+    
+    
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/img/reward/alipay-qr-code.png">
+        <span>支付宝打赏</span>
+      </label>
+  </div>
+</div>
+
+    <footer class="post-footer">
+      <div class="post-tags">
+          
+          <a href="/tags/andfix/">AndFix</a>
+          
+        </div>
+
+      
+      <nav class="post-nav">
+        
+          <a class="prev" href="/post/andfix-%E8%A7%A3%E6%9E%90%E4%B8%AD/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">AndFix解析-(中)</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
+        
+          <a class="next" href="/post/jenkins_email_failed/">
+            <span class="next-text nav-default">Jenkins_email_failed</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+  <div id="disqus_thread"></div>
+    <script type="text/javascript">
+    (function() {
+      
+      
+      if (window.location.hostname === 'localhost') return;
+
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      var disqus_shortname = 'yunair';
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:airzhaoyn@gmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://github.com/yunair" class="iconfont icon-github" title="github"></a>
+  <a href="http://blog.airzone.world/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    
+      2015 - 
+    2018
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">Air</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+<script src="/lib/highlight/highlight.pack.js?v=20171001"></script><script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox-3.1.20.min.js"></script>
+
+
+<script type="text/javascript" src="/dist/even.min.js?v=3.2.0"></script>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-103683322-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+
+
+
+
+</body>
+</html>

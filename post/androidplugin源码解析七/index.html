@@ -1,0 +1,1221 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>AndroidPlugin源码解析-(七) - Air Little Place</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="Air" />
+  <meta name="description" content="忽视了 Aidl, Shader, Ndk, Jni, Jack, DataBinding, StripNativeLibrary, Split, InstantRun, Lint 这些 Task 之后，我们就只剩下面三个重要的 Task 了： createJavacTask(tasks, variantScope); createPostCompilationTasks(tasks, variantScope); createPackagingTask(tasks, variantScope, true /publishApk/, fullBuildInfoGeneratorTask); 这篇文章我们来分析前面两个 Task createJavacTask 这个 Task 的方法为: public AndroidTask&amp;lt;? extends JavaCompile&amp;gt;" />
+
+  <meta name="keywords" content="blog" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.49-DEV" />
+
+
+<link rel="canonical" href="http://blog.airzone.world/post/androidplugin%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%B8%83/" />
+
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+
+<link href="/dist/even.min.css?v=3.2.0" rel="stylesheet">
+<link href="/lib/fancybox/jquery.fancybox-3.1.20.min.css" rel="stylesheet">
+
+
+
+
+<meta property="og:title" content="AndroidPlugin源码解析-(七)" />
+<meta property="og:description" content="忽视了 Aidl, Shader, Ndk, Jni, Jack, DataBinding, StripNativeLibrary, Split, InstantRun, Lint 这些 Task 之后，我们就只剩下面三个重要的 Task 了： createJavacTask(tasks, variantScope); createPostCompilationTasks(tasks, variantScope); createPackagingTask(tasks, variantScope, true /publishApk/, fullBuildInfoGeneratorTask); 这篇文章我们来分析前面两个 Task createJavacTask 这个 Task 的方法为: public AndroidTask&lt;? extends JavaCompile&gt;" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://blog.airzone.world/post/androidplugin%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%B8%83/" /><meta property="article:published_time" content="2017-09-10T00:00:00&#43;00:00"/>
+<meta property="article:modified_time" content="2017-09-10T00:00:00&#43;00:00"/>
+<meta itemprop="name" content="AndroidPlugin源码解析-(七)">
+<meta itemprop="description" content="忽视了 Aidl, Shader, Ndk, Jni, Jack, DataBinding, StripNativeLibrary, Split, InstantRun, Lint 这些 Task 之后，我们就只剩下面三个重要的 Task 了： createJavacTask(tasks, variantScope); createPostCompilationTasks(tasks, variantScope); createPackagingTask(tasks, variantScope, true /publishApk/, fullBuildInfoGeneratorTask); 这篇文章我们来分析前面两个 Task createJavacTask 这个 Task 的方法为: public AndroidTask&lt;? extends JavaCompile&gt;">
+
+
+<meta itemprop="datePublished" content="2017-09-10T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2017-09-10T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="7717">
+
+
+
+<meta itemprop="keywords" content="AndroidPlugin," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="AndroidPlugin源码解析-(七)"/>
+<meta name="twitter:description" content="忽视了 Aidl, Shader, Ndk, Jni, Jack, DataBinding, StripNativeLibrary, Split, InstantRun, Lint 这些 Task 之后，我们就只剩下面三个重要的 Task 了： createJavacTask(tasks, variantScope); createPostCompilationTasks(tasks, variantScope); createPackagingTask(tasks, variantScope, true /publishApk/, fullBuildInfoGeneratorTask); 这篇文章我们来分析前面两个 Task createJavacTask 这个 Task 的方法为: public AndroidTask&lt;? extends JavaCompile&gt;"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">Air</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">Air</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">AndroidPlugin源码解析-(七)</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2017-09-10 </span>
+        
+        <span class="more-meta"> 约 7717 字 </span>
+        <span class="more-meta"> 预计阅读 16 分钟 </span>
+        
+      </div>
+    </header>
+
+    
+    
+<div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  
+  <div class="post-toc-content">
+    <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#createjavactask">createJavacTask</a></li>
+<li><a href="#createpostcompilationtasks">createPostCompilationTasks</a>
+<ul>
+<li><a href="#createproguardtransform">createProguardTransform</a>
+<ul>
+<li><a href="#applyproguardconfig">applyProguardConfig</a></li>
+</ul></li>
+<li><a href="#createshrinkresourcestransform">createShrinkResourcesTransform</a></li>
+<li><a href="#multidextransform-transform">MultiDexTransform transform</a>
+<ul>
+<li><a href="#multidextransform-shrinkwithproguard">MultiDexTransform shrinkWithProguard</a></li>
+<li><a href="#multidextransform-computelist">MultiDexTransform computeList</a></li>
+</ul></li>
+<li><a href="#dextransform-transform">DexTransform transform</a></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+  </div>
+</div>
+
+    
+    
+
+    
+    <div class="post-content">
+      
+
+<p>忽视了 Aidl, Shader, Ndk, Jni, Jack, DataBinding, StripNativeLibrary, Split, InstantRun, Lint 这些 Task 之后，我们就只剩下面三个重要的 Task 了：</p>
+
+<ul>
+<li>createJavacTask(tasks, variantScope);</li>
+<li>createPostCompilationTasks(tasks, variantScope);</li>
+<li>createPackagingTask(tasks, variantScope, true /<em>publishApk</em>/, fullBuildInfoGeneratorTask);</li>
+</ul>
+
+<p>这篇文章我们来分析前面两个 Task</p>
+
+<h3 id="createjavactask">createJavacTask</h3>
+
+<p>这个 Task 的方法为:</p>
+
+<pre><code class="language-java">public AndroidTask&lt;? extends JavaCompile&gt; createJavacTask(
+        @NonNull final TaskFactory tasks,
+        @NonNull final VariantScope scope) {
+    final BaseVariantData&lt;? extends BaseVariantOutputData&gt; variantData = scope.getVariantData();
+    // 这是AndroidJavaCompileTask的前置Task，如果生成的源码有变动，则清空AndroidJavaCompile的输出目录，强制重新编译
+    // 这个文件为  build/intermediates/incremental-safeguard/tag.txt
+    AndroidTask&lt;IncrementalSafeguard&gt; javacIncrementalSafeguard = androidTasks.create(tasks,
+            new IncrementalSafeguard.ConfigAction(scope));
+
+    final AndroidTask&lt;? extends JavaCompile&gt; javacTask = androidTasks.create(tasks,
+            new JavaCompileConfigAction(scope));
+    scope.setJavacTask(javacTask);
+    javacTask.dependsOn(tasks, javacIncrementalSafeguard);
+
+    setupCompileTaskDependencies(tasks, scope, javacTask);
+
+    // Create jar task for uses by external modules.
+    // 还没遇见过，暂时忽视
+    // 生成的文件路径在 build/intermediates/classes-jar/${buildType}/class.jar
+    if (variantData.getVariantDependency().getClassesConfiguration() != null) {
+        AndroidTask&lt;Jar&gt; packageJarArtifact =
+                androidTasks.create(tasks, new PackageJarArtifactConfigAction(scope));
+        packageJarArtifact.dependsOn(tasks, javacTask);
+    }
+
+    return javacTask;
+}
+</code></pre>
+
+<p>看到这里相当于存在 3 个 Task，但是我们只要关心<code>javacTask</code>即可，</p>
+
+<p>第一个<code>javacIncrementalSafeguard</code>,就是类似标识位的东东，</p>
+
+<p>最后一个<code>packageJarArtifact</code>，因为我还没遇到使用外部 modules 的情况，所以也忽略，</p>
+
+<p>大家如果在打包完成的 build 路径下看到我提到的路径，就可以在这里查看情况。</p>
+
+<p>好的，那么我们来仔细看一下<code>javacTask</code></p>
+
+<pre><code class="language-java">public void execute(@NonNull final AndroidJavaCompile javacTask) {
+    scope.getVariantData().javacTask = javacTask;
+    // compileSdkVersion &gt;= 24，需要用JDK 1.8及以上版本
+    javacTask.compileSdkVersion = scope.getGlobalScope().getExtension().getCompileSdkVersion();
+    javacTask.mBuildContext = scope.getInstantRunBuildContext();
+
+    // We can't just pass the collection directly, as the instanceof check in the incremental
+    // compile doesn't work recursively currently, so every ConfigurableFileTree needs to be
+    // directly in the source array.
+    for (ConfigurableFileTree fileTree : scope.getVariantData().getJavaSources()) {
+        javacTask.source(fileTree);
+    }
+
+    // Set boot classpath if we don't need to keep the default.  Otherwise, this is added as
+    // normal classpath.
+    javacTask.getOptions().setBootClasspath(
+            Joiner.on(File.pathSeparator).join(
+                    scope.getGlobalScope().getAndroidBuilder()
+                            .getBootClasspathAsStrings(false)));
+
+
+    javacTask.setDestinationDir(scope.getJavaOutputDir()); // build/intermediates/classes/
+
+    javacTask.setDependencyCacheDir(scope.getJavaDependencyCache()); // build/intermediates/dependency-cache/
+
+    CompileOptions compileOptions = scope.getGlobalScope().getExtension().getCompileOptions();
+
+    AbstractCompilesUtil.configureLanguageLevel(
+            javacTask,
+            compileOptions,
+            scope.getGlobalScope().getExtension().getCompileSdkVersion(),
+            scope.getVariantConfiguration().getJackOptions().isEnabled());
+
+    javacTask.getOptions().setEncoding(compileOptions.getEncoding());
+
+    GlobalScope globalScope = scope.getGlobalScope();
+    Project project = scope.getGlobalScope().getProject();
+
+    CoreAnnotationProcessorOptions annotationProcessorOptions =
+            scope.getVariantConfiguration().getJavaCompileOptions()
+                    .getAnnotationProcessorOptions();
+
+
+    checkNotNull(annotationProcessorOptions.getIncludeCompileClasspath());
+    Collection&lt;File&gt; processorPath =
+            Lists.newArrayList(
+                    scope.getVariantData().getVariantDependency()
+                            .resolveAndGetAnnotationProcessorClassPath(
+                                    annotationProcessorOptions.getIncludeCompileClasspath(),
+                                    scope.getGlobalScope().getAndroidBuilder().getErrorReporter()));
+
+
+    if (!processorPath.isEmpty()) {
+        if (Boolean.TRUE.equals(annotationProcessorOptions.getIncludeCompileClasspath())) {
+            processorPath.addAll(javacTask.getClasspath().getFiles());
+        }
+        javacTask.getOptions().getCompilerArgs().add(&quot;-processorpath&quot;);
+        javacTask.getOptions().getCompilerArgs().add(FileUtils.joinFilePaths(processorPath));
+    }
+    if (!annotationProcessorOptions.getClassNames().isEmpty()) {
+        javacTask.getOptions().getCompilerArgs().add(&quot;-processor&quot;);
+        javacTask.getOptions().getCompilerArgs().add(
+                Joiner.on(',').join(annotationProcessorOptions.getClassNames()));
+    }
+    if (!annotationProcessorOptions.getArguments().isEmpty()) {
+        for (Map.Entry&lt;String, String&gt; arg :
+                annotationProcessorOptions.getArguments().entrySet()) {
+            javacTask.getOptions().getCompilerArgs().add(
+                    &quot;-A&quot; + arg.getKey() + &quot;=&quot; + arg.getValue());
+        }
+    }
+
+    // Create directory for output of annotation processor.
+    javacTask.doFirst(task -&gt; {
+        FileUtils.mkdirs(scope.getAnnotationProcessorOutputDir()); // build/generated/source/apt
+    });
+    javacTask.getOptions().getCompilerArgs().add(&quot;-s&quot;);
+    javacTask.getOptions().getCompilerArgs().add(
+            scope.getAnnotationProcessorOutputDir().getAbsolutePath());
+}
+</code></pre>
+
+<p>看下来这个代码，这里就是在给 javac 命令添加参数，看到<code>setDestinationDir()</code>方法，说明 javac 之后生成的代码路径为<code>build/intermediates/classes/</code>。
+先往回看代码:</p>
+
+<pre><code class="language-java">javacTask.getOptions().setBootClasspath(
+        Joiner.on(File.pathSeparator).join(
+            scope.getGlobalScope().getAndroidBuilder()
+                .getBootClasspathAsStrings(false)));
+</code></pre>
+
+<p>这个方法就是设置一些很基础的 jar 包的 classpath，比如<code>android.jar</code>。</p>
+
+<p>这个代码通过查找 Sdk location 来获取这些 jar 包的位置，至于使用的是哪个版本，则由<code>compileSdkVersion</code>决定，</p>
+
+<p>所以，升级<code>compileSdkVersion</code>，就能使用最新的<code>android.jar</code>的 sdk，</p>
+
+<p>还有，如果你想使用暴露隐藏方法的<code>android.jar</code>，替换对应<code>compileSdkVersion</code>的<code>android.jar</code>即可。具体路径在<code>${sdkVersion}/platforms/android-${compileSdkVersion}</code>。
+</br></p>
+
+<p>往下继续看代码，可以看到一个叫做<code>processorPath</code>的列表，<code>processorPath</code>这个列表是怎么来的呢？就是我们在<code>build.gradle</code>里面<code>dependencies</code>里面声明的<code>annotationProcessor</code>。</p>
+
+<p>假设你的项目里有<code>butterknife</code>之类的东东，所以这个列表不会为空，所以会为 javac 添加如下参数<code>-processorpath ${processorPath}</code>,</p>
+
+<p>继续看，发现又添加了具体的 apt 处理类的参数:
+<code>-processor ${processorClassName1,processorClassName2...}</code>，</p>
+
+<p>最后，如果你为某个<code>annotationProcessor</code>设置了参数，就会为 javac 再加入新的参数<code>-A ${key}=${value}</code>,</p>
+
+<p>为某个<code>annotationProcessor</code>设置了参数的方式为(以<code>butterknife</code>为例)</p>
+
+<p><code>javaCompileOptions.annotationProcessorOptions.arguments['butterknife.debuggable'] = 'false'</code></p>
+
+<p>所以，这个地方给 javac 添加的参数类似<code>-A butterknife.debuggable=false</code>。
+</br></p>
+
+<p>最后，要在执行 javac 之前做一些处理，我们可以看到，就是创建<code>build/generated/source/apt</code>这个文件夹，如果存在，删除之后再重新创建。创建好此文件夹后，就可以加入<code>-s ${annotationProcessorOutputDir}</code>,</p>
+
+<p>这样，无论是需要 apt 生成的代码，还是最终需要 javac 生成的代码都配置好了，如果想知道每个参数的具体含义，请参考<code>javac -help</code>
+</br></p>
+
+<p>剩下的就是调用 javac 命令来执行了，因为这个属于<code>JavaCompile</code> task，这个 Task 是 gradle 自带的，所以到这里<code>createJavacTask</code>方法就结束了。
+</br></p>
+
+<p>接下来这个 Task 并不是打包过程的一步，放在这里是因为如果你需要打包一个 Jar 包给别人，那么这里是最合适执行此 Task 的地方，因为这个 Task 要依赖<code>javacTask</code>。</p>
+
+<p>这个 Task 的任务就是把 Javac 生成的那些文件，R 文件，BuildConfig 文件打包，所以这里也没有写出这个 Task 的名字，就直接创建了，</p>
+
+<p>创建代码为:
+<code>getAndroidTasks().create(tasks, new AndroidJarTask.JarClassesConfigAction(variantScope));</code>，</p>
+
+<p>这个 Task 执行结果放在<code>build/intermediates/packaged/${buildType}/classes.jar</code>。</p>
+
+<p>不过，这里只是包含当前 lib 生成的 class 文件，不包含依赖的 class 文件。
+</br></p>
+
+<p>了解到这里，我们就可以继续往下看了。</p>
+
+<h3 id="createpostcompilationtasks">createPostCompilationTasks</h3>
+
+<pre><code class="language-java">/**
+ * Creates the post-compilation tasks for the given Variant.
+ *
+ * These tasks create the dex file from the .class files, plus optional intermediary steps like
+ * proguard and jacoco
+ *
+ */
+public void createPostCompilationTasks(
+        @NonNull TaskFactory tasks,
+        @NonNull final VariantScope variantScope) {
+
+    checkNotNull(variantScope.getJavacTask());
+
+    final BaseVariantData&lt;? extends BaseVariantOutputData&gt; variantData = variantScope.getVariantData();
+    final GradleVariantConfiguration config = variantData.getVariantConfiguration();
+
+    TransformManager transformManager = variantScope.getTransformManager();
+
+    // ---- Code Coverage first -----
+    // 如果有单元测试代码，且testCoverageEnabled，则执行JacocoTansform
+    boolean isTestCoverageEnabled = config.getBuildType().isTestCoverageEnabled() &amp;&amp;
+            !config.getType().isForTesting() &amp;&amp;
+            getIncrementalMode(variantScope.getVariantConfiguration()) == IncrementalMode.NONE;
+    if (isTestCoverageEnabled) {
+        createJacocoTransform(tasks, variantScope);
+    }
+
+    boolean isMinifyEnabled = isMinifyEnabled(variantScope);
+    boolean isMultiDexEnabled = config.isMultiDexEnabled();
+    // Switch to native multidex if possible when using instant run.
+    boolean isLegacyMultiDexMode = isLegacyMultidexMode(variantScope);
+
+    AndroidConfig extension = variantScope.getGlobalScope().getExtension();
+
+    // ----- External Transforms -----
+    // apply all the external transforms.
+    List&lt;Transform&gt; customTransforms = extension.getTransforms();
+    List&lt;List&lt;Object&gt;&gt; customTransformsDependencies = extension.getTransformsDependencies();
+
+    for (int i = 0, count = customTransforms.size() ; i &lt; count ; i++) {
+        Transform transform = customTransforms.get(i);
+        AndroidTask&lt;TransformTask&gt; task = transformManager
+                .addTransform(tasks, variantScope, transform);
+        // task could be null if the transform is invalid.
+        if (task != null) {
+            List&lt;Object&gt; deps = customTransformsDependencies.get(i);
+            if (!deps.isEmpty()) {
+                task.dependsOn(tasks, deps);
+            }
+
+            // if the task is a no-op then we make assemble task depend on it.
+            if (transform.getScopes().isEmpty()) {
+                variantScope.getAssembleTask().dependsOn(tasks, task);
+            }
+
+        }
+    }
+
+    // ----- Minify next -----
+
+    if (isMinifyEnabled) {
+        boolean outputToJarFile = isMultiDexEnabled &amp;&amp; isLegacyMultiDexMode;
+        createMinifyTransform(tasks, variantScope, outputToJarFile);
+    }
+
+
+    // ----- Multi-Dex support
+
+    AndroidTask&lt;TransformTask&gt; multiDexClassListTask = null;
+    // non Library test are running as native multi-dex
+    if (isMultiDexEnabled &amp;&amp; isLegacyMultiDexMode) {
+        if (!variantData.getVariantConfiguration().getBuildType().isUseProguard()) {
+            throw new IllegalStateException(
+                    &quot;Build-in class shrinker and multidex are not supported yet.&quot;);
+        }
+
+        // ----------
+        // create a transform to jar the inputs into a single jar.
+        if (!isMinifyEnabled) {
+            // merge the classes only, no need to package the resources since they are
+            // not used during the computation.
+            JarMergingTransform jarMergingTransform = new JarMergingTransform(
+                    TransformManager.SCOPE_FULL_PROJECT);
+            variantScope.addColdSwapBuildTask(
+                    transformManager.addTransform(tasks, variantScope, jarMergingTransform));
+        }
+
+        // ---------
+        // create the transform that's going to take the code and the proguard keep list
+        // from above and compute the main class list.
+        MultiDexTransform multiDexTransform = new MultiDexTransform(
+                variantScope,
+                extension.getDexOptions(),
+                null);
+        multiDexClassListTask = transformManager.addTransform(
+                tasks, variantScope, multiDexTransform);
+        multiDexClassListTask.optionalDependsOn(tasks, manifestKeepListTask);
+        variantScope.addColdSwapBuildTask(multiDexClassListTask);
+    }
+    // create dex transform
+    DefaultDexOptions dexOptions = DefaultDexOptions.copyOf(extension.getDexOptions());
+
+    DexTransform dexTransform = new DexTransform(
+            dexOptions,
+            config.getBuildType().isDebuggable(),
+            isMultiDexEnabled,
+            isMultiDexEnabled &amp;&amp; isLegacyMultiDexMode ? variantScope.getMainDexListFile() : null,
+            variantScope.getPreDexOutputDir(),
+            variantScope.getGlobalScope().getAndroidBuilder(),
+            getLogger(),
+            variantScope.getInstantRunBuildContext(),
+            AndroidGradleOptions.getBuildCache(variantScope.getGlobalScope().getProject()));
+    AndroidTask&lt;TransformTask&gt; dexTask = transformManager.addTransform(
+            tasks, variantScope, dexTransform);
+    // need to manually make dex task depend on MultiDexTransform since there's no stream
+    // consumption making this automatic
+    dexTask.optionalDependsOn(tasks, multiDexClassListTask);
+}
+</code></pre>
+
+<p>看到最外层的注释，这里就是把 class 文件转化为 dex 文件的地方。那我们来详细跟踪一下代码。</p>
+
+<p>这里应该有很多熟悉的参数名称，比如<code>minifyEnabled</code>,<code>multiDexEnabled</code>等，这些参数之后接下来就获取<code>customTransforms</code>这样一个<code>Transform</code>对象列表，这样一个列表是怎么来的呢？</p>
+
+<p>就是通过<code>Android Plugin</code>的<code>extension</code>的<code>registerTransform</code>注册的 transfrom。</p>
+
+<p>这个 Transform 是个什么东东呢？如果你写过 Gradle 插件，对这个应该不陌生，</p>
+
+<p>这个就是<code>Android Plugin</code>暴露的 Hook Api，让你可以自定义操作参与打包过程之中。</p>
+
+<p>从这里也可以看出，gradle plugin 引入的顺序，影响 plugin 的<code>Transform</code>被调用的顺序。</p>
+
+<p>这些<code>Transform</code>就会被加入到<code>TransformManager</code>中，按顺序执行。</p>
+
+<p>跳过这个将<code>Transfrom</code>加入<code>TransformManager</code>的过程，下面就轮到了<code>// ----- Minify next -----</code>，</p>
+
+<p>看这个方法名<code>createMinifyTransform</code>，应该是创建<code>Minify</code>这个<code>Transform</code>，并加入<code>TransformManager</code>中。接下来我们跟进去看看细节。</p>
+
+<p>简单几层跟进之后，如果<code>useProguard</code>属性设置为 true,则执行如下两个方法:</p>
+
+<pre><code class="language-java">// createJarFile是bool值，Application中是true，Library中是false
+createProguardTransform(taskFactory, variantScope, mappingConfiguration, createJarFile);
+createShrinkResourcesTransform(taskFactory, variantScope);
+</code></pre>
+
+<p>我们来一一查看，先看</p>
+
+<h4 id="createproguardtransform">createProguardTransform</h4>
+
+<pre><code class="language-java">private void createProguardTransform(
+        @NonNull TaskFactory taskFactory,
+        @NonNull VariantScope variantScope,
+        @Nullable Configuration mappingConfiguration,
+        boolean createJarFile) {
+
+    final BaseVariantData&lt;? extends BaseVariantOutputData&gt; variantData = variantScope
+            .getVariantData();
+    final GradleVariantConfiguration variantConfig = variantData.getVariantConfiguration();
+    final BaseVariantData testedVariantData = variantScope.getTestedVariantData();
+
+    ProGuardTransform transform = new ProGuardTransform(variantScope, createJarFile);
+
+    applyProguardConfig(transform, variantData);
+
+    AndroidTask&lt;?&gt; task = variantScope.getTransformManager().addTransform(taskFactory,
+            variantScope, transform,
+            (proGuardTransform, proGuardTask) -&gt;
+                    variantData.mappingFileProviderTask = new FileSupplier() {
+                        @NonNull
+                        @Override
+                        public Task getTask() {
+                    return proGuardTask;
+                }
+
+                        @Override
+                        public File get() {
+                    return proGuardTransform.getMappingFile();
+                }
+                    });
+
+}
+</code></pre>
+
+<p>这里最重要的就是两个语句，</p>
+
+<p>一个是初始化<code>ProGuardTransform</code>并将其加入<code>TransformManager</code>中，</p>
+
+<p>第二个是给<code>ProGuardTransform</code>设置配置，</p>
+
+<p>在这里我们关注的是流程，所以<code>ProGuardTransform</code>是如何执行的就不在这里细讲了，</p>
+
+<p>如果你熟悉<code>Transform</code> Api，那么就会知道这里执行的是<code>ProGuardTransform</code>里的<code>transform</code>方法，如果你有兴趣，看这个方法了解 ProGuard 执行的细节。</p>
+
+<p>好了，那我们来看一看<code>applyProguardConfig</code>方法</p>
+
+<h5 id="applyproguardconfig">applyProguardConfig</h5>
+
+<pre><code class="language-java">final GradleVariantConfiguration variantConfig = variantData.getVariantConfiguration();
+transform.setConfigurationFiles(() -&gt; {
+    Set&lt;File&gt; proguardFiles = variantConfig.getProguardFiles(
+            true,
+            Collections.singletonList(ProguardFiles.getDefaultProguardFile(
+                    TaskManager.DEFAULT_PROGUARD_CONFIG_FILE, project)));
+
+    // use the first output when looking for the proguard rule output of
+    // the aapt task. The different outputs are not different in a way that
+    // makes this rule file different per output.
+    BaseVariantOutputData outputData = variantData.getOutputs().get(0);
+    proguardFiles.add(outputData.processResourcesTask.getProguardOutputFile());
+    return proguardFiles;
+});
+
+if (variantData.getType() == LIBRARY) {
+    transform.keep(&quot;class **.R&quot;);
+    transform.keep(&quot;class **.R$*&quot;);
+}
+</code></pre>
+
+<p>不知道你们有没有过好奇，我们在新建项目的时候，build.gradle 文件中会有这么一行配置<code>proguardFiles getDefaultProguardFile('proguard-android.txt')</code>，这个文件在哪里呢，会不会可以改名字呢？这个的答案就在这里就可以找到。</p>
+
+<p>就是下面这行代码</p>
+
+<pre><code class="language-java">ProguardFiles.getDefaultProguardFile(TaskManager.DEFAULT_PROGUARD_CONFIG_FILE, project))
+</code></pre>
+
+<p>首先，它会检测参数值是否为&rdquo;proguard-android.txt&rdquo;或&rdquo;proguard-android-optimize.txt&rdquo;，也就说明了，<code>getDefaultProguardFile</code>只能填这两个参数。</p>
+
+<p>接下来就是返回这个文件的具体路径在根目录的 build 文件夹下，在<code>build/intermediates/proguard-files/</code>这个目录下，文件名最后为当前 gradle plugin 的版本，这两个文件最初的位置在哪里呢？原来是<code>${sdkPath}/tools/proguard/</code>这个目录下的那两个文件.</p>
+
+<p>还有，是不是好奇为什么出现在 layout 和 Manifest 里的东东都不会混淆，就是因为这行代码</p>
+
+<pre><code class="language-java">proguardFiles.add(outputData.processResourcesTask.getProguardOutputFile());
+</code></pre>
+
+<p>这个就是给 proguardFiles 加入<code>build.intermediates/proguard-rules/${buildType}/aapt_rules.txt</code>，这个文件就是在前面的过程中生成的 proguard 的规则。</p>
+
+<p>最后就是为 Library 单独配置的规则了，如果是 Library，不混淆它的 R 文件。</p>
+
+<p>到这里<code>createProguardTransform</code>方法就结束了。继续看下一个方法<code>createShrinkResourcesTransform</code></p>
+
+<h4 id="createshrinkresourcestransform">createShrinkResourcesTransform</h4>
+
+<pre><code class="language-java">private void createShrinkResourcesTransform(
+        @NonNull TaskFactory taskFactory,
+        @NonNull VariantScope scope) {
+    CoreBuildType buildType = scope.getVariantConfiguration().getBuildType();
+
+    if (!buildType.isShrinkResources()) {
+        // The user didn't enable resource shrinking, silently move on.
+        return;
+    }
+
+    // if resources are shrink, insert a no-op transform per variant output
+    // to transform the res package into a stripped res package
+    for (final BaseVariantOutputData variantOutputData : scope.getVariantData().getOutputs()) {
+        VariantOutputScope variantOutputScope = variantOutputData.getScope();
+
+        ShrinkResourcesTransform shrinkResTransform = new ShrinkResourcesTransform(
+                variantOutputData,
+                variantOutputScope.getProcessResourcePackageOutputFile(),
+                variantOutputScope.getShrinkedResourcesFile(),
+                androidBuilder,
+                logger);
+        AndroidTask&lt;TransformTask&gt; shrinkTask = scope.getTransformManager()
+                .addTransform(taskFactory, variantOutputScope, shrinkResTransform);
+        // need to record this task since the package task will not depend
+        // on it through the transform manager.
+        variantOutputScope.setShrinkResourcesTask(shrinkTask);
+    }
+}
+</code></pre>
+
+<p>这个方法很简短，老规矩，不分析这个<code>Transform</code>到底是怎么做的，这里将两点:</p>
+
+<ol>
+<li>shrinkResources 默认是 false，如果没有在 buildType 中主动声明为 true，则此方法会直接返回。</li>
+<li>这个<code>shrinkResTransform</code>是在<code>ProGuardTransform</code>之后加入的，也就意味着在最后处理代码的时候，先执行 ProGuard,后执行 ShrinkResources。</li>
+</ol>
+
+<p>这个方法要讲的就这么多，我们再返回<code>createPostCompilationTasks</code>方法继续看下去。</p>
+
+<p>接下里分析<code>// ----- Multi-Dex support</code>这一段代码</p>
+
+<pre><code class="language-java">AndroidTask&lt;TransformTask&gt; multiDexClassListTask = null;
+// non Library test are running as native multi-dex
+if (isMultiDexEnabled &amp;&amp; isLegacyMultiDexMode) {
+
+    // ----------
+    // create a transform to jar the inputs into a single jar.
+    if (!isMinifyEnabled) {
+        // merge the classes only, no need to package the resources since they are
+        // not used during the computation.
+        // 把所有的.class打包成一个combined.jar
+        JarMergingTransform jarMergingTransform = new JarMergingTransform(
+                TransformManager.SCOPE_FULL_PROJECT);
+        variantScope.addColdSwapBuildTask(
+                transformManager.addTransform(tasks, variantScope, jarMergingTransform));
+    }
+
+    // ---------
+    // create the transform that's going to take the code and the proguard keep list
+    // from above and compute the main class list.
+    MultiDexTransform multiDexTransform = new MultiDexTransform(
+            variantScope,
+            extension.getDexOptions(),
+            null);
+    multiDexClassListTask = transformManager.addTransform(
+            tasks, variantScope, multiDexTransform);
+    multiDexClassListTask.optionalDependsOn(tasks, manifestKeepListTask);
+    variantScope.addColdSwapBuildTask(multiDexClassListTask);
+}
+</code></pre>
+
+<p>可以看到，这里的重点就是两个<code>Transform</code>:</p>
+
+<ul>
+<li>JarMergingTransform</li>
+<li>MultiDexTransform</li>
+</ul>
+
+<p>虽然如此，但是<code>JarMergingTransform</code>本身的任务很简单，就是将 class 文件打成 jar 包，这里就不仔细分析了，</p>
+
+<p>熟悉<code>Transform Api</code>的话很容易就能看懂，
+这个的最终结果是:
+<code>build/intermediates/transform/${outputTypes}/${scope}/combined.jar</code>这样一个 jar 包，
+对着结果来理解应该会更容易了。</p>
+
+<p>好了，这样我们来仔细关注<code>MultiDexTransform</code>，我们来看看它的<code>transform</code>方法</p>
+
+<h4 id="multidextransform-transform">MultiDexTransform transform</h4>
+
+<pre><code class="language-java">//校验referencedInputs只能有一个，要么是jar，要么是directory
+File input = verifyInputs(invocation.getReferencedInputs());
+shrinkWithProguard(input);
+computeList(input);
+</code></pre>
+
+<p>看起来就三个方法，第一个方法就是做一个校验；但是后面两个比较复杂，我们仔细研究一下。</p>
+
+<h5 id="multidextransform-shrinkwithproguard">MultiDexTransform shrinkWithProguard</h5>
+
+<pre><code class="language-java">private void shrinkWithProguard(@NonNull File input) throws IOException, ParseException {
+    dontobfuscate();  // 设置obfuscate = false
+    dontoptimize(); // 设置 optimize = false
+    dontpreverify(); // 设置 preverify = false
+    dontwarn(); // 设置 warn = Lists.newArrayList(&quot;**&quot;)
+    dontnote(); // 设置 note = Lists.newArrayList(&quot;**&quot;)
+    forceprocessing(); // 设置 lastModified = Long.MAX_VALUE
+
+    applyConfigurationFile(manifestKeepListProguardFile);
+
+    if (userMainDexKeepProguard != null) {
+        applyConfigurationFile(userMainDexKeepProguard);
+    }
+
+    // add a couple of rules that cannot be easily parsed from the manifest.
+    keep(&quot;public class * extends android.app.Instrumentation { &lt;init&gt;(); }&quot;);
+    keep(&quot;public class * extends android.app.Application { &quot;
+            + &quot;  &lt;init&gt;(); &quot;
+            + &quot;  void attachBaseContext(android.content.Context);&quot;
+            + &quot;}&quot;);
+    keep(&quot;public class * extends android.app.backup.BackupAgent { &lt;init&gt;(); }&quot;);
+    keep(&quot;public class * extends java.lang.annotation.Annotation { *;}&quot;);
+    keep(&quot;class com.android.tools.fd.** {*;}&quot;); // Instant run.
+
+    // handle inputs
+
+    libraryJar(findShrinkedAndroidJar());
+    inJar(input);
+
+    // outputs.
+    outJar(variantScope.getProguardComponentsJarFile());
+    printconfiguration(configFileOut);
+
+    // run proguard
+    runProguard();
+}
+</code></pre>
+
+<p>看到最后一个方法<code>runProguard()</code>，先猜测一下这个方法前面的过程是给<code>Proguard</code>设置参数的过程。经过分析，确实如此。</p>
+
+<p>这里就点几点，<code>userMainDexKeepProguard != null</code>，</p>
+
+<p>这个在什么情况下不为 null 呢？在<code>bulidType</code>中设置过这个参数<code>multiDexKeepProguard</code>的情况下不为<code>null</code>。</p>
+
+<p>作为<code>librayJar</code>的参数到底是哪个 Jar 呢？
+是 <code>build-tools/${buildToolsVersion}/lib/shrinkedAndroid.jar</code>这个 Jar。</p>
+
+<p><code>outJar</code>的最终位置在哪里呢？
+在<code>build/intermediates/multi-dex/${buildType}/componentClasses.jar</code>，</p>
+
+<p>好了，最后一个这个配置的输出是在
+<code>build/intermediates/multi-dex/${buildType}/components.flags</code>，
+看这个文件的内容，就是这里的配置。</p>
+
+<p>配置完成了，接下来就是跑<code>Proguard</code>输出<code>componentClasses.jar</code>的过程，这个过程是<code>Proguard</code>的任务，就不在我们流程之中了。详细了解这个过程，请参考<code>Proguard</code>的源码。</p>
+
+<p>然后我们就可以看<code>transform</code>方法内的第三个方法了。</p>
+
+<h5 id="multidextransform-computelist">MultiDexTransform computeList</h5>
+
+<pre><code class="language-java">private void computeList(File _allClassesJarFile) throws ProcessException, IOException {
+    // manifest components plus immediate dependencies must be in the main dex.
+    Set&lt;String&gt; mainDexClasses = callDx(
+            _allClassesJarFile,
+            variantScope.getProguardComponentsJarFile());
+
+    if (userMainDexKeepFile != null) {
+        mainDexClasses = ImmutableSet.&lt;String&gt;builder()
+                .addAll(mainDexClasses)
+                .addAll(Files.readLines(userMainDexKeepFile, Charsets.UTF_8))
+                .build();
+    }
+
+    String fileContent = Joiner.on(System.getProperty(&quot;line.separator&quot;)).join(mainDexClasses);
+
+    Files.write(fileContent, mainDexListFile, Charsets.UTF_8);
+
+}
+</code></pre>
+
+<p>这个最难的方法是<code>callDx</code>方法，大概讲一下这个方法的流程：</p>
+
+<p>这个方法最终会调用<code>AndroidBuilder</code>的<code>createMainDexList</code>方法，此方法是调用<code>build-tools/${buildToolsVersion}/lib/dx.jar</code>的<code>com.android.multidex.ClassReferenceListBuilder</code>这个类的<code>main</code>方法，生成需要放入主 dex 的 class 集合；</p>
+
+<p>接下来判断<code>userMainDexKeepFile</code>这个值，这个值的设置在哪里呢？是在<code>bulidType</code>中的参数<code>multiDexKeepFile</code>决定的。如果存在这样一个文件，就把这个文件里的内容也作为一个集合加入其中。</p>
+
+<p>最后，将前面那个集合的内容写入<code>maindexlist.txt</code>这个文件中，这个文件位于<code>build/intermediates/multi-dex/${buildType}/</code>目录下。</p>
+
+<p>到这里，<code>MultiDexTransform</code>的处理逻辑就分析完了，也就意味着，我们可以再返回<code>createPostCompilationTasks</code>方法继续看下去了。</p>
+
+<p>接下来就是这个方法的最后一部分，<code>dex</code>处理部分。</p>
+
+<pre><code class="language-java">DefaultDexOptions dexOptions = DefaultDexOptions.copyOf(extension.getDexOptions());
+
+DexTransform dexTransform = new DexTransform(
+        dexOptions,
+        config.getBuildType().isDebuggable(),
+        isMultiDexEnabled,
+        isMultiDexEnabled &amp;&amp; isLegacyMultiDexMode ? variantScope.getMainDexListFile() : null,
+        variantScope.getPreDexOutputDir(),
+        variantScope.getGlobalScope().getAndroidBuilder(),
+        getLogger(),
+        variantScope.getInstantRunBuildContext(),
+        AndroidGradleOptions.getBuildCache(variantScope.getGlobalScope().getProject()));
+AndroidTask&lt;TransformTask&gt; dexTask = transformManager.addTransform(
+        tasks, variantScope, dexTransform);
+// need to manually make dex task depend on MultiDexTransform since there's no stream
+// consumption making this automatic
+dexTask.optionalDependsOn(tasks, multiDexClassListTask);
+variantScope.addColdSwapBuildTask(dexTask);
+</code></pre>
+
+<p>浏览了这部分源码过后，重点也是一个<code>Transform</code>的执行过程， 那么我们就来看看这个<code>DexTransform</code></p>
+
+<h4 id="dextransform-transform">DexTransform transform</h4>
+
+<pre><code class="language-java">public void transform(@NonNull TransformInvocation transformInvocation)
+        throws TransformException, IOException, InterruptedException {
+    TransformOutputProvider outputProvider = transformInvocation.getOutputProvider();
+
+    // Gather a full list of all inputs.
+    List&lt;JarInput&gt; jarInputs = Lists.newArrayList();
+    List&lt;DirectoryInput&gt; directoryInputs = Lists.newArrayList();
+    for (TransformInput input : transformInvocation.getInputs()) {
+        jarInputs.addAll(input.getJarInputs());
+        directoryInputs.addAll(input.getDirectoryInputs());
+    }
+
+    ProcessOutputHandler outputHandler = new ParsingProcessOutputHandler(
+            new ToolOutputParser(new DexParser(), Message.Kind.ERROR, logger),
+            new ToolOutputParser(new DexParser(), logger),
+            androidBuilder.getErrorReporter());
+
+    outputProvider.deleteAll();
+
+    try {
+        // if only one scope or no per-scope dexing, just do a single pass that
+        // runs dx on everything.
+        if ((jarInputs.size() + directoryInputs.size()) == 1
+                || !dexOptions.getPreDexLibraries()) {
+            File outputDir = outputProvider.getContentLocation(&quot;main&quot;,
+                    getOutputTypes(), getScopes(),
+                    Format.DIRECTORY);
+            FileUtils.mkdirs(outputDir);
+
+            // first delete the output folder where the final dex file(s) will be.
+            FileUtils.cleanOutputDir(outputDir);
+
+            // gather the inputs. This mode is always non incremental, so just
+            // gather the top level folders/jars
+            final List&lt;File&gt; inputFiles =
+                    Stream.concat(
+                            jarInputs.stream().map(JarInput::getFile),
+                            directoryInputs.stream().map(DirectoryInput::getFile))
+                    .collect(Collectors.toList());
+
+            androidBuilder.convertByteCode(
+                    inputFiles,
+                    outputDir,
+                    multiDex,
+                    mainDexListFile,
+                    dexOptions,
+                    getOptimize(),
+                    outputHandler);
+
+        } else {
+            // Figure out if we need to do a dx merge.
+            // The ony case we don't need it is in native multi-dex mode when doing debug
+            // builds. This saves build time at the expense of too many dex files which is fine.
+            // FIXME dx cannot receive dex files to merge inside a folder. They have to be in a
+            // jar. Need to fix in dx.
+            boolean needMerge = !multiDex || mainDexListFile != null;// || !debugMode;
+
+            // where we write the pre-dex depends on whether we do the merge after.
+            // If needMerge changed from one build to another, we'll be in non incremental
+            // mode, so we don't have to deal with changing folder in incremental mode.
+            File perStreamDexFolder = null;
+            if (needMerge) {
+                perStreamDexFolder = intermediateFolder;
+                FileUtils.deletePath(perStreamDexFolder);
+            }
+
+            // dex all the different streams separately, then merge later (maybe)
+            // hash to detect duplicate jars (due to isse with library and tests)
+            final Set&lt;String&gt; hashs = Sets.newHashSet();
+            // input files to output file map
+            final Map&lt;File, File&gt; inputFiles = Maps.newHashMap();
+            // set of input files that are external libraries
+            final Set&lt;File&gt; externalLibs = Sets.newHashSet();
+            // stuff to delete. Might be folders.
+            final List&lt;File&gt; deletedFiles = Lists.newArrayList();
+
+            // first gather the different inputs to be dexed separately.
+            for (DirectoryInput directoryInput : directoryInputs) {
+                File rootFolder = directoryInput.getFile();
+                // The incremental mode only detect file level changes.
+                // It does not handle removed root folders. However the transform
+                // task will add the TransformInput right after it's removed so that it
+                // can be detected by the transform.
+                if (!rootFolder.exists()) {
+                    // if the root folder is gone we need to remove the previous
+                    // output
+                    File preDexedFile = getPreDexFile(
+                            outputProvider, needMerge, perStreamDexFolder, directoryInput);
+                    if (preDexedFile.exists()) {
+                        deletedFiles.add(preDexedFile);
+                    }
+                } else if (!isIncremental || !directoryInput.getChangedFiles().isEmpty()) {
+                    // add the folder for re-dexing only if we're not in incremental
+                    // mode or if it contains changed files.
+                    logger.info(&quot;Changed file for %s are %s&quot;,
+                            directoryInput.getFile().getAbsolutePath(),
+                            Joiner.on(&quot;,&quot;).join(directoryInput.getChangedFiles().entrySet()));
+                    File preDexFile = getPreDexFile(
+                            outputProvider, needMerge, perStreamDexFolder, directoryInput);
+                    inputFiles.put(rootFolder, preDexFile);
+                    if (isExternalLibrary(directoryInput)) {
+                        externalLibs.add(rootFolder);
+                    }
+                }
+            }
+
+            for (JarInput jarInput : jarInputs) {
+                switch (jarInput.getStatus()) {
+                    case NOTCHANGED:
+                        // intended fall-through
+                    case CHANGED:
+                    case ADDED: {
+                        File preDexFile = getPreDexFile(
+                                outputProvider, needMerge, perStreamDexFolder, jarInput);
+                        inputFiles.put(jarInput.getFile(), preDexFile);
+                        if (isExternalLibrary(jarInput)) {
+                            externalLibs.add(jarInput.getFile());
+                        }
+                        break;
+                    }
+                    case REMOVED: {
+                        File preDexedFile = getPreDexFile(
+                                outputProvider, needMerge, perStreamDexFolder, jarInput);
+                        if (preDexedFile.exists()) {
+                            deletedFiles.add(preDexedFile);
+                        }
+                        break;
+                    }
+                }
+            }
+
+            WaitableExecutor&lt;Void&gt; executor = WaitableExecutor.useGlobalSharedThreadPool();
+
+            for (Map.Entry&lt;File, File&gt; entry : inputFiles.entrySet()) {
+                Callable&lt;Void&gt; action = new PreDexTask(
+                        entry.getKey(),
+                        entry.getValue(),
+                        hashs,
+                        outputHandler,
+                        externalLibs.contains(entry.getKey()) ? buildCache : FileCache.NO_CACHE);
+                logger.info(&quot;Adding PreDexTask for %s : %s&quot;, entry.getKey(), action);
+                executor.execute(action);
+            }
+
+            for (final File file : deletedFiles) {
+                executor.execute(() -&gt; {
+                    FileUtils.deletePath(file);
+                    return null;
+                });
+            }
+
+            executor.waitForTasksWithQuickFail(false);
+            logger.info(&quot;Done with all dexing&quot;);
+
+            if (needMerge) {
+                File outputDir = outputProvider.getContentLocation(&quot;main&quot;,
+                        TransformManager.CONTENT_DEX, getScopes(),
+                        Format.DIRECTORY);
+                FileUtils.mkdirs(outputDir);
+
+                // first delete the output folder where the final dex file(s) will be.
+                FileUtils.cleanOutputDir(outputDir);
+                FileUtils.mkdirs(outputDir);
+
+                // find the inputs of the dex merge.
+                // they are the content of the intermediate folder.
+                List&lt;File&gt; outputs = null;
+                if (!multiDex) {
+                    // content of the folder is jar files.
+                    File[] files = intermediateFolder.listFiles((file, name) -&gt; {
+                        return name.endsWith(SdkConstants.DOT_JAR);
+                    });
+                    if (files != null) {
+                        outputs = Arrays.asList(files);
+                    }
+                } else {
+                    File[] directories = intermediateFolder.listFiles(File::isDirectory);
+                    if (directories != null) {
+                        outputs = Arrays.asList(directories);
+                    }
+                }
+
+                if (outputs == null) {
+                    throw new RuntimeException(&quot;No dex files to merge!&quot;);
+                }
+
+                androidBuilder.convertByteCode(
+                        outputs,
+                        outputDir,
+                        multiDex,
+                        mainDexListFile,
+                        dexOptions,
+                        getOptimize(),
+                        outputHandler);
+            }
+        }
+    } catch (Exception e) {
+        throw new TransformException(e);
+    }
+}
+</code></pre>
+
+<p>这个方法看起来很长， 因为要处理 multidex 和非 multidex 的情况。我们慢慢分析。</p>
+
+<p>首先看第一个 if 里的代码<code>if ((jarInputs.size() + directoryInputs.size()) == 1|| !dexOptions.getPreDexLibraries())</code>,</p>
+
+<p>这个代码中的<code>outputDir</code>路径为: <code>build/intermediates/transforms/dex/folders/${outputTypes}/${scope}/main</code>，</p>
+
+<p>这也就是我们看到的最终的<code>classes.dex</code>这个文件的地方，这里面调用了一个很重要的方法，但是在这篇文章我们不会去跟进里面的具体实现，可以等待后续文章分析它的具体实现，就是下面这个方法。</p>
+
+<pre><code>androidBuilder.convertByteCode(
+    inputFiles,
+    outputDir,
+    multiDex,
+    mainDexListFile,
+    dexOptions,
+    getOptimize(),
+    outputHandler);
+</code></pre>
+
+<p>这个方法的作用说起来很简单，但是里面的过程很复杂，就是将字节码转化为 Dalvik 格式的字节码。</p>
+
+<p>这样，这个 if 里的内容就分析完了，接下来我们看对应的 else 里面的内容。</p>
+
+<p>else 里面的代码什么时候触发呢？最简单的方式就是符合开启<code>multidex</code>的条件，并开启<code>multidex</code>。</p>
+
+<p>这里的代码和 if 里的一样，收集最终需要转化的 inputs 文件，最终输出文件地址为<code>build/intermediates/transforms/dex/folders/${outputTypes}/${scope}/main</code>，</p>
+
+<p>通过<code>androidBuilder.convertByteCode</code>转化这些字节码。
+</br></p>
+
+<p>在这里讲一段代码，也是 AS 为 gradle 打包提速的一个方法: 生成 cache</p>
+
+<pre><code class="language-java">WaitableExecutor&lt;Void&gt; executor = WaitableExecutor.useGlobalSharedThreadPool();
+
+for (Map.Entry&lt;File, File&gt; entry : inputFiles.entrySet()) {
+    Callable&lt;Void&gt; action = new PreDexTask(
+            entry.getKey(),
+            entry.getValue(),
+            hashs,
+            outputHandler,
+            externalLibs.contains(entry.getKey()) ? buildCache : FileCache.NO_CACHE);
+    logger.info(&quot;Adding PreDexTask for %s : %s&quot;, entry.getKey(), action);
+    executor.execute(action);
+}
+</code></pre>
+
+<p>这个地方的代码为参与最终转化的代码生成了 cache，cache 的具体位置在<code>$Users/.android/build-cache/</code>这个目录下，用包的 sha1 值作为目录名称，如果对应的包没改过，则 sha1 值不会变，就使用 cache 中的包。</p>
+
+<p>这样我们就把<code>DexTransform</code>讲完了。</p>
+
+<p>回到<code>createPostCompilationTasks</code>这个方法，讲完了<code>DexTransform</code>也就意味着这个方法结束了，也就是说<code>PostCompilationTasks</code>到这里也结束了。
+</br></p>
+
+<p>那么我们就需要去理解整个打包过程最后一个方法了。</p>
+
+    </div>
+
+    
+    
+
+    
+    
+<div class="post-reward">
+  <input type="checkbox" name="reward" id="reward" hidden />
+  <label class="reward-button" for="reward">赞赏支持</label>
+  <div class="qr-code">
+    
+    
+    
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/img/reward/alipay-qr-code.png">
+        <span>支付宝打赏</span>
+      </label>
+  </div>
+</div>
+
+    <footer class="post-footer">
+      <div class="post-tags">
+          
+          <a href="/tags/androidplugin/">AndroidPlugin</a>
+          
+        </div>
+
+      
+      <nav class="post-nav">
+        
+          <a class="prev" href="/post/androidplugin%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E5%85%AB/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">AndroidPlugin源码解析-(八)</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
+        
+          <a class="next" href="/post/androidplugin%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E5%85%AD/">
+            <span class="next-text nav-default">AndroidPlugin源码解析-(六)</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+  <div id="disqus_thread"></div>
+    <script type="text/javascript">
+    (function() {
+      
+      
+      if (window.location.hostname === 'localhost') return;
+
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      var disqus_shortname = 'yunair';
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:airzhaoyn@gmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://github.com/yunair" class="iconfont icon-github" title="github"></a>
+  <a href="http://blog.airzone.world/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    
+      2015 - 
+    2018
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">Air</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+<script src="/lib/highlight/highlight.pack.js?v=20171001"></script><script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox-3.1.20.min.js"></script>
+
+
+<script type="text/javascript" src="/dist/even.min.js?v=3.2.0"></script>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-103683322-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+
+
+
+
+</body>
+</html>

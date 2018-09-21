@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>AndFix on Air Little Place</title>
+    <link>http://blog.airzone.world/tags/andfix/</link>
+    <description>Recent content in AndFix on Air Little Place</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Fri, 23 Oct 2015 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="http://blog.airzone.world/tags/andfix/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>AndFix解析-(下)</title>
+      <link>http://blog.airzone.world/post/andfix-%E8%A7%A3%E6%9E%90%E4%B8%8B/</link>
+      <pubDate>Fri, 23 Oct 2015 00:00:00 +0000</pubDate>
+      
+      <guid>http://blog.airzone.world/post/andfix-%E8%A7%A3%E6%9E%90%E4%B8%8B/</guid>
+      <description>我们接着分析阿里开源的 AndFix 库， 上一篇分析了Patch类，这个类相当于我们提供补丁的容器，容器里有了东西，我们要对容器进行操作了, 于是开始了我们</description>
+    </item>
+    
+    <item>
+      <title>AndFix解析-(中)</title>
+      <link>http://blog.airzone.world/post/andfix-%E8%A7%A3%E6%9E%90%E4%B8%AD/</link>
+      <pubDate>Sat, 10 Oct 2015 00:00:00 +0000</pubDate>
+      
+      <guid>http://blog.airzone.world/post/andfix-%E8%A7%A3%E6%9E%90%E4%B8%AD/</guid>
+      <description>我们接着分析阿里开源的 AndFix 库，上次留下了三个坑，一个方法，两个类，不知道你们是否想急切了解呢？ loadPatch()方法和AndFixMana</description>
+    </item>
+    
+    <item>
+      <title>AndFix解析-(上)</title>
+      <link>http://blog.airzone.world/post/andfix-%E8%A7%A3%E6%9E%90%E4%B8%8A/</link>
+      <pubDate>Fri, 25 Sep 2015 00:00:00 +0000</pubDate>
+      
+      <guid>http://blog.airzone.world/post/andfix-%E8%A7%A3%E6%9E%90%E4%B8%8A/</guid>
+      <description>阿里巴巴前一段时间开源了他们用来解决线上紧急 bug 的一款 Android 库——AndFix 对 Android 开发者来说真是一个很好的消息。 基于自己的经验，太长的文字很少有人</description>
+    </item>
+    
+  </channel>
+</rss>

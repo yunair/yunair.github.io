@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>OkHttp源码解析-(下) - Air Little Place</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="Air" />
+  <meta name="description" content="这篇的主要内容就是解析这一个个拦截器，所以重新将图放在这里。 图中存在用户自定义的Interceptor对象，这一部分我们忽略，剩下的Inte" />
+
+  <meta name="keywords" content="blog" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.49-DEV" />
+
+
+<link rel="canonical" href="http://blog.airzone.world/post/okhttp%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90-%E4%B8%8B/" />
+
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+
+<link href="/dist/even.min.css?v=3.2.0" rel="stylesheet">
+<link href="/lib/fancybox/jquery.fancybox-3.1.20.min.css" rel="stylesheet">
+
+
+
+
+<meta property="og:title" content="OkHttp源码解析-(下)" />
+<meta property="og:description" content="这篇的主要内容就是解析这一个个拦截器，所以重新将图放在这里。 图中存在用户自定义的Interceptor对象，这一部分我们忽略，剩下的Inte" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://blog.airzone.world/post/okhttp%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90-%E4%B8%8B/" /><meta property="article:published_time" content="2016-12-10T00:00:00&#43;00:00"/>
+<meta property="article:modified_time" content="2016-12-10T00:00:00&#43;00:00"/>
+<meta itemprop="name" content="OkHttp源码解析-(下)">
+<meta itemprop="description" content="这篇的主要内容就是解析这一个个拦截器，所以重新将图放在这里。 图中存在用户自定义的Interceptor对象，这一部分我们忽略，剩下的Inte">
+
+
+<meta itemprop="datePublished" content="2016-12-10T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2016-12-10T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="4134">
+
+
+
+<meta itemprop="keywords" content="okhttp,square," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="OkHttp源码解析-(下)"/>
+<meta name="twitter:description" content="这篇的主要内容就是解析这一个个拦截器，所以重新将图放在这里。 图中存在用户自定义的Interceptor对象，这一部分我们忽略，剩下的Inte"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">Air</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">Air</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">OkHttp源码解析-(下)</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2016-12-10 </span>
+        
+        <span class="more-meta"> 约 4134 字 </span>
+        <span class="more-meta"> 预计阅读 9 分钟 </span>
+        
+      </div>
+    </header>
+
+    
+    
+<div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  
+  <div class="post-toc-content">
+    <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#retryandfollowupinterceptor">RetryAndFollowUpInterceptor</a>
+<ul>
+<li><a href="#interceptor">interceptor()</a></li>
+<li><a href="#followuprequest">followUpRequest()</a></li>
+</ul></li>
+<li><a href="#bridgeinterceptor">BridgeInterceptor</a>
+<ul>
+<li><a href="#interceptor-1">interceptor()</a></li>
+</ul></li>
+<li><a href="#cacheinterceptor">CacheInterceptor</a>
+<ul>
+<li><a href="#intercept">intercept()</a></li>
+</ul></li>
+<li><a href="#connectinterceptor">ConnectInterceptor</a>
+<ul>
+<li><a href="#intercept-1">intercept()</a></li>
+</ul></li>
+<li><a href="#callserverinterceptor">CallServerInterceptor</a>
+<ul>
+<li><a href="#intercept-2">intercept()</a></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+  </div>
+</div>
+
+    
+    
+
+    
+    <div class="post-content">
+      
+
+<p>这篇的主要内容就是解析这一个个拦截器，所以重新将图放在这里。</p>
+
+<p><img src="/img/okhttp/OkHttp3.4.1-interceptors.jpg" alt="" /></p>
+
+<p>图中存在用户自定义的<code>Interceptor</code>对象，这一部分我们忽略，剩下的<code>Interceptor</code>对象还有如下几个：
+1. RetryAndFollowUpInterceptor: 失败重试以及重定向
+2. BridgeInterceptor: 用户友好代码和网络友好代码之间的转化。
+3. CacheInterceptor: 读取缓存直接返回、更新缓存
+4. ConnectInterceptor: 和服务器建立连接
+5. CallServerInterceptor: 向服务器发送请求数据、从服务器读取响应数据的</p>
+
+<p>第一个分析<code>RetryAndFollowUpInterceptor</code>这个<code>Interceptor</code>对象。</p>
+
+<h3 id="retryandfollowupinterceptor">RetryAndFollowUpInterceptor</h3>
+
+<p>作为网络框架，意外不可避免，尤其是外部环境导致的意外，这个时候要有合理的恢复策略，同时在HTTP的世界中，还存在服务端修改了域名，旧的域名要通过重定向访问到新的域名的情况。对于框架来说，异常和重定向都是需要重新请求网络的，就在这个拦截器都给处理了。</p>
+
+<h4 id="interceptor">interceptor()</h4>
+
+<pre><code class="language-java">@Override public Response intercept(Chain chain) throws IOException {
+  Request request = chain.request();
+
+  streamAllocation = new StreamAllocation(
+      client.connectionPool(), createAddress(request.url()), callStackTrace);
+
+  int followUpCount = 0;
+  Response priorResponse = null;
+  while (true) {
+    if (canceled) {
+      streamAllocation.release();
+      throw new IOException(&quot;Canceled&quot;);
+    }
+
+    Response response = null;
+    boolean releaseConnection = true;
+    try {
+      response = ((RealInterceptorChain) chain).proceed(request, streamAllocation, null, null);
+      releaseConnection = false;
+    } catch (RouteException e) {
+      // The attempt to connect via a route failed. The request will not have been sent.
+      if (!recover(e.getLastConnectException(), false, request)) {
+        throw e.getLastConnectException();
+      }
+      releaseConnection = false;
+      continue;
+    } catch (IOException e) {
+      // An attempt to communicate with a server failed. The request may have been sent.
+      boolean requestSendStarted = !(e instanceof ConnectionShutdownException);
+      if (!recover(e, requestSendStarted, request)) throw e;
+      releaseConnection = false;
+      continue;
+    } finally {
+      // We're throwing an unchecked exception. Release any resources.
+      if (releaseConnection) {
+        streamAllocation.streamFailed(null);
+        streamAllocation.release();
+      }
+    }
+
+    // Attach the prior response if it exists. Such responses never have a body.
+    if (priorResponse != null) {
+      response = response.newBuilder()
+          .priorResponse(priorResponse.newBuilder()
+                  .body(null)
+                  .build())
+          .build();
+    }
+	
+    // 将服务端返回的消息转换为新的Request
+    // 比如服务端返回301，会在Header头有Location字段告诉你要跳转到哪里。
+    Request followUp = followUpRequest(response); 
+
+    if (followUp == null) {
+      if (!forWebSocket) {
+        streamAllocation.release();
+      }
+      return response;
+    }
+
+    closeQuietly(response.body());
+	// 不会无限的重定向跟踪，防止环形重定向或者造成攻击
+    // MAX_FOLLOW_UPS的次数是20
+    if (++followUpCount &gt; MAX_FOLLOW_UPS) {
+      streamAllocation.release();
+      throw new ProtocolException(&quot;Too many follow-up requests: &quot; + followUpCount);
+    }
+
+    if (followUp.body() instanceof UnrepeatableRequestBody) {
+      streamAllocation.release();
+      throw new HttpRetryException(&quot;Cannot retry streamed HTTP body&quot;, response.code());
+    }
+	
+    if (!sameConnection(response, followUp.url())) {
+      streamAllocation.release();
+      streamAllocation = new StreamAllocation(
+          client.connectionPool(), createAddress(followUp.url()), callStackTrace);
+    } else if (streamAllocation.codec() != null) {
+      throw new IllegalStateException(&quot;Closing the body of &quot; + response
+          + &quot; didn't close its backing stream. Bad interceptor?&quot;);
+    }
+
+    request = followUp;
+    priorResponse = response;
+  }
+}
+</code></pre>
+
+<p>首先构造了<code>StreamAllocation</code>对象，该对象将三个实体的关系联系起来了。分别是</p>
+
+<ul>
+<li>Connections: 物理socket链接到远端服务</li>
+<li>Streams: 逻辑上的HTTP request/response对，在Connections层之上。</li>
+<li>Calls: 逻辑上的流的序列，通常是一个初始请求和接下来的跳转请求。</li>
+</ul>
+
+<p>然后，尝试从服务端获取请求，获取请求之后处理请求，通过<code>followUpRequest()</code>方法，这个方法是这个拦截器处理的核心。如果获取响应失败，则会尝试恢复请求，这个处理内容在<code>recover()</code>方法内，其他的一些错误处理我这里就不解析了。那我们来看一看<code>followUpRequest()</code>方法。</p>
+
+<h4 id="followuprequest">followUpRequest()</h4>
+
+<pre><code class="language-java">/**
+ * Figures out the HTTP request to make in response to receiving {@code userResponse}. This will
+ * either add authentication headers, follow redirects or handle a client request timeout. If a
+ * follow-up is either unnecessary or not applicable, this returns null.
+ */
+private Request followUpRequest(Response userResponse) throws IOException {
+  if (userResponse == null) throw new IllegalStateException();
+  Connection connection = streamAllocation.connection();
+  Route route = connection != null
+      ? connection.route()
+      : null;
+  int responseCode = userResponse.code();
+
+  final String method = userResponse.request().method();
+  switch (responseCode) {
+   // HTTP Status-Code 407: Proxy Authentication Required.
+   // 需要代理，则调用创建okhttp对象的时候设置的代理对象
+    case HTTP_PROXY_AUTH:
+      Proxy selectedProxy = route != null
+          ? route.proxy()
+          : client.proxy();
+      if (selectedProxy.type() != Proxy.Type.HTTP) {
+        throw new ProtocolException(&quot;Received HTTP_PROXY_AUTH (407) code while not using proxy&quot;);
+      }
+      return client.proxyAuthenticator().authenticate(route, userResponse);
+    //  HTTP Status-Code 401: Unauthorized.
+    // 需要身份验证，则调用创建okhttp对象的时候设置的验证对象，加入对应的信息
+    case HTTP_UNAUTHORIZED:
+      return client.authenticator().authenticate(route, userResponse);
+
+    case HTTP_PERM_REDIRECT:
+    case HTTP_TEMP_REDIRECT:
+      // &quot;If the 307 or 308 status code is received in response to a request other than GET
+      // or HEAD, the user agent MUST NOT automatically redirect the request&quot;
+      if (!method.equals(&quot;GET&quot;) &amp;&amp; !method.equals(&quot;HEAD&quot;)) {
+        return null;
+      }
+      // fall-through
+    case HTTP_MULT_CHOICE:
+    case HTTP_MOVED_PERM:
+    case HTTP_MOVED_TEMP:
+    case HTTP_SEE_OTHER:
+      // Does the client allow redirects?
+      if (!client.followRedirects()) return null;
+      // Header 头中读取Location字段
+      String location = userResponse.header(&quot;Location&quot;);
+      if (location == null) return null;
+      // 通过Location字段的值构造新的请求的url
+      HttpUrl url = userResponse.request().url().resolve(location);
+
+      // Don't follow redirects to unsupported protocols.
+      if (url == null) return null;
+
+      // If configured, don't follow redirects between SSL and non-SSL.
+      boolean sameScheme = url.scheme().equals(userResponse.request().url().scheme());
+      if (!sameScheme &amp;&amp; !client.followSslRedirects()) return null;
+
+      // Most redirects don't include a request body.
+      Request.Builder requestBuilder = userResponse.request().newBuilder();
+      if (HttpMethod.permitsRequestBody(method)) {
+        final boolean maintainBody = HttpMethod.redirectsWithBody(method);
+        // 除了PROPFIND(WebDAV用的)请求，其他请求都要转为GET请求
+        if (HttpMethod.redirectsToGet(method)) {
+          requestBuilder.method(&quot;GET&quot;, null);
+        } else {
+          RequestBody requestBody = maintainBody ? userResponse.request().body() : null;
+          requestBuilder.method(method, requestBody);
+        }
+        if (!maintainBody) {
+          requestBuilder.removeHeader(&quot;Transfer-Encoding&quot;);
+          requestBuilder.removeHeader(&quot;Content-Length&quot;);
+          requestBuilder.removeHeader(&quot;Content-Type&quot;);
+        }
+      }
+
+      // When redirecting across hosts, drop all authentication headers. This
+      // is potentially annoying to the application layer since they have no
+      // way to retain them.
+      if (!sameConnection(userResponse, url)) {
+        requestBuilder.removeHeader(&quot;Authorization&quot;);
+      }
+
+      return requestBuilder.url(url).build();
+
+    case HTTP_CLIENT_TIMEOUT:
+      // 408's are rare in practice, but some servers like HAProxy use this response code. The
+      // spec says that we may repeat the request without modifications. Modern browsers also
+      // repeat the request (even non-idempotent ones.)
+      if (userResponse.request().body() instanceof UnrepeatableRequestBody) {
+        return null;
+      }
+      // 超时返回原始的请求，就代表重新请求
+      return userResponse.request();
+
+    default:
+      return null;
+  }
+}
+</code></pre>
+
+<p>主要的解析都在代码中以注释的形式出现了。
+到这里，这个Interceptor就解析完毕了，我们来看看文章最开头链上下一个Interceptor:</p>
+
+<h3 id="bridgeinterceptor">BridgeInterceptor</h3>
+
+<p>作为框架，不可能要求所有使用者都对HTTP协议理解的很深刻。所以，框架需要将HTTP协议中约定的信息加入其中，要让使用者尽可能少的处理HTTP协议的细节，这就是这个Interceptor的任务。</p>
+
+<h4 id="interceptor-1">interceptor()</h4>
+
+<pre><code class="language-java">@Override public Response intercept(Chain chain) throws IOException {
+  Request userRequest = chain.request();
+  Request.Builder requestBuilder = userRequest.newBuilder();
+
+  RequestBody body = userRequest.body();
+  if (body != null) {
+    MediaType contentType = body.contentType();
+    if (contentType != null) {
+      requestBuilder.header(&quot;Content-Type&quot;, contentType.toString());
+    }
+	// 从这里可以看出，HTTP请求头的Content-Length和Transfer-Encoding是互斥的
+    long contentLength = body.contentLength();
+    if (contentLength != -1) {
+      requestBuilder.header(&quot;Content-Length&quot;, Long.toString(contentLength));
+      requestBuilder.removeHeader(&quot;Transfer-Encoding&quot;);
+    } else {
+      requestBuilder.header(&quot;Transfer-Encoding&quot;, &quot;chunked&quot;);
+      requestBuilder.removeHeader(&quot;Content-Length&quot;);
+    }
+  }
+
+  if (userRequest.header(&quot;Host&quot;) == null) {
+    requestBuilder.header(&quot;Host&quot;, hostHeader(userRequest.url(), false));
+  }
+
+  if (userRequest.header(&quot;Connection&quot;) == null) {
+    requestBuilder.header(&quot;Connection&quot;, &quot;Keep-Alive&quot;);
+  }
+
+  // If we add an &quot;Accept-Encoding: gzip&quot; header field we're responsible for also decompressing
+  // the transfer stream.
+  boolean transparentGzip = false;
+  // 不指定Accept-Encoding请求头，默认使用gzip，压缩数据
+  if (userRequest.header(&quot;Accept-Encoding&quot;) == null) {
+    transparentGzip = true;
+    requestBuilder.header(&quot;Accept-Encoding&quot;, &quot;gzip&quot;);
+  }
+
+  List&lt;Cookie&gt; cookies = cookieJar.loadForRequest(userRequest.url());
+  if (!cookies.isEmpty()) {
+    requestBuilder.header(&quot;Cookie&quot;, cookieHeader(cookies));
+  }
+  // 用户设置了UA,这里就不能覆盖了，否则使用当前okhttp版本作为UA
+  if (userRequest.header(&quot;User-Agent&quot;) == null) {
+    requestBuilder.header(&quot;User-Agent&quot;, Version.userAgent());
+  }
+
+  Response networkResponse = chain.proceed(requestBuilder.build());
+
+  HttpHeaders.receiveHeaders(cookieJar, userRequest.url(), networkResponse.headers());
+
+  Response.Builder responseBuilder = networkResponse.newBuilder()
+      .request(userRequest);
+
+  if (transparentGzip
+      &amp;&amp; &quot;gzip&quot;.equalsIgnoreCase(networkResponse.header(&quot;Content-Encoding&quot;))
+      &amp;&amp; HttpHeaders.hasBody(networkResponse)) {
+      // 因为响应式gzip编码，所以需要先解压
+    GzipSource responseBody = new GzipSource(networkResponse.body().source());
+    Headers strippedHeaders = networkResponse.headers().newBuilder()
+        .removeAll(&quot;Content-Encoding&quot;)
+        .removeAll(&quot;Content-Length&quot;)
+        .build();
+    responseBuilder.headers(strippedHeaders);
+    responseBuilder.body(new RealResponseBody(strippedHeaders, Okio.buffer(responseBody)));
+  }
+
+  return responseBuilder.build();
+}
+</code></pre>
+
+<p>这里理解起来很容易，看代码中的注释即可，接下来看下一个Interceptor:</p>
+
+<h3 id="cacheinterceptor">CacheInterceptor</h3>
+
+<p>网络请求毕竟是一个缓慢的操作，所以，可以通过缓存来加速，但是，不能所有都缓存，也不能什么情况下都从缓存中拿数据，这里就是处理这个逻辑的地方。</p>
+
+<h4 id="intercept">intercept()</h4>
+
+<pre><code class="language-java">@Override public Response intercept(Chain chain) throws IOException {
+  Response cacheCandidate = cache != null
+      ? cache.get(chain.request())
+      : null;
+
+  long now = System.currentTimeMillis();
+  // 根据HTTP的Date|Expires|Last-Modified|ETag|Age头来确定对应的策略
+  CacheStrategy strategy = new CacheStrategy.Factory(now, chain.request(), cacheCandidate).get();
+  Request networkRequest = strategy.networkRequest;
+  Response cacheResponse = strategy.cacheResponse;
+
+  if (cache != null) {
+    cache.trackResponse(strategy);
+  }
+
+  if (cacheCandidate != null &amp;&amp; cacheResponse == null) {
+    closeQuietly(cacheCandidate.body()); // The cache candidate wasn't applicable. Close it.
+  }
+
+  // If we're forbidden from using the network and the cache is insufficient, fail.
+  if (networkRequest == null &amp;&amp; cacheResponse == null) {
+    return new Response.Builder()
+        .request(chain.request())
+        .protocol(Protocol.HTTP_1_1)
+        .code(504)
+        .message(&quot;Unsatisfiable Request (only-if-cached)&quot;)
+        .body(Util.EMPTY_RESPONSE)
+        .sentRequestAtMillis(-1L)
+        .receivedResponseAtMillis(System.currentTimeMillis())
+        .build();
+  }
+
+  // If we don't need the network, we're done.
+  if (networkRequest == null) {
+    return cacheResponse.newBuilder()
+        .cacheResponse(stripBody(cacheResponse))
+        .build();
+  }
+
+  Response networkResponse = null;
+  try {
+    networkResponse = chain.proceed(networkRequest);
+  } finally {
+    // If we're crashing on I/O or otherwise, don't leak the cache body.
+    if (networkResponse == null &amp;&amp; cacheCandidate != null) {
+      closeQuietly(cacheCandidate.body());
+    }
+  }
+
+  // If we have a cache response too, then we're doing a conditional get.
+  if (cacheResponse != null) {
+    // HTTP Status-Code 304: Not Modified. 
+    // 存在缓存，服务端还返回这个HTTP状态码
+    if (networkResponse.code() == HTTP_NOT_MODIFIED) {
+      Response response = cacheResponse.newBuilder()
+          .headers(combine(cacheResponse.headers(), networkResponse.headers()))
+          .sentRequestAtMillis(networkResponse.sentRequestAtMillis())
+          .receivedResponseAtMillis(networkResponse.receivedResponseAtMillis())
+          .cacheResponse(stripBody(cacheResponse))
+          .networkResponse(stripBody(networkResponse))
+          .build();
+      networkResponse.body().close();
+
+      // Update the cache after combining headers but before stripping the
+      // Content-Encoding header (as performed by initContentStream()).
+      cache.trackConditionalCacheHit();
+      cache.update(cacheResponse, response);
+      return response;
+    } else {
+      closeQuietly(cacheResponse.body());
+    }
+  }
+
+  Response response = networkResponse.newBuilder()
+      .cacheResponse(stripBody(cacheResponse))
+      .networkResponse(stripBody(networkResponse))
+      .build();
+
+  if (HttpHeaders.hasBody(response)) {
+    CacheRequest cacheRequest = maybeCache(response, networkResponse.request(), cache);
+    response = cacheWritingResponse(cacheRequest, response);
+  }
+
+  return response;
+}
+</code></pre>
+
+<p>这里主要通过<code>CacheStrategy</code>类来管理Cache的储存策略，比如要不要保存Cache，保存Cache的超时时间等等，详细内容看这个类即可。
+如果没网，不存在Cache就返回504状态码的响应，否则返回cache响应。
+通过网络请求获取响应。响应的状态码304的情况下，还存在缓存，则更新缓存，返回对应的响应。
+最后，不存在缓存的情况下去除cacheResponse和networkResponse的body，返回通过请求获取的响应。</p>
+
+<p>接着看下一个Interceptor:</p>
+
+<h3 id="connectinterceptor">ConnectInterceptor</h3>
+
+<p>这个Interceptor的作用就是建立与服务端的连接，为什么将连接服务器和服务器之间的交互分开呢？我觉得因为提供的networkInterceptors对象，这个对象给了框架使用者这样一种能力，在连接到服务器的时候做一些需要的操作（我暂时没遇到这样的需求，所以对这里理解不深，大家有想法的可以在评论里告诉我）</p>
+
+<h4 id="intercept-1">intercept()</h4>
+
+<pre><code class="language-java">@Override public Response intercept(Chain chain) throws IOException {
+  RealInterceptorChain realChain = (RealInterceptorChain) chain;
+  Request request = realChain.request();
+  StreamAllocation streamAllocation = realChain.streamAllocation();
+
+  // We need the network to satisfy this request. Possibly for validating a conditional GET.
+  boolean doExtensiveHealthChecks = !request.method().equals(&quot;GET&quot;);
+  HttpCodec httpCodec = streamAllocation.newStream(client, doExtensiveHealthChecks);
+  RealConnection connection = streamAllocation.connection();
+
+  return realChain.proceed(request, streamAllocation, httpCodec, connection);
+}
+</code></pre>
+
+<p>还记得分析<code>RetryAndFollowUpInterceptor</code>过程中出现的<code>StreamAllocation</code>对象吗？这里又出现，根据前面说的，HttpCodec就是一个Stream，RealConnection就是Connection。那也就意味着，逻辑的HTTP请求响应是HttpCodec负责处理的。</p>
+
+<p>这里就简单分析一下<code>HttpCodec</code>,对它有个具体的认识，到分析下一个Interceptor的时候，才不会那么头疼。</p>
+
+<pre><code class="language-java">/** Encodes HTTP requests and decodes HTTP responses. */
+public interface HttpCodec {
+  /**
+   * The timeout to use while discarding a stream of input data. Since this is used for connection
+   * reuse, this timeout should be significantly less than the time it takes to establish a new
+   * connection.
+   */
+  int DISCARD_STREAM_TIMEOUT_MILLIS = 100;
+
+  /** Returns an output stream where the request body can be streamed. */
+  Sink createRequestBody(Request request, long contentLength);
+
+  /** This should update the HTTP engine's sentRequestMillis field. */
+  void writeRequestHeaders(Request request) throws IOException;
+
+  /** Flush the request to the underlying socket. */
+  void finishRequest() throws IOException;
+
+  /** Read and return response headers. */
+  Response.Builder readResponseHeaders() throws IOException;
+
+  /** Returns a stream that reads the response body. */
+  ResponseBody openResponseBody(Response response) throws IOException;
+
+  /**
+   * Cancel this stream. Resources held by this stream will be cleaned up, though not synchronously.
+   * That may happen later by the connection pool thread.
+   */
+  void cancel();
+}
+</code></pre>
+
+<p>可以看到<code>HttpCodec</code>是一个接口，为什么是一个接口呢？因为HTTP协议的兼容性问题，HTTP现在已经存在两种实现了，分为HTTP1和HTTP2，HTTP协议的不同，当然，进行这些操作的实现方式也不一样，所以，通过接口隔离具体协议实现方式的不同。当然，具体的实现在<code>streamAllocation.newStream()</code>这里，通过连接到服务器，服务器会返回接受的协议，发现服务端接受&rdquo;h2&rdquo;，则使用<code>Http2Codec</code>，否则使用<code>Http1Codec</code></p>
+
+<p>好了，终于到了最后一个Interceptor:</p>
+
+<h3 id="callserverinterceptor">CallServerInterceptor</h3>
+
+<p>前面的Interceptor做了这么多铺垫，就等着最后一个Interceptor完成最后一步，向服务端发送请求，从服务端获取请求。</p>
+
+<h4 id="intercept-2">intercept()</h4>
+
+<pre><code class="language-java">@Override public Response intercept(Chain chain) throws IOException {
+  HttpCodec httpCodec = ((RealInterceptorChain) chain).httpStream();
+  StreamAllocation streamAllocation = ((RealInterceptorChain) chain).streamAllocation();
+  Request request = chain.request();
+
+  long sentRequestMillis = System.currentTimeMillis();
+  // 发送request header
+  httpCodec.writeRequestHeaders(request);
+
+  if (HttpMethod.permitsRequestBody(request.method()) &amp;&amp; request.body() != null) {
+  // 发送request body
+    Sink requestBodyOut = httpCodec.createRequestBody(request, request.body().contentLength());
+    BufferedSink bufferedRequestBody = Okio.buffer(requestBodyOut);
+    request.body().writeTo(bufferedRequestBody);
+    bufferedRequestBody.close();
+  }
+  // 完成request
+  httpCodec.finishRequest();
+  // 读取response header
+  Response response = httpCodec.readResponseHeaders()
+      .request(request)
+      .handshake(streamAllocation.connection().handshake())
+      .sentRequestAtMillis(sentRequestMillis)
+      .receivedResponseAtMillis(System.currentTimeMillis())
+      .build();
+
+  int code = response.code();
+  if (forWebSocket &amp;&amp; code == 101) {
+    // Connection is upgrading, but we need to ensure interceptors see a non-null response body.
+    response = response.newBuilder()
+        .body(Util.EMPTY_RESPONSE)
+        .build();
+  } else {
+    response = response.newBuilder()
+        .body(httpCodec.openResponseBody(response))
+        .build();
+  }
+  
+  if (&quot;close&quot;.equalsIgnoreCase(response.request().header(&quot;Connection&quot;))
+      || &quot;close&quot;.equalsIgnoreCase(response.header(&quot;Connection&quot;))) {
+    streamAllocation.noNewStreams();
+  }
+
+  if ((code == 204 || code == 205) &amp;&amp; response.body().contentLength() &gt; 0) {
+    throw new ProtocolException(
+        &quot;HTTP &quot; + code + &quot; had non-zero Content-Length: &quot; + response.body().contentLength());
+  }
+
+  return response;
+}
+</code></pre>
+
+<p>主要流程是:
+1. 发送request header
+2. 存在request body,发送给服务端
+3. 完成request
+4. 读取服务端response header，生成Response对象
+5. 存在response body,则将body添加到上一步生成的Response对象里</p>
+
+<p>好了，到这里我们就把Interceptor链给分析完毕了。然后Response对象就一层层的返回到之前的Interceptors里了。如果前面的Interceptor关心Response，就重新进行这样的链式处理，否则就返回给我们调用网络请求的地方，这样我们就拿到了需要的Response对象。</p>
+
+<p>通过我们的分析，可以看出，这个责任链把功能分层分的淋漓尽致，需要什么功能，加一个专门的Interceptor即可，了解到了这样一种简洁干净的设计，以后写代码的时候就可以借鉴一下。</p>
+
+    </div>
+
+    
+    
+
+    
+    
+<div class="post-reward">
+  <input type="checkbox" name="reward" id="reward" hidden />
+  <label class="reward-button" for="reward">赞赏支持</label>
+  <div class="qr-code">
+    
+    
+    
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/img/reward/alipay-qr-code.png">
+        <span>支付宝打赏</span>
+      </label>
+  </div>
+</div>
+
+    <footer class="post-footer">
+      <div class="post-tags">
+          
+          <a href="/tags/okhttp/">okhttp</a>
+          
+          <a href="/tags/square/">square</a>
+          
+        </div>
+
+      
+      <nav class="post-nav">
+        
+          <a class="prev" href="/post/groovygradle%E5%85%A5%E9%97%A8/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">Groovy &amp; Gradle 入门</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
+        
+          <a class="next" href="/post/okhttp%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90-%E4%B8%8A/">
+            <span class="next-text nav-default">OkHttp源码解析-(上)</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+  <div id="disqus_thread"></div>
+    <script type="text/javascript">
+    (function() {
+      
+      
+      if (window.location.hostname === 'localhost') return;
+
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      var disqus_shortname = 'yunair';
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:airzhaoyn@gmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://github.com/yunair" class="iconfont icon-github" title="github"></a>
+  <a href="http://blog.airzone.world/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    
+      2015 - 
+    2018
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">Air</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+<script src="/lib/highlight/highlight.pack.js?v=20171001"></script><script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox-3.1.20.min.js"></script>
+
+
+<script type="text/javascript" src="/dist/even.min.js?v=3.2.0"></script>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-103683322-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+
+
+
+
+</body>
+</html>

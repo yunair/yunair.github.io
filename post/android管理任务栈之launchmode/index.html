@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Android管理任务栈之—launchMode - Air Little Place</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="Air" />
+  <meta name="description" content="前言 之前遇到了一个问题，大概是有 4 个 Activity，分别为 A, B, C, D Activity，当你的 Activity 跳转, A -&amp;gt; B -&amp;gt; C -&amp;gt; D 跳转，此时，你需要从 D 跳回" />
+
+  <meta name="keywords" content="blog" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.49-DEV" />
+
+
+<link rel="canonical" href="http://blog.airzone.world/post/android%E7%AE%A1%E7%90%86%E4%BB%BB%E5%8A%A1%E6%A0%88%E4%B9%8Blaunchmode/" />
+
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+
+<link href="/dist/even.min.css?v=3.2.0" rel="stylesheet">
+<link href="/lib/fancybox/jquery.fancybox-3.1.20.min.css" rel="stylesheet">
+
+
+
+
+<meta property="og:title" content="Android管理任务栈之—launchMode" />
+<meta property="og:description" content="前言 之前遇到了一个问题，大概是有 4 个 Activity，分别为 A, B, C, D Activity，当你的 Activity 跳转, A -&gt; B -&gt; C -&gt; D 跳转，此时，你需要从 D 跳回" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://blog.airzone.world/post/android%E7%AE%A1%E7%90%86%E4%BB%BB%E5%8A%A1%E6%A0%88%E4%B9%8Blaunchmode/" /><meta property="article:published_time" content="2016-03-06T00:00:00&#43;00:00"/>
+<meta property="article:modified_time" content="2016-03-06T00:00:00&#43;00:00"/>
+<meta itemprop="name" content="Android管理任务栈之—launchMode">
+<meta itemprop="description" content="前言 之前遇到了一个问题，大概是有 4 个 Activity，分别为 A, B, C, D Activity，当你的 Activity 跳转, A -&gt; B -&gt; C -&gt; D 跳转，此时，你需要从 D 跳回">
+
+
+<meta itemprop="datePublished" content="2016-03-06T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2016-03-06T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="2423">
+
+
+
+<meta itemprop="keywords" content="" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Android管理任务栈之—launchMode"/>
+<meta name="twitter:description" content="前言 之前遇到了一个问题，大概是有 4 个 Activity，分别为 A, B, C, D Activity，当你的 Activity 跳转, A -&gt; B -&gt; C -&gt; D 跳转，此时，你需要从 D 跳回"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">Air</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">Air</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">Android管理任务栈之—launchMode</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2016-03-06 </span>
+        
+        <span class="more-meta"> 约 2423 字 </span>
+        <span class="more-meta"> 预计阅读 5 分钟 </span>
+        
+      </div>
+    </header>
+
+    
+    
+<div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  
+  <div class="post-toc-content">
+    <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#前言">前言</a></li>
+<li><a href="#launchmode-开篇">LaunchMode 开篇</a></li>
+<li><a href="#四种模式各个模式的作用">四种模式各个模式的作用</a></li>
+</ul></li>
+</ul>
+</nav>
+  </div>
+</div>
+
+    
+    
+
+    
+    <div class="post-content">
+      
+
+<h2 id="前言">前言</h2>
+
+<p>之前遇到了一个问题，大概是有 4 个 Activity，分别为 A, B, C, D Activity，当你的 Activity 跳转, A -&gt; B -&gt; C -&gt; D 跳转，此时，你需要从 D 跳回 B，不能把 C<code>finish()</code>掉，因为用户中途可能会返回 C，而不继续进行下一步操作；直接跳也不可以，因为默认情况下跳到 B 的时候，用户点返回会返回 D 而不是 A，这个时候我知道了 LaunchMode，发现这种情况很适合一个 LaunchMode 的使用 ———— <code>singleTask</code>，趁此机会，研究一下 LaunchMode。</p>
+
+<h2 id="launchmode-开篇">LaunchMode 开篇</h2>
+
+<p>说到 LaunchMode，我们来看看官方文档怎么说 ：</p>
+
+<blockquote>
+<p>An instruction on how the activity should be launched. There are four modes that work in conjunction with activity flags (<code>FLAG_ACTIVITY_*</code> constants) in Intent objects to determine what should happen when the activity is called upon to handle an intent. They are:</p>
+</blockquote>
+
+<ul>
+<li><p>&ldquo;standard&rdquo;</p></li>
+
+<li><p>&ldquo;singleTop&rdquo;</p></li>
+
+<li><p>&ldquo;singleTask&rdquo;</p></li>
+
+<li><p>&ldquo;singleInstance&rdquo;</p></li>
+</ul>
+
+<p>The default mode is &ldquo;standard&rdquo;.</p>
+
+<p>即 Activity 有 4 种启动模式，分别是</p>
+
+<ul>
+<li>&ldquo;standard&rdquo;</li>
+<li>&ldquo;singleTop&rdquo;</li>
+<li>&ldquo;singleTask&rdquo;</li>
+<li>&ldquo;singleInstance&rdquo;</li>
+</ul>
+
+<p>这个需要在 Manifest 中指定。可以和 Intent 中的<code>FLAG_ACTIVITY_*</code>结合使用。</p>
+
+<p>当然，我们要明确一点，Android 中以栈的形式来管理<code>Activity</code>，至于什么是栈，请复习数据结构相关内容，这里假设大家都理解栈。</p>
+
+<h2 id="四种模式各个模式的作用">四种模式各个模式的作用</h2>
+
+<p>先告诉大家一个方法，通过如下命令获取你当前包的<code>Activity</code>任务栈</p>
+
+<pre><code class="language-shell">adb shell dumpsys activity activities | sed -En -e '/Stack #/p' -e '/Running activities/,/Run #0/p' | grep &quot;包名&quot;
+</code></pre>
+
+<ul>
+<li>&ldquo;standard&rdquo;</li>
+</ul>
+
+<p>大家默认新建的<code>Activity</code>就是这个模式的，这个模式相当于不对<code>Activity</code>加任何约束，即你调用<code>intent.startActivity()</code>的时候，每调用一次，就会在栈中新加一个改<code>Activity</code>。</p>
+
+<p>先看一下我们当前的任务栈：</p>
+
+<pre><code class="language-shell">Run #7: ActivityRecord{ac97db9 u0 com.air.activitylaunchmodetestdemo/.MainActivity t1211}
+</code></pre>
+
+<p>可以看到，当前只有一个<code>MainActivity</code>，此时，当我点击按钮执行<code>startActivity(new Intent(this, MainActivity.class))</code>的时候，可以看到任务栈变成了：</p>
+
+<pre><code class="language-shell">Run #8: ActivityRecord{11e0192c u0 com.air.activitylaunchmodetestdemo/.MainActivity t1211}
+Run #7: ActivityRecord{ac97db9 u0 com.air.activitylaunchmodetestdemo/.MainActivity t1211}
+</code></pre>
+
+<p>因为没有在<code>startActivity()</code>之后执行<code>finish()</code>方法，现在我们有了两个<code>MainActivity</code>实例，此时如果退出应用，要点两次后退键才可以。如果我再次点击按钮执行<code>startActivity(new Intent(this, MainActivity.class))</code>的时候，可以想象新的任务栈该变成什么了。</p>
+
+<p>接下来我们以图的形式说明该 LaunchMode 情况下，任务栈的样子。</p>
+
+<p><img src="/img/launchMode/ActivityStack--standard.png" alt="ActivityStack--standard" /></p>
+
+<p>就像上图画的那样，每启动一个新的 Activity，就会添加到栈上，无论即将启动的 Activity 是否是同一个 Activity。</p>
+
+<ul>
+<li>&ldquo;singleTop&rdquo;</li>
+</ul>
+
+<p>看到这个名字，先靠命名理解一下，在顶部的时候是单一存在，因为是以栈的形式来管理<code>Activity</code>的，那么顶部指的就是栈的顶部。</p>
+
+<p>好了，上面的猜测其实已经和真正的情况是差不多了，我在此再补充几点细节。对于不是栈顶的<code>Activity</code>，即使设置了这个 launchMode，依旧会创建新的 Activity。例如，存在两个<code>Activity</code>A、B，它们的 launchMode 都是 singleTop，如果你在 A 中启动 A，栈不会新添加<code>Activity</code>，因为此时 A<code>Activity</code>在栈顶，但是，如果你用 A 启动 B，B 就会被加入到栈中，此时栈就变成了 AB，再拿 B 启动 A，会产生 A 的新实例添加到栈内，现在栈变成了 ABA。</p>
+
+<p>拿前面举的 A<code>Activity</code>例子来说，在 A 中启动 A，由于 A 在栈顶，所以栈内不会添加 A 的新实例，自然不会调用 A 的<code>onCreate()</code>方法，这个时候，如果启动 A 的时候给 A 传了额外的参数，那么需要在哪里处理呢？答案是<code>onNewIntent()</code>，这里就是 singleTop 和 standard 两种 launchMode 不同的地方。</p>
+
+<p>常用场景：带搜索功能的<code>Activity</code>，搜索不同的关键词不用多次启动同一个<code>Activity</code>。</p>
+
+<ul>
+<li>&ldquo;singleTask&rdquo;</li>
+</ul>
+
+<p>上面介绍的两个 launchMode 的作用不能实现栈中只存在一个<code>Activity</code>实例，但是有些时候，就像我在开头举的那个例子，业务逻辑中间要跳好几层，最终只想跳到入口界面，即栈中只需要存在一个相应的<code>Activity</code>，而不是多个。</p>
+
+<p>总结一个 singleTask 的作用，若一个<code>Activity</code>的 launchMode 被指定为 singleTask，则在对应的栈中只会存在一个实例。若这个实例不存在，则新建实例；若存在，则把在栈中该实例之上的其他实例移除出栈，并调用该<code>Activity</code>的<code>onNewIntent()</code>方法，将 intent 传入。</p>
+
+<p><img src="/img/launchMode/ActivityStack--singleTop.png" alt="ActivityStack--singleTop" /></p>
+
+<p>我们来通过代码验证一下：启动了四个<code>Activity</code>，</p>
+
+<pre><code class="language-shell">Run #7: ActivityRecord{b53e419 u0 com.air.activitylaunchmodetestdemo/.BActivity t3909}
+Run #6: ActivityRecord{7a83deb u0 com.air.activitylaunchmodetestdemo/.AActivity t3909}
+Run #5: ActivityRecord{df9c4ad u0 com.air.activitylaunchmodetestdemo/.CActivity t3909}
+Run #4: ActivityRecord{e7c438 u0 com.air.activitylaunchmodetestdemo/.MainActivity t3909}
+</code></pre>
+
+<p>CActivity 为 launchMode 为 singleTask 的<code>Activity</code>，此时，从 BActivity 启动 CActivity，通过前面的介绍，我们猜测会调用 CActivity 的<code>onNewIntent()</code>方法，并且，在栈中，CActivity 之上的<code>Activity</code>都会被移除，此时，执行<code>startActivity()</code>方法，最新的栈内容如下：</p>
+
+<pre><code class="language-shell">Run #5: ActivityRecord{df9c4ad u0 com.air.activitylaunchmodetestdemo/.CActivity t3909}
+Run #4: ActivityRecord{e7c438 u0 com.air.activitylaunchmodetestdemo/.MainActivity t3909}
+</code></pre>
+
+<p>可以看出，确实是我们所介绍的效果。至于设置 taskAffinity 后该 launchMode 的表现，我们在这篇文章中不会涉及，留到下一篇文章再与大家见面。</p>
+
+<p>常用场景：注册 Activity 或者启动应用的首个<code>Activity</code>，这样就不用担心任务栈内有其他的<code>Activity</code>没有销毁了。</p>
+
+<ul>
+<li>&ldquo;singleInstance&rdquo;</li>
+</ul>
+
+<p>这个或许可以称之为 singleTask 模式的加强版，对于设置了 singleTask 的<code>Activity</code>，我们可以让它加入到在我们当前的任务栈中，也可以新建一个任务栈，把它放入(设置 taskAffinity 的情况下)。但是，对于 singleInstance 的<code>Activity</code>，我们只能新建一个任务栈，并把它放入，没有任何<code>Activity</code>可以和它在一个栈中。</p>
+
+<p>那么对于我们开发的应用，其中有一个<code>Activity</code>需要给其他应用使用，比如浏览器，你从自己的应用点开一个链接，使用浏览器应用开启网页，你单机后退，直接退到了你的应用，而不是你之前浏览的其他页面，如果你在浏览器中访问的连接可以访问你的应用，那么，此时点击后退你会发现，居然在你应用所在的栈中进行了回退操作，而不是退到浏览器页面，然后你退出应用，发现这个时候反倒打开了浏览器页面，这样说有点绕，我们以图的形势来展示一下。</p>
+
+<p><img src="/img/launchMode/ActivityStack--singleInstance.png" alt="ActivityStack--singleInstance" /></p>
+
+<p>至于常用场景，我本以为支付、分享之类的很可能会使用，但是我反编译微信查看其 manifest 文件的时候，发现它并没有使用这个 launchMode，所以暂时这里空着，如果你有什么使用场景，可以给我留言。</p>
+
+<p>参考文章：</p>
+
+<ol>
+<li><a href="http://developer.android.com/guide/topics/manifest/activity-element.html#lmode">官方文档</a></li>
+<li><a href="http://droidyue.com/blog/2015/08/16/dive-into-android-activity-launchmode/">深入讲解 Android 中的 Activity launchMode</a></li>
+</ol>
+
+<p>参考书籍：</p>
+
+<ol>
+<li>《第一行代码》</li>
+<li>《Android 开发艺术探索》</li>
+</ol>
+
+    </div>
+
+    
+    
+
+    
+    
+<div class="post-reward">
+  <input type="checkbox" name="reward" id="reward" hidden />
+  <label class="reward-button" for="reward">赞赏支持</label>
+  <div class="qr-code">
+    
+    
+    
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/img/reward/alipay-qr-code.png">
+        <span>支付宝打赏</span>
+      </label>
+  </div>
+</div>
+
+    <footer class="post-footer">
+      
+
+      
+      <nav class="post-nav">
+        
+          <a class="prev" href="/post/retrofit2.0%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%B8%8A/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">Retrofit2源码分析-(上)</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
+        
+          <a class="next" href="/post/retrofit_1.9%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E4%B8%8B/">
+            <span class="next-text nav-default">Retrofit-1.9源码分析-(下)</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+  <div id="disqus_thread"></div>
+    <script type="text/javascript">
+    (function() {
+      
+      
+      if (window.location.hostname === 'localhost') return;
+
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      var disqus_shortname = 'yunair';
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:airzhaoyn@gmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://github.com/yunair" class="iconfont icon-github" title="github"></a>
+  <a href="http://blog.airzone.world/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    
+      2015 - 
+    2018
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">Air</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+<script src="/lib/highlight/highlight.pack.js?v=20171001"></script><script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox-3.1.20.min.js"></script>
+
+
+<script type="text/javascript" src="/dist/even.min.js?v=3.2.0"></script>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-103683322-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+
+
+
+
+</body>
+</html>

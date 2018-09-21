@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>(翻译)使用正确的方式绘制布局 - Air Little Place</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="Air" />
+  <meta name="description" content="原文 ： https://possiblemobile.com/2013/05/layout-inflation-as-intended/ 绘制(inflation，翻译下同)布局(Layout)是在 Android 的 Context 中使用的术语，它的作用是解析一个 XML 布局资源并且把这个资源转换到视图" />
+
+  <meta name="keywords" content="blog" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.49-DEV" />
+
+
+<link rel="canonical" href="http://blog.airzone.world/post/%E7%BF%BB%E8%AF%91%E4%BD%BF%E7%94%A8%E6%AD%A3%E7%A1%AE%E7%9A%84%E6%96%B9%E5%BC%8F%E7%BB%98%E5%88%B6%E5%B8%83%E5%B1%80/" />
+
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+
+<link href="/dist/even.min.css?v=3.2.0" rel="stylesheet">
+<link href="/lib/fancybox/jquery.fancybox-3.1.20.min.css" rel="stylesheet">
+
+
+
+
+<meta property="og:title" content="(翻译)使用正确的方式绘制布局" />
+<meta property="og:description" content="原文 ： https://possiblemobile.com/2013/05/layout-inflation-as-intended/ 绘制(inflation，翻译下同)布局(Layout)是在 Android 的 Context 中使用的术语，它的作用是解析一个 XML 布局资源并且把这个资源转换到视图" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://blog.airzone.world/post/%E7%BF%BB%E8%AF%91%E4%BD%BF%E7%94%A8%E6%AD%A3%E7%A1%AE%E7%9A%84%E6%96%B9%E5%BC%8F%E7%BB%98%E5%88%B6%E5%B8%83%E5%B1%80/" /><meta property="article:published_time" content="2016-01-12T00:00:00&#43;00:00"/>
+<meta property="article:modified_time" content="2016-01-12T00:00:00&#43;00:00"/>
+<meta itemprop="name" content="(翻译)使用正确的方式绘制布局">
+<meta itemprop="description" content="原文 ： https://possiblemobile.com/2013/05/layout-inflation-as-intended/ 绘制(inflation，翻译下同)布局(Layout)是在 Android 的 Context 中使用的术语，它的作用是解析一个 XML 布局资源并且把这个资源转换到视图">
+
+
+<meta itemprop="datePublished" content="2016-01-12T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2016-01-12T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="1814">
+
+
+
+<meta itemprop="keywords" content="翻译," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="(翻译)使用正确的方式绘制布局"/>
+<meta name="twitter:description" content="原文 ： https://possiblemobile.com/2013/05/layout-inflation-as-intended/ 绘制(inflation，翻译下同)布局(Layout)是在 Android 的 Context 中使用的术语，它的作用是解析一个 XML 布局资源并且把这个资源转换到视图"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">Air</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">Air</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">(翻译)使用正确的方式绘制布局</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2016-01-12 </span>
+        
+        <span class="more-meta"> 约 1814 字 </span>
+        <span class="more-meta"> 预计阅读 4 分钟 </span>
+        
+      </div>
+    </header>
+
+    
+    
+<div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  
+  <div class="post-toc-content">
+    <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#绘制-inflation-翻译下同-布局-layout-是在-android-的-context-中使用的术语-它的作用是解析一个-xml-布局资源并且把这个资源转换到视图对象的层级-hierarchy-中">绘制(inflation，翻译下同)布局(Layout)是在 Android 的 Context 中使用的术语，它的作用是解析一个 XML 布局资源并且把这个资源转换到视图对象的层级(hierarchy)中</a>
+<ul>
+<li><a href="#了解-layoutinflater">了解  LayoutInflater</a></li>
+<li><a href="#android-系统的例子">Android 系统的例子</a></li>
+<li><a href="#应用例子">应用例子</a></li>
+<li><a href="#每个规则都有例外-文中的例外在现在的-android-版本已经不存在了-所以这一节就不翻译了">每个规则都有例外（文中的例外在现在的 Android 版本已经不存在了，所以这一节就不翻译了）</a></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+  </div>
+</div>
+
+    
+    
+
+    
+    <div class="post-content">
+      
+
+<p><code>原文 ： https://possiblemobile.com/2013/05/layout-inflation-as-intended/</code></p>
+
+<h2 id="绘制-inflation-翻译下同-布局-layout-是在-android-的-context-中使用的术语-它的作用是解析一个-xml-布局资源并且把这个资源转换到视图对象的层级-hierarchy-中">绘制(inflation，翻译下同)布局(Layout)是在 Android 的 Context 中使用的术语，它的作用是解析一个 XML 布局资源并且把这个资源转换到视图对象的层级(hierarchy)中</h2>
+
+<p>这在 Android SDK 中很长用，但你会很惊奇的发现有一种错误的方式使用*LayoutInflater*，并且你的应用可能正在错误的使用它。如果你曾经在你的 Android 应用中，使用*LayoutInflater*写过类似下面的代码，</p>
+
+<pre><code class="language-java">inflater.inflate(R.layout.my_layout, null);
+</code></pre>
+
+<p>那么请继续阅读，因为你用错了，我想告诉你为什么你是错的。</p>
+
+<h3 id="了解-layoutinflater">了解  LayoutInflater</h3>
+
+<p>首先，我们看一下*LayoutInflater*是如何工作，对于常见的应用，*inflate()*  方法有两种可用的方式。</p>
+
+<ol>
+<li><code>inflate(int resource, ViewGroup root)</code></li>
+<li><code>inflate(int resource, ViewGroup root, boolean attachToRoot)</code></li>
+</ol>
+
+<p>第一个参数(resource)指出哪个布局资源想要被绘制。第二个参数是你绘制的资源将会添加到该根视图的层级中(翻译不好，附上原文：The second parameter is the root view of the hierarchy you are inflating the resource to attach to.)。当第三个参数出现的时候，它控制绘制好的视图是否附着到所提供的根视图上。</p>
+
+<p>后两个参数可能会让人困惑。对于这个方法的两个参数版本，*LayoutInflater*将会自动尝试将绘制好的视图附加到提供的根视图上。然而，系统会做一个检查，防止你给根视图传  *null*  导致的应用崩溃。</p>
+
+<p>许多开发者使用这种方式，意味着给根视图传*null*是禁止绘制的视图附着的正确方法；在大部分情况下，甚至没有意识到  *inflate()*  方法有三个参数的版本。这样做我们同时也禁止了根视图拥有的另外一种很重要的功能——但是我走的太快了，你们可能会跟不上(翻译不好，附上原文：but I’m getting ahead of myself.)。</p>
+
+<h3 id="android-系统的例子">Android 系统的例子</h3>
+
+<p>在系统希望开发者绘制视图的地方，让我们做一些实验。</p>
+
+<p><strong>Adapters</strong>是使用*LayoutInflater*最常用的地方，通常用在自定义<code>Listview</code>的*Adapter*中，重载  *getView()*方法，这个方法有如下的方法签名：</p>
+
+<pre><code class="language-java">getView(int position, View convertView, ViewGroup parent)
+</code></pre>
+
+<p><strong>Fragments</strong>在创建视图的时候也使用*LayoutInflater*，通过*onCreateView()*方法；注意它的方法签名：</p>
+
+<pre><code class="language-java">onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+</code></pre>
+
+<p>你是否注意到，每次系统想让你绘制布局的时候，它都会传给你最终要附着到的父*ViewGroup*？同时在大部分情况下(包括以上两个例子)，在*LayoutInflater*被允许将绘制好的视图附加到根视图的时候，它将会抛出一个异常。</p>
+
+<p>当我们不应该附着到*ViewGroup*的时候，为什么我们会需要它？原来，在绘制过程中，父视图是很重要的部分，因为在  XML  文件被绘制的过程中，计算在根元素声明的*LayoutParams*需要它  。在这里传*null*相当于告诉系统“抱歉，我不知道需要附着到哪个父视图上”。</p>
+
+<p>这样做的问题是*android:layout_xxx*  属性总是在父视图的*Context*中被计算。因此，如果没有父视图的信息，在<strong>XML</strong>树中，所有的根元素声明的*LayoutParams*将会被丢弃，然后，你将会问“为什么系统忽略我声明的*Layout*属性，我需要好好检查一下为什么，看看是不是哪里有 bug”。</p>
+
+<p>没有了<em>LayoutParams</em>, 最终承载绘制布局的*ViewGroup*将会生成一个默认的设置给你。  如果你足够幸运(大多数情况下都是)，这些默认的参数和你在  XML 中声明的一样——因此遮盖了这里有错误的事实。</p>
+
+<h3 id="应用例子">应用例子</h3>
+
+<p>因此你说你从没在应用中见过它出现？请看下面的布局，我们用它来绘制  *ListView*  的行：</p>
+
+<p><strong>R.layout.item_row</strong></p>
+
+<pre><code class="language-xml">&lt;LinearLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;
+    android:layout_width=&quot;match_parent&quot;
+    android:layout_height=&quot;?android:attr/listPreferredItemHeight&quot;
+    android:gravity=&quot;center_vertical&quot;
+    android:orientation=&quot;horizontal&quot;&gt;
+    &lt;TextView
+        android:id=&quot;@+id/text1&quot;
+        android:layout_width=&quot;wrap_content&quot;
+        android:layout_height=&quot;wrap_content&quot;
+        android:paddingRight=&quot;15dp&quot;
+        android:text=&quot;Text1&quot; /&gt;
+    &lt;TextView
+        android:id=&quot;@+id/text2&quot;
+        android:layout_width=&quot;0dp&quot;
+        android:layout_height=&quot;wrap_content&quot;
+        android:layout_weight=&quot;1&quot;
+        android:text=&quot;Text2&quot; /&gt;
+&lt;/LinearLayout&gt;
+</code></pre>
+
+<p>我们希望把每行的高度设置为固定的高度，在这种情况下，首选项的高度和当前的主题相关——看起来很合理。</p>
+
+<p>然后，当我们以错误的方式绘制布局的时候</p>
+
+<pre><code class="language-java">public View getView(int position, View convertView, ViewGroup parent) {
+    if (convertView == null) {
+        convertView = inflate(R.layout.item_row, null);
+    }
+    return convertView;
+}
+</code></pre>
+
+<p>我们得到的结果看起来像这样：</p>
+
+<p><img src="/img/layout/image1.png" alt="" /></p>
+
+<p>我们设置的固定高度出了什么情况？</p>
+
+<p>如果我们替换绘制布局的方式：</p>
+
+<pre><code class="language-java">public View getView(int position, View convertView, ViewGroup parent) {
+    if (convertView == null) {
+        convertView = inflate(R.layout.item_row, parent, false);
+    }
+    return convertView;
+}
+</code></pre>
+
+<p>我们得到的结果就如我们希望的那样。</p>
+
+<p><img src="/img/layout/Image2.png" alt="" /></p>
+
+<h3 id="每个规则都有例外-文中的例外在现在的-android-版本已经不存在了-所以这一节就不翻译了">每个规则都有例外（文中的例外在现在的 Android 版本已经不存在了，所以这一节就不翻译了）</h3>
+
+<p>所以，下一次你想给  *inflate()*方法传  *null*的时候，你需要停下来并问一问你自己“我真的不知道这个视图的根视图是什么吗？(这句话我没有理解作者的意思，就按我觉得翻译了，do I really not know where this view will end up?)”</p>
+
+<p>最后，当第三个参数为 true 时，你可以使用两个参数版本的*inflate()*  来省它。当第三个参数为 false 的时候，你不应该将  *null*  传给第二个参数来省略它。</p>
+
+    </div>
+
+    
+    
+
+    
+    
+<div class="post-reward">
+  <input type="checkbox" name="reward" id="reward" hidden />
+  <label class="reward-button" for="reward">赞赏支持</label>
+  <div class="qr-code">
+    
+    
+    
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/img/reward/alipay-qr-code.png">
+        <span>支付宝打赏</span>
+      </label>
+  </div>
+</div>
+
+    <footer class="post-footer">
+      <div class="post-tags">
+          
+          <a href="/tags/%E7%BF%BB%E8%AF%91/">翻译</a>
+          
+        </div>
+
+      
+      <nav class="post-nav">
+        
+          <a class="prev" href="/post/retrofit-1.9%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E4%B8%8A/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">Retrofit-1.9源码分析-(上)</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
+        
+          <a class="next" href="/post/%E7%BF%BB%E8%AF%91%E4%BB%80%E4%B9%88%E6%98%AF-context/">
+            <span class="next-text nav-default">(翻译)什么是Context</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+  <div id="disqus_thread"></div>
+    <script type="text/javascript">
+    (function() {
+      
+      
+      if (window.location.hostname === 'localhost') return;
+
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      var disqus_shortname = 'yunair';
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:airzhaoyn@gmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://github.com/yunair" class="iconfont icon-github" title="github"></a>
+  <a href="http://blog.airzone.world/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    
+      2015 - 
+    2018
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">Air</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+<script src="/lib/highlight/highlight.pack.js?v=20171001"></script><script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox-3.1.20.min.js"></script>
+
+
+<script type="text/javascript" src="/dist/even.min.js?v=3.2.0"></script>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-103683322-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+
+
+
+
+</body>
+</html>

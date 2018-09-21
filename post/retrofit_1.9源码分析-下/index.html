@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Retrofit-1.9源码分析-(下) - Air Little Place</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="Air" />
+  <meta name="description" content="看过上一篇的分析，并思考了我在最后留给大家的对那个方法的思考之后，我们就可以继续解析这个库了。 记得上一篇提到的小尾巴吗？这里我们先不谈这个小" />
+
+  <meta name="keywords" content="blog" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.49-DEV" />
+
+
+<link rel="canonical" href="http://blog.airzone.world/post/retrofit_1.9%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E4%B8%8B/" />
+
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+
+<link href="/dist/even.min.css?v=3.2.0" rel="stylesheet">
+<link href="/lib/fancybox/jquery.fancybox-3.1.20.min.css" rel="stylesheet">
+
+
+
+
+<meta property="og:title" content="Retrofit-1.9源码分析-(下)" />
+<meta property="og:description" content="看过上一篇的分析，并思考了我在最后留给大家的对那个方法的思考之后，我们就可以继续解析这个库了。 记得上一篇提到的小尾巴吗？这里我们先不谈这个小" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://blog.airzone.world/post/retrofit_1.9%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E4%B8%8B/" /><meta property="article:published_time" content="2016-01-16T00:00:00&#43;00:00"/>
+<meta property="article:modified_time" content="2016-01-16T00:00:00&#43;00:00"/>
+<meta itemprop="name" content="Retrofit-1.9源码分析-(下)">
+<meta itemprop="description" content="看过上一篇的分析，并思考了我在最后留给大家的对那个方法的思考之后，我们就可以继续解析这个库了。 记得上一篇提到的小尾巴吗？这里我们先不谈这个小">
+
+
+<meta itemprop="datePublished" content="2016-01-16T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2016-01-16T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="2781">
+
+
+
+<meta itemprop="keywords" content="retrofit,square," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Retrofit-1.9源码分析-(下)"/>
+<meta name="twitter:description" content="看过上一篇的分析，并思考了我在最后留给大家的对那个方法的思考之后，我们就可以继续解析这个库了。 记得上一篇提到的小尾巴吗？这里我们先不谈这个小"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">Air</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">Air</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">Retrofit-1.9源码分析-(下)</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2016-01-16 </span>
+        
+        <span class="more-meta"> 约 2781 字 </span>
+        <span class="more-meta"> 预计阅读 6 分钟 </span>
+        
+      </div>
+    </header>
+
+    
+    
+<div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  
+  <div class="post-toc-content">
+    <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#注解">注解</a>
+<ul>
+<li><a href="#get">GET</a></li>
+<li><a href="#restmethod">RestMethod</a></li>
+</ul></li>
+<li><a href="#完成接口代理的创建">完成接口代理的创建</a>
+<ul>
+<li><a href="#resthandler-invoke">RestHandler.invoke()</a></li>
+<li><a href="#resthandler-invokerequest">RestHandler.invokeRequest()</a></li>
+</ul></li>
+<li><a href="#提示">提示</a></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+  </div>
+</div>
+
+    
+    
+
+    
+    <div class="post-content">
+      
+
+<p>看过上一篇的分析，并思考了我在最后留给大家的对那个方法的思考之后，我们就可以继续解析这个库了。</p>
+
+<p>记得上一篇提到的小尾巴吗？这里我们先不谈这个小尾巴，先从 Demo 里接口里面的定义开始谈。</p>
+
+<h3 id="注解">注解</h3>
+
+<pre><code class="language-java">public interface GitHubService {
+    //被注释的内容是同步方法，在Android 4.0以后不允许主线程进行网络请求，所以一般不这么用
+    //@GET(&quot;/users/{user}/repos&quot;)
+    //List&lt;Repo&gt; listRepos(@Path(&quot;user&quot;) String user);
+    @GET(&quot;/users/{user}/repos&quot;)
+    void listRepos(@Path(&quot;user&quot;) String user, Callback&lt;List&lt;Repo&gt;&gt; callback);
+}
+</code></pre>
+
+<p>在这里我们看到使用注解定义进行 http 请求时所需要的各种信息，比如相对 url，参数等等。
+那我们就先观察一下注解。这里使用了<code>@GET</code>注解，表示 HTTP 中的 GET 方法，</p>
+
+<h4 id="get">GET</h4>
+
+<pre><code class="language-java">/** Make a GET request to a REST path relative to base URL. */
+@Documented
+@Target(METHOD)
+@Retention(RUNTIME)
+@RestMethod(&quot;GET&quot;)
+public @interface GET {
+  String value();
+}
+</code></pre>
+
+<p>注解基础就不在这里讲了，这个<code>@GET</code>注解又被<code>@RestMethod</code>注解注解了，我们来看一下。</p>
+
+<h4 id="restmethod">RestMethod</h4>
+
+<pre><code class="language-java">@Documented
+@Target(ANNOTATION_TYPE)
+@Retention(RUNTIME)
+public @interface RestMethod {
+  String value();
+  boolean hasBody() default false;
+}
+</code></pre>
+
+<p>这是注解注解的注解，也就是所谓的元注解。所有被这个注解注解的注解都可以被认为是该类型，
+可以当作所有子类都可以被转换为父类。</p>
+
+<p>被这个元注解注解的注解有这么几个, <code>@GET</code>, <code>@POST</code>, <code>@PUT</code>, <code>@PATCH</code>, <code>@DELETE</code>, <code>@DELETE</code>,
+可以看出，这就是进行 HTTP 请求的几种常用的请求方式。</p>
+
+<p>在示例中出现的其他注解先放一下。有了注解，那要实现这些注解的解析方式，这个实现在<code>RestMethodInfo.java</code>中
+这里有两个重要方法来处理自定义的注解：
+第一种是用在方法上的注解，如<code>@GET</code>，由<code>parseMethodAnnotations()</code>方法实现，
+第二种是用在参数内的注解，如<code>@PATH</code>，由<code>parseParameters()</code>实现，</p>
+
+<p>在这两个方法中，你可以知道哪些注解可以用在方法上，哪些注解可以用在参数内。</p>
+
+<p>好了，到这里，我们终于可以返回上一篇最后留下的坑继续看了。</p>
+
+<pre><code class="language-java">return (T) Proxy.newProxyInstance(service.getClassLoader(),
+    new Class&lt;?&gt;[] { service },
+    new RestHandler(getMethodInfoCache(service)));
+</code></pre>
+
+<h3 id="完成接口代理的创建">完成接口代理的创建</h3>
+
+<p>最终，<code>RestHandler</code>实现了<code>InvocationHandler</code>，对接口中的方法进行加工。</p>
+
+<p>看名字应该也很容易理解，<code>getMethodInfoCache()</code>的意义就是从传入的接口中获取对应的相关方法的缓存，
+用户定义的接口中每个<code>Method</code>都要和<code>RestMethodInfo</code>对应，自然想到使用<code>Map</code>做它们关系的联结。
+<code>RestHandler</code>持有对应的<code>Map</code>。
+来看一下<code>InvocationHandler</code>接口中必须实现的唯一的方法：</p>
+
+<h4 id="resthandler-invoke">RestHandler.invoke()</h4>
+
+<pre><code class="language-java">@SuppressWarnings(&quot;unchecked&quot;) //
+@Override public Object invoke(Object proxy, Method method, final Object[] args)
+    throws Throwable {
+  // If the method is a method from Object then defer to normal invocation.
+  //Object类方法，直接执行，不需要做额外操作
+  if (method.getDeclaringClass() == Object.class) {
+    return method.invoke(this, args);
+  }
+
+  // Load or create the details cache for the current method.
+  final RestMethodInfo methodInfo = getMethodInfo(methodDetailsCache, method);
+
+  //同步方法的处理逻辑，作为Android库的话忽视就可以了
+  if (methodInfo.isSynchronous) {
+    try {
+      return invokeRequest(requestInterceptor, methodInfo, args);
+    } catch (RetrofitError error) {
+      Throwable newError = errorHandler.handleError(error);
+      if (newError == null) {
+        throw new IllegalStateException(&quot;Error handler returned null for wrapped exception.&quot;,
+            error);
+      }
+      throw newError;
+    }
+  }
+
+  if (httpExecutor == null || callbackExecutor == null) {
+    throw new IllegalStateException(&quot;Asynchronous invocation requires calling setExecutors.&quot;);
+  }
+  //这个RestMethodInfo类中的类变量，通过你接口中方法定义来确认
+  if (methodInfo.isObservable) {
+    if (rxSupport == null) {
+      if (Platform.HAS_RX_JAVA) {  //和前面hasOkHttpOnClasspath()方法类似，就是找对应的包名
+        rxSupport = new RxSupport(httpExecutor, errorHandler, requestInterceptor);
+      } else {
+        throw new IllegalStateException(&quot;Observable method found but no RxJava on classpath.&quot;);
+      }
+    }
+    //rxSupport是一个自定义的类，查看这个方法的源码应该可以提升你对任意对象转换成Observable对象的理解
+    return rxSupport.createRequestObservable(new RxSupport.Invoker() {
+      @Override public ResponseWrapper invoke(RequestInterceptor requestInterceptor) {
+        return (ResponseWrapper) invokeRequest(requestInterceptor, methodInfo, args);
+      }
+    });
+  }
+
+  // Apply the interceptor synchronously, recording the interception so we can replay it later.
+  // This way we still defer argument serialization to the background thread.
+  final RequestInterceptorTape interceptorTape = new RequestInterceptorTape();
+  requestInterceptor.intercept(interceptorTape);
+
+  Callback&lt;?&gt; callback = (Callback&lt;?&gt;) args[args.length - 1];
+  //线程池执行网络请求，callbackExecutor指定callback执行的线程
+  httpExecutor.execute(new CallbackRunnable(callback, callbackExecutor, errorHandler) {
+    @Override public ResponseWrapper obtainResponse() {
+      return (ResponseWrapper) invokeRequest(interceptorTape, methodInfo, args);
+    }
+  });
+  return null; // Asynchronous methods should have return type of void.
+}
+</code></pre>
+
+<p>不得不说这个代码的注释写的真好，我针对其中的一部分代码写了中文注释。这里<code>invokeRequest()</code>方法很复杂，下面我们来看一下。</p>
+
+<h4 id="resthandler-invokerequest">RestHandler.invokeRequest()</h4>
+
+<pre><code class="language-java">/**
+ * Execute an HTTP request.
+ *
+ * @return HTTP response object of specified {@code type} or {@code null}.
+ * @throws RetrofitError if any error occurs during the HTTP request.
+ */
+private Object invokeRequest(RequestInterceptor requestInterceptor, RestMethodInfo methodInfo,
+    Object[] args) {
+  String url = null;
+  try {
+    methodInfo.init(); // Ensure all relevant method information has been loaded.
+
+    String serverUrl = server.getUrl();
+    RequestBuilder requestBuilder = new RequestBuilder(serverUrl, methodInfo, converter);
+    //在这个方法内，将你放入该方法中的各个参数处理成http标准格式
+    requestBuilder.setArguments(args);
+    //给http请求添加额外的信息，这些信息在requestBuilder写好了
+    //自己在初始化RestAdapter的时候也可以初始化自己的RequestInterceptor，
+    //这样的话就可以为一群http请求添加共同的header也好，参数也好
+    requestInterceptor.intercept(requestBuilder);
+    //封装了一个HTTP请求所有需要的信息
+    Request request = requestBuilder.build();
+
+    ...
+
+    long start = System.nanoTime();
+    //使用之前设置的Client.Provider进行网络请求，并得到返回值
+    //Response这个类封装了HTTP返回信息
+    Response response = clientProvider.get().execute(request);
+    long elapsedTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
+
+    int statusCode = response.getStatus();
+    //就是指接口中方法的返回值类型
+    Type type = methodInfo.responseObjectType;
+
+    if (statusCode &gt;= 200 &amp;&amp; statusCode &lt; 300) { // 2XX == successful request
+      //我们一般都要Convert之后的格式, 我还没遇到直接需要Response的情况，
+      // Caller requested the raw Response object directly.
+      if (type.equals(Response.class)) {
+        if (!methodInfo.isStreaming) {
+          //如果你返回值是Response，并且不返回流，而返回原始类型，
+          //response会将服务端返回值写入一个64K大小的数组中，如果返回值很大，那么数据就无法完全储存，所以在这种情况下返回大文件会有问题
+          // Read the entire stream and replace with one backed by a byte[].
+          response = Utils.readBodyToBytesIfNecessary(response);
+        }
+
+        if (methodInfo.isSynchronous) {
+          return response;
+        }
+        return new ResponseWrapper(response, response);
+      }
+      //这个接口的注释 Binary data with an associated mime type.
+      //这个接口用来抽象http的返回值的body
+      TypedInput body = response.getBody();
+      if (body == null) {
+        if (methodInfo.isSynchronous) {
+          return null;
+        }
+        //这个就是callback里的Response和Body
+        return new ResponseWrapper(response, null);
+      }
+
+      ExceptionCatchingTypedInput wrapped = new ExceptionCatchingTypedInput(body);
+      try {
+        //调用我们之前定义的Converter来解析数据
+        Object convert = converter.fromBody(wrapped, type);
+        logResponseBody(body, convert);
+        if (methodInfo.isSynchronous) {
+          return convert;
+        }
+        return new ResponseWrapper(response, convert);
+      } catch (ConversionException e) {
+        ...
+      }
+    }
+    //将body的数据转换成byte数组, http状态码不在200-300之间
+    response = Utils.readBodyToBytesIfNecessary(response);
+    ...
+  }
+}
+</code></pre>
+
+<p>这个方法很长，我去掉了<code>profiler</code>和<code>log</code>以及错误处理相关的内容。</p>
+
+<p>这里首先调用的就是<code>method.init()</code>方法，这个方法:</p>
+
+<pre><code class="language-java">synchronized void init() {
+  if (loaded) return;
+
+  parseMethodAnnotations();
+  parseParameters();
+
+  loaded = true;
+}
+</code></pre>
+
+<p>如果执行过，直接从缓存 Map 里拿就可以了，不需要重复执行，
+这个方法就是前面说的，获取每个方法对应的注解和方法参数内的注解，并给你的那些方法做合理的替换。</p>
+
+<p>剩下的方法基本都已做了注释，看代码即可了解。再提示一点，有<code>TypedInput</code>，自然有<code>TypedOutput</code>，
+<code>TypedOutput</code>的作用就和大家想的一样，是发送出去的数据类型的接口抽象。</p>
+
+<h3 id="提示">提示</h3>
+
+<p>在这里进行几点提示：</p>
+
+<ol>
+<li>自定义 converter 的时候需要实现<code>Converter</code>接口，比如你想用其它的 Json 解析库替代 Gson，或者服务端返回值不是 Json，而是 XML 等等。
+只要了解了<code>TypedInput</code>和<code>TypedOutput</code>，剩下的很容易就可以完成了。</li>
+<li>Retrofit 这个版本不支持 Multimap，所以如果服务端要求请求的时候 key 一样 value 不一样就很悲剧，那么修改 RequestBuilder 就可以达到 Multimap 的目的。</li>
+<li>Retrofit 这个版本不支持在接口中写入整个 url，如果 endpoint 不一样就要重新创建一个<code>RestAdapter</code>，但悲剧的是创建一个<code>RestAdapter</code>的代价是很大的，
+那么修改 RestMethodInfo 就可以达到在 HTTP 方法注解中使用整个 url 的目的。</li>
+</ol>
+
+<p>到这里我们对这个库的源码分析就完了，接下来以一副图来结束这个专题。</p>
+
+<p><img src="/img/retrofit/retrofit1.9.png" alt="" /></p>
+
+<p>这样看来，Retrofit 本身就是一个胶水层，同时像插槽一样留出一些插口给大家使用，简化了网络请求。</p>
+
+<p>参考: <a href="http://www.cnblogs.com/angeldevil/p/3757335.html">快速 Android 开发系列网络篇之 Retrofit</a></p>
+
+    </div>
+
+    
+    
+
+    
+    
+<div class="post-reward">
+  <input type="checkbox" name="reward" id="reward" hidden />
+  <label class="reward-button" for="reward">赞赏支持</label>
+  <div class="qr-code">
+    
+    
+    
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/img/reward/alipay-qr-code.png">
+        <span>支付宝打赏</span>
+      </label>
+  </div>
+</div>
+
+    <footer class="post-footer">
+      <div class="post-tags">
+          
+          <a href="/tags/retrofit/">retrofit</a>
+          
+          <a href="/tags/square/">square</a>
+          
+        </div>
+
+      
+      <nav class="post-nav">
+        
+          <a class="prev" href="/post/android%E7%AE%A1%E7%90%86%E4%BB%BB%E5%8A%A1%E6%A0%88%E4%B9%8Blaunchmode/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">Android管理任务栈之—launchMode</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
+        
+          <a class="next" href="/post/retrofit-1.9%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E4%B8%8A/">
+            <span class="next-text nav-default">Retrofit-1.9源码分析-(上)</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+  <div id="disqus_thread"></div>
+    <script type="text/javascript">
+    (function() {
+      
+      
+      if (window.location.hostname === 'localhost') return;
+
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      var disqus_shortname = 'yunair';
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:airzhaoyn@gmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://github.com/yunair" class="iconfont icon-github" title="github"></a>
+  <a href="http://blog.airzone.world/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    
+      2015 - 
+    2018
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">Air</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+<script src="/lib/highlight/highlight.pack.js?v=20171001"></script><script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox-3.1.20.min.js"></script>
+
+
+<script type="text/javascript" src="/dist/even.min.js?v=3.2.0"></script>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-103683322-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+
+
+
+
+</body>
+</html>

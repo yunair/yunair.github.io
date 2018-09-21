@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Jenkins on Air Little Place</title>
+    <link>http://blog.airzone.world/tags/jenkins/</link>
+    <description>Recent content in Jenkins on Air Little Place</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Tue, 11 Oct 2016 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="http://blog.airzone.world/tags/jenkins/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Jenkins的使用</title>
+      <link>http://blog.airzone.world/post/jenkins%E4%BD%BF%E7%94%A8/</link>
+      <pubDate>Tue, 11 Oct 2016 00:00:00 +0000</pubDate>
+      
+      <guid>http://blog.airzone.world/post/jenkins%E4%BD%BF%E7%94%A8/</guid>
+      <description>前提: 使用 Git 作为公司的版本控制工具，使用 GitLab 作为对应的服务器 首先安装 Jenkins plugins, 下面列出两个关键的 Plugins GitLab Plugin Git plugin 打包 APK 对于 APK 的打包，相信大家公司内部都有不</description>
+    </item>
+    
+    <item>
+      <title>Jenkins_email_failed</title>
+      <link>http://blog.airzone.world/post/jenkins_email_failed/</link>
+      <pubDate>Thu, 24 Sep 2015 00:00:00 +0000</pubDate>
+      
+      <guid>http://blog.airzone.world/post/jenkins_email_failed/</guid>
+      <description>报错信息： Failed to send out e-mail com.sun.mail.smtp.SMTPSendFailedException: 501 mail from address must be same as authorization user; nested exception is: com.sun.mail.smtp.SMTPSenderFailedException: 501 mail from address must be same as authorization user 解决方法： 在设置 Jenkins URL 底下有一个文本框 System Admin e-mail address， 这里要设置发</description>
+    </item>
+    
+  </channel>
+</rss>

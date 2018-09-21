@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>AndroidPlugin on Air Little Place</title>
+    <link>http://blog.airzone.world/tags/androidplugin/</link>
+    <description>Recent content in AndroidPlugin on Air Little Place</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Sun, 08 Oct 2017 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="http://blog.airzone.world/tags/androidplugin/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>AndroidPlugin源码解析-(九)</title>
+      <link>http://blog.airzone.world/post/androidplugin%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%B9%9D/</link>
+      <pubDate>Sun, 08 Oct 2017 00:00:00 +0000</pubDate>
+      
+      <guid>http://blog.airzone.world/post/androidplugin%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%B9%9D/</guid>
+      <description>前言 前面我们分了 8 篇讲解整个 Android Apk 的打包过程，可以说我们中间几篇文章都是只见树木不见森林，研究了其中的细节，但缺少对这个过程的整体把握，这篇文</description>
+    </item>
+    
+    <item>
+      <title>AndroidPlugin源码解析-(八)</title>
+      <link>http://blog.airzone.world/post/androidplugin%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E5%85%AB/</link>
+      <pubDate>Sat, 30 Sep 2017 00:00:00 +0000</pubDate>
+      
+      <guid>http://blog.airzone.world/post/androidplugin%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E5%85%AB/</guid>
+      <description>这篇文章我们就来看看打包过程中最后一个方法createPackagingTask createPackagingTask public void createPackagingTask(@NonNull TaskFactory tasks, @NonNull VariantScope variantScope, boolean publishApk, @Nullable AndroidTask&amp;lt;InstantRunWrapperTask&amp;gt; fullBuildInfoGeneratorTask) { GlobalScope globalScope = variantScope.getGlobalScope(); ApkVariantData variantData = (ApkVariantData) variantScope.getVariantData(); boolean signedApk = variantData.isSigned(); // s</description>
+    </item>
+    
+    <item>
+      <title>AndroidPlugin源码解析-(七)</title>
+      <link>http://blog.airzone.world/post/androidplugin%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%B8%83/</link>
+      <pubDate>Sun, 10 Sep 2017 00:00:00 +0000</pubDate>
+      
+      <guid>http://blog.airzone.world/post/androidplugin%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%B8%83/</guid>
+      <description>忽视了 Aidl, Shader, Ndk, Jni, Jack, DataBinding, StripNativeLibrary, Split, InstantRun, Lint 这些 Task 之后，我们就只剩下面三个重要的 Task 了： createJavacTask(tasks, variantScope); createPostCompilationTasks(tasks, variantScope); createPackagingTask(tasks, variantScope, true /publishApk/, fullBuildInfoGeneratorTask); 这篇文章我们来分析前面两个 Task createJavacTask 这个 Task 的方法为: public AndroidTask&amp;lt;? extends JavaCompile&amp;gt;</description>
+    </item>
+    
+    <item>
+      <title>AndroidPlugin源码解析-(六)</title>
+      <link>http://blog.airzone.world/post/androidplugin%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E5%85%AD/</link>
+      <pubDate>Tue, 15 Aug 2017 00:00:00 +0000</pubDate>
+      
+      <guid>http://blog.airzone.world/post/androidplugin%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E5%85%AD/</guid>
+      <description>上篇提到，我们这篇研究的是接下来三个过程, 分别是: createBuildConfigTask createApkProcessResTask createProcessJavaResTasks 接下来，我们一个一个来看 createBuildConfigTask 这个 task 实际执行如下方法: // must clear the folder in case the packagename changed, otherwise, // there&#39;ll be two classes. File</description>
+    </item>
+    
+    <item>
+      <title>AndroidPlugin源码解析-(五)</title>
+      <link>http://blog.airzone.world/post/androidplugin%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%BA%94/</link>
+      <pubDate>Thu, 20 Jul 2017 00:00:00 +0000</pubDate>
+      
+      <guid>http://blog.airzone.world/post/androidplugin%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%BA%94/</guid>
+      <description>上篇提到，我们这篇研究的是如下过程, 分别是: createGenerateResValuesTask createMergeResourcesTask createMergeAssetsTask 接下来，我们一个一个来看 createGenerateResValuesTask 这个 task 实际执行下面的方法： // 该folder名字为resValue</description>
+    </item>
+    
+    <item>
+      <title>AndroidPlugin源码解析-(四)</title>
+      <link>http://blog.airzone.world/post/androidplugin%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E5%9B%9B/</link>
+      <pubDate>Fri, 30 Jun 2017 00:00:00 +0000</pubDate>
+      
+      <guid>http://blog.airzone.world/post/androidplugin%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E5%9B%9B/</guid>
+      <description>接下来几篇就来解析上篇提到的代码。 一个一个 Task 来看 createAnchorTasks 这个方法创建的 Tasks 就如名字所示，是 Anchor Tasks（即所谓的锚点任务）。在这里不做仔细的解析。 具</description>
+    </item>
+    
+    <item>
+      <title>AndroidPlugin源码解析-(三)</title>
+      <link>http://blog.airzone.world/post/androidplugin%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%B8%89/</link>
+      <pubDate>Thu, 15 Jun 2017 00:00:00 +0000</pubDate>
+      
+      <guid>http://blog.airzone.world/post/androidplugin%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%B8%89/</guid>
+      <description>上个系列文章留下的taskManager.createTasksForVariantData(tasks, variantData);的分析放</description>
+    </item>
+    
+    <item>
+      <title>AndroidPlugin源码解析-(二)</title>
+      <link>http://blog.airzone.world/post/androidplugin%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%BA%8C/</link>
+      <pubDate>Wed, 31 May 2017 00:00:00 +0000</pubDate>
+      
+      <guid>http://blog.airzone.world/post/androidplugin%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%BA%8C/</guid>
+      <description>前言 上一篇文章还没分析完，还留了剩下两步，这一篇我们继续跟进。 先从第三步开始： BasePlugin createTasks 看apply方法中第三个过程createTasks() private void</description>
+    </item>
+    
+    <item>
+      <title>AndroidPlugin源码解析-(一)</title>
+      <link>http://blog.airzone.world/post/androidplugin%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%B8%80/</link>
+      <pubDate>Tue, 30 May 2017 00:00:00 +0000</pubDate>
+      
+      <guid>http://blog.airzone.world/post/androidplugin%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%B8%80/</guid>
+      <description>前言 上一篇我们知道com.android.application plugin 对应的类为com.android.build.gradle.AppPlug</description>
+    </item>
+    
+  </channel>
+</rss>

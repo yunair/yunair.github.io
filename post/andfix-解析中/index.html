@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>AndFix解析-(中) - Air Little Place</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="Air" />
+  <meta name="description" content="我们接着分析阿里开源的 AndFix 库，上次留下了三个坑，一个方法，两个类，不知道你们是否想急切了解呢？ loadPatch()方法和AndFixMana" />
+
+  <meta name="keywords" content="blog" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.49-DEV" />
+
+
+<link rel="canonical" href="http://blog.airzone.world/post/andfix-%E8%A7%A3%E6%9E%90%E4%B8%AD/" />
+
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+
+<link href="/dist/even.min.css?v=3.2.0" rel="stylesheet">
+<link href="/lib/fancybox/jquery.fancybox-3.1.20.min.css" rel="stylesheet">
+
+
+
+
+<meta property="og:title" content="AndFix解析-(中)" />
+<meta property="og:description" content="我们接着分析阿里开源的 AndFix 库，上次留下了三个坑，一个方法，两个类，不知道你们是否想急切了解呢？ loadPatch()方法和AndFixMana" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://blog.airzone.world/post/andfix-%E8%A7%A3%E6%9E%90%E4%B8%AD/" /><meta property="article:published_time" content="2015-10-10T00:00:00&#43;00:00"/>
+<meta property="article:modified_time" content="2015-10-10T00:00:00&#43;00:00"/>
+<meta itemprop="name" content="AndFix解析-(中)">
+<meta itemprop="description" content="我们接着分析阿里开源的 AndFix 库，上次留下了三个坑，一个方法，两个类，不知道你们是否想急切了解呢？ loadPatch()方法和AndFixMana">
+
+
+<meta itemprop="datePublished" content="2015-10-10T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2015-10-10T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="4826">
+
+
+
+<meta itemprop="keywords" content="AndFix," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="AndFix解析-(中)"/>
+<meta name="twitter:description" content="我们接着分析阿里开源的 AndFix 库，上次留下了三个坑，一个方法，两个类，不知道你们是否想急切了解呢？ loadPatch()方法和AndFixMana"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">Air</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">Air</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">AndFix解析-(中)</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2015-10-10 </span>
+        
+        <span class="more-meta"> 约 4826 字 </span>
+        <span class="more-meta"> 预计阅读 10 分钟 </span>
+        
+      </div>
+    </header>
+
+    
+    
+<div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  
+  <div class="post-toc-content">
+    <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#class-patch">class Patch</a>
+<ul>
+<li><a href="#patch-constructor">Patch Constructor</a></li>
+<li><a href="#patch-init">Patch init()</a></li>
+</ul></li>
+<li><a href="#apkpatch-jar">apkpatch.jar</a>
+<ul>
+<li><a href="#main-main">Main Main()</a></li>
+<li><a href="#apkpatch">ApkPatch</a>
+<ul>
+<li><a href="#apkpatch-constructor">ApkPatch Constructor</a></li>
+</ul></li>
+<li><a href="#build">Build</a>
+<ul>
+<li><a href="#build-constructor">Build Constructor</a></li>
+<li><a href="#apkpatch-dopatch">ApkPatch doPatch()</a></li>
+<li><a href="#apkpatch-buildcode-smalidir-dexfile-info">ApkPatch buildCode(smaliDir, dexFile, info)</a></li>
+<li><a href="#apkpatch-build-outfile-dexfile">ApkPatch build(outFile, dexFile)</a></li>
+<li><a href="#patchbuilder-constructor">PatchBuilder Constructor</a></li>
+<li><a href="#signedjarbuilder-constructor">SignedJarBuilder Constructor</a></li>
+<li><a href="#signedjarbuilder-writefile-file-string">SignedJarBuilder writeFile(File, String)</a></li>
+<li><a href="#signedjarbuilder-writeentry-inputstream-jarentry">SignedJarBuilder writeEntry(InputStream, JarEntry)</a></li>
+<li><a href="#apkpatch-release-this-out-dexfile-outfile">ApkPatch release(this.out, dexFile, outFile)</a></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+  </div>
+</div>
+
+    
+    
+
+    
+    <div class="post-content">
+      
+
+<p>我们接着分析阿里开源的 AndFix 库，上次留下了三个坑，一个方法，两个类，不知道你们是否想急切了解呢？
+<code>loadPatch()</code>方法和<code>AndFixManager</code>和<code>Patch</code>类。</p>
+
+<p>分析<code>loadPatch()</code>方法的时候离不开<code>AndFixManager</code>这个类，所以，我会在分析<code>loadPatch()</code>方法的时候分析<code>AndFixManager</code>这个类。
+<code>Patch</code>类相当于一个容器，把修复 bug 所需的信息放在其中，<code>Patch</code>类相对来说比较独立，不需要牵扯到另外两个坑，所以，就先把这个坑埋了。</p>
+
+<p>要分析<code>Patch</code>类，就不能不分析阿里提供的打包.apatch 的工具<code>apkpatch-1.0.2.jar</code>，<code>Patch</code>获取的信息其实就是<code>apkpatch</code>打包时放入其中的信息。
+我下面对<code>apkpatch.jar</code>的分析以这个版本的源码为准。</p>
+
+<p>分析源码，那些 try-catch-finally 和逻辑无关，所以，我会把这些代码从源码中删掉的，除非有提示用户的操作</p>
+
+<p>我们先来看看<code>Patch</code>类</p>
+
+<h3 id="class-patch">class Patch</h3>
+
+<p>从前一篇的分析中，我们看到调用了<code>Patch</code>的构造函数，那我们就从构造函数开始看。</p>
+
+<h4 id="patch-constructor">Patch Constructor</h4>
+
+<pre><code class="language-java">public Patch(File file) throws IOException {
+    this.mFile = file;
+    this.init();
+}
+</code></pre>
+
+<h4 id="patch-init">Patch init()</h4>
+
+<p>将传入的文件保存在类变量中，并调用<code>init()</code>函数，那么<code>init()</code>函数干什么呢？
+代码里异常和清理的代码我给删掉了，毕竟，这和我们对源码的分析关系不大，那么我们看一下剩下的代码</p>
+
+<pre><code class="language-java">public void init(){
+    JarFile jarFile = new JarFile(this.mFile);
+    JarEntry entry = jarFile.getJarEntry(ENTRY_NAME);
+    InputStream inputStream = jarFile.getInputStream(entry);
+    Manifest manifest = new Manifest(inputStream);
+    Attributes main = manifest.getMainAttributes();
+    this.mName = main.getValue(PATCH_NAME);
+    this.mTime = new Date(main.getValue(CREATED_TIME));
+    this.mClassesMap = new HashMap();
+    Iterator it = main.keySet().iterator();
+
+    while(it.hasNext()) {
+        Name attrName = (Name)it.next();
+        String name = attrName.toString();
+        if(name.endsWith(CLASSES)) {
+            List strings = Arrays.asList(main.getValue(attrName).split(&quot;,&quot;));
+            if(name.equalsIgnoreCase(PATCH_CLASSES)) {
+                this.mClassesMap.put(this.mName, strings);
+            } else {
+                this.mClassesMap.put(name.trim().substring(0, name.length() - 8), strings);
+            }
+        }
+    }
+}
+</code></pre>
+
+<p>先分析上面的代码，通过 JarFile, JarEntry, Manifest, Attributes 一层层的获取 jar 文件中值，并放入对应的类变量中
+这些值是从哪里来的呢？是从生成这个.apatch 文件的时候写入的，即<code>apkpatch.jar</code>文件中写入的。
+虽然这个文件后缀名是 apatch，不是 jar，但是它生成的时候是使用 Attributes，Manifest，jarEntry 将数据写入的，
+其实依旧是 jar 格式，修改了扩展名而已</p>
+
+<p>上面的那些常量都是什么呢，我们来看看这个类的类变量，就是一些对应的字符串。</p>
+
+<pre><code class="language-java">private static final String ENTRY_NAME = &quot;META-INF/PATCH.MF&quot;;
+private static final String CLASSES = &quot;-Classes&quot;;
+private static final String PATCH_CLASSES = &quot;Patch-Classes&quot;;
+private static final String CREATED_TIME = &quot;Created-Time&quot;;
+private static final String PATCH_NAME = &quot;Patch-Name&quot;;
+private final File mFile;
+private String mName;
+private Date mTime;
+private Map&lt;String, List&lt;String&gt;&gt; mClassesMap;
+</code></pre>
+
+<p>看完了 Patch 类，是不是还一头雾水呢, 其他的好理解， mClassesMap 里面的各种类名是从哪里来，里面的类作用又是什么呢？
+这里，我们就需要进入<code>apkpatch.jar</code>一探究竟。</p>
+
+<h3 id="apkpatch-jar">apkpatch.jar</h3>
+
+<p>对于 Jar 文件，我们可以使用<code>jd-gui</code>文件打开，阿里这里并没有对这个 jar 文件加密，所以我们可以直接看，对于 Jar 文件，我们从<code>Main()</code>方法开始看起。
+在<code>package com.euler.patch;</code>里面，有一个<code>Main</code>类，其中有那个我们常见的<code>main()</code>方法，那么我们就进入看一看。
+代码比较长，我们一段一段来看</p>
+
+<h4 id="main-main">Main Main()</h4>
+
+<pre><code class="language-java">//CommandLineParser，CommandLine， Option, Options，OptionBuilder,  PosixParser等等类都是
+//org.apache.commons.cli这个包中的类，负责解析命令行传给程序的参数，所以下面的很多内容应该就不用我过多解释了
+CommandLineParser parser = new PosixParser();
+CommandLine commandLine = null;
+//option()方法就是将命令行需要解析的参数加入其中，有三种解析方式
+//private static final Options allOptions = new Options();
+//private static final Options patchOptions = new Options();
+//private static final Options mergeOptions = new Options();
+option();
+try {
+  commandLine = parser.parse(allOptions, args);
+} catch (ParseException e) {
+  System.err.println(e.getMessage());
+  //提示用户如何使用这个jar包
+  usage(commandLine);
+  return;
+}
+
+if ((!commandLine.hasOption('k')) &amp;&amp; (!commandLine.hasOption(&quot;keystore&quot;))) {
+  usage(commandLine);
+  return;
+}
+if ((!commandLine.hasOption('p')) &amp;&amp; (!commandLine.hasOption(&quot;kpassword&quot;))) {
+  usage(commandLine);
+  return;
+}
+if ((!commandLine.hasOption('a')) &amp;&amp; (!commandLine.hasOption(&quot;alias&quot;))) {
+  usage(commandLine);
+  return;
+}
+if ((!commandLine.hasOption('e')) &amp;&amp; (!commandLine.hasOption(&quot;epassword&quot;))) {
+  usage(commandLine);
+  return;
+}
+</code></pre>
+
+<p>这一部分主要是查看命令行是否有那些参数，如果没有要求的参数，则提示用户需要哪些参数。</p>
+
+<p>接下来注意一下你下载<code>apkpatch</code>这个文件的时间，根据 github 的历史提交记录，如果你 2015 年 10 月以后下载的，可以忽视掉这个提醒，如果你是 10 月之前下载的那个工具，建议你更新一下这个工具，否则可能会导致<code>-o</code>所在的文件夹被清空。</p>
+
+<p>好了，提醒完了，我们继续</p>
+
+<pre><code class="language-java">String keystore = commandLine.getOptionValue('k');
+String password = commandLine.getOptionValue('p');
+String alias = commandLine.getOptionValue('a');
+String entry = commandLine.getOptionValue('e');
+String name = &quot;main&quot;;
+if ((commandLine.hasOption('n')) || (commandLine.hasOption(&quot;name&quot;))){
+  name = commandLine.getOptionValue('n');
+}
+</code></pre>
+
+<p>对于我们的 release 版应用来说，我们会指定<code>storeFile， storePassword, keyAlias, keyPassword</code>,
+这些即是上面<code>keystore, password, alias, entry</code>对应的值。至于 name，这是最后生成的文件的名称，基本可以不用管。</p>
+
+<p>下面，我们看一下<code>main()</code>函数中最后的一个 if-else</p>
+
+<pre><code class="language-java">if ((commandLine.hasOption('m')) || (commandLine.hasOption(&quot;merge&quot;))) {
+    String[] merges = commandLine.getOptionValues('m');
+    File[] files = new File[merges.length];
+    for (int i = 0; i &lt; merges.length; i++) {
+      files[i] = new File(merges[i]);
+    }
+    MergePatch mergePatch = new MergePatch(files, name, out, keystore,
+      password, alias, entry);
+    mergePatch.doMerge();
+} else {
+    if ((!commandLine.hasOption('f')) &amp;&amp; (!commandLine.hasOption(&quot;from&quot;))) {
+      usage(commandLine);
+      return;
+    }
+    if ((!commandLine.hasOption('t')) &amp;&amp; (!commandLine.hasOption(&quot;to&quot;))) {
+      usage(commandLine);
+      return;
+    }
+
+    File from = new File(commandLine.getOptionValue(&quot;f&quot;));
+    File to = new File(commandLine.getOptionValue('t'));
+    if ((!commandLine.hasOption('n')) &amp;&amp; (!commandLine.hasOption(&quot;name&quot;))) {
+      name = from.getName().split(&quot;\\.&quot;)[0];
+}
+</code></pre>
+
+<p>在此，我选择不分析<code>MergePatch</code>这个部分，毕竟，你只有先生成了，后面才可能需要做 merge 操作。
+from 指修复 bug 后的 apk，to 指之前有 bug 的 apk。所以这部分的分析就结束了。</p>
+
+<p><code>main()</code>函数里最后一部分内容</p>
+
+<pre><code class="language-java">ApkPatch apkPatch = new ApkPatch(from, to, name, out, keystore,
+  password, alias, entry);
+apkPatch.doPatch();
+</code></pre>
+
+<p>将那些参数传给 ApkPatch 去初始化，然后调用<code>doPatch()</code>方法</p>
+
+<h4 id="apkpatch">ApkPatch</h4>
+
+<h5 id="apkpatch-constructor">ApkPatch Constructor</h5>
+
+<p>我们一步步来看，首先是调用构造函数</p>
+
+<pre><code class="language-java">public ApkPatch(File from, File to, String name, File out, String keystore, String password, String alias, String entry){
+    super(name, out, keystore, password, alias, entry);
+    this.from = from;
+    this.to = to;
+}
+</code></pre>
+
+<p>这些代码大家都经常写了，我们跟着进入看看父类的构造函数做了什么，</p>
+
+<h4 id="build">Build</h4>
+
+<h5 id="build-constructor">Build Constructor</h5>
+
+<p><code>public class ApkPatch extends Build</code> ApkPatch 的函数头，说明它是<code>Build</code>类的子类</p>
+
+<pre><code class="language-java">public Build(String name, File out, String keystore, String password, String alias, String entry)
+{
+    this.name = name;
+    this.out = out;
+    this.keystore = keystore;
+    this.password = password;
+    this.alias = alias;
+    this.entry = entry;
+    if (!out.exists())
+      out.mkdirs();
+    else if (!out.isDirectory())
+      throw new RuntimeException(&quot;output path must be directory.&quot;);
+    try{
+      FileUtils.cleanDirectory(out);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+}
+</code></pre>
+
+<p>在这里，看到了我之前提到的<code>-o</code>操作的问题，会清空那个文件夹内的内容。</p>
+
+<p>好了，我们接下来就可以看看最后一个方法，<code>doPatch()</code>方法了。</p>
+
+<h5 id="apkpatch-dopatch">ApkPatch doPatch()</h5>
+
+<pre><code class="language-java">public void doPatch() {
+    File smaliDir = new File(this.out, &quot;smali&quot;);
+    smaliDir.mkdir();
+
+    File dexFile = new File(this.out, &quot;diff.dex&quot;);
+    File outFile = new File(this.out, &quot;diff.apatch&quot;);
+    //DiffInfo是一个容器类，主要保存了新加的和修改的 类，方法和字段。
+    DiffInfo info = new DexDiffer().diff(this.from, this.to);
+
+    this.classes = buildCode(smaliDir, dexFile, info);
+
+    build(outFile, dexFile);
+
+    release(this.out, dexFile, outFile);
+}
+</code></pre>
+
+<p>在 out 文件夹内生成了一个<code>smali</code>文件夹，还有<code>diff.dex</code>, <code>diff.apatch</code>文件。
+看到 diff()方法，应该能想到就是比较两个文件的不同，所以 DiffInfo 就是储存两个文件不同的一个容器类，
+由于篇幅原因，这里就不深入其中了，有兴趣的同学可以深入其中看一下。</p>
+
+<p>但是，在这个<code>diff()</code>方法中，有一个重要的问题需要大家注意，就是其中只针对<code>classes.dex</code>做了 diff，如果你使用了 Google 的 Multidex，那么结果就是你其它 dex 文件中的任何 bug，依旧无法修复，因为这个生成的<code>DiffInfo</code>中没有其它 dex 的信息，这个时候就需要大家使用 JavaAssist 之类的工具修改阿里的这个 jar 文件，然后达到你自己的修复非<code>classes.dex</code>文件中 bug 的目的，问题出在<code>DexFileFactory.class</code>类中。</p>
+
+<p>接下来，我们可以看到调用了三个方法，<code>buildCode(smaliDir, dexFile, info);</code>
+<code>build(outFile, dexFile);</code><code>release(this.out, dexFile, outFile);</code>
+一个个的跟进去看一看。</p>
+
+<h5 id="apkpatch-buildcode-smalidir-dexfile-info">ApkPatch buildCode(smaliDir, dexFile, info)</h5>
+
+<pre><code class="language-java">private static Set&lt;String&gt; buildCode(File smaliDir, File dexFile, DiffInfo info)
+    throws IOException, RecognitionException, FileNotFoundException{
+    Set classes = new HashSet();
+    Set list = new HashSet();
+    //从这里可以看出，list保存了DiffInfo容器中的新添加的classes和被修改过的classes
+    list.addAll(info.getAddedClasses());
+    list.addAll(info.getModifiedClasses());
+
+    baksmaliOptions options = new baksmaliOptions();
+
+    options.deodex = false;
+    options.noParameterRegisters = false;
+    options.useLocalsDirective = true;
+    options.useSequentialLabels = true;
+    options.outputDebugInfo = true;
+    options.addCodeOffsets = false;
+    options.jobs = -1;
+    options.noAccessorComments = false;
+    options.registerInfo = 0;
+    options.ignoreErrors = false;
+    options.inlineResolver = null;
+    options.checkPackagePrivateAccess = false;
+    if (!options.noAccessorComments) {
+      options.syntheticAccessorResolver = new SyntheticAccessorResolver(list);
+    }
+    ClassFileNameHandler outFileNameHandler = new ClassFileNameHandler(
+      smaliDir, &quot;.smali&quot;);
+    ClassFileNameHandler inFileNameHandler = new ClassFileNameHandler(
+      smaliDir, &quot;.smali&quot;);
+    DexBuilder dexBuilder = DexBuilder.makeDexBuilder();
+
+    for (DexBackedClassDef classDef : list) {
+      String className = classDef.getType();
+      //将相关的类信息写入outFileNameHandler
+      baksmali.disassembleClass(classDef, outFileNameHandler, options);
+      File smaliFile = inFileNameHandler.getUniqueFilenameForClass(
+        TypeGenUtil.newType(className));
+      classes.add(TypeGenUtil.newType(className)
+        .substring(1, TypeGenUtil.newType(className).length() - 1)
+        .replace('/', '.'));
+      SmaliMod.assembleSmaliFile(smaliFile, dexBuilder, true, true);
+    }
+    dexBuilder.writeTo(new FileDataStore(dexFile));
+
+    return classes;
+}
+</code></pre>
+
+<p>看到 baksmali，反编译过 apk 的同学一定不陌生，这就是 dex 的打包工具，还有对应的解包工具 smali，就到这里，这方面不继续深入了。
+如果想深入了解 dex 打包解包工具的源码，参见<a href="http://sunzeduo.blog.51cto.com/2758509/1540085">This Blog</a></p>
+
+<p>可以看到，这个方法的返回值将 DiffInfo 中新添加的 classes 和修改过的 classes 做了一个重命名，然后保存了起来，同时，将相关内容写入 smali 文件中。
+这个重命名是一个怎样的重命名呢，看一下生成的 smali 文件夹里任意一个 smali 文件，我就拿 Demo 里的<code>MainActivity.smali</code>来说明
+这个类在文件中的类名是<code>Lcom/euler/andfix/MainActivity;</code>，看到这个名字，再看下面这个方法就很清晰了</p>
+
+<pre><code class="language-java">classes.add(TypeGenUtil.newType(className)
+.substring(1, TypeGenUtil.newType(className).length() - 1)
+.replace('/', '.'));
+</code></pre>
+
+<p>就是把<code>Lcom/euler/andfix/MainActivity;</code>替换成<code>com.euler.andfix.MainActivity_CF;</code>
+那个_CF 哪里来的呢，就是那个<code>TypeGenUtil</code>类做的操作了。
+这个类就一个方法，该方法进对 String 进行了操作，我们来看一看源码</p>
+
+<pre><code class="language-java">public static String newType(String type){
+    return type.substring(0, type.length() - 1) + &quot;_CF;&quot;;
+}
+</code></pre>
+
+<p>可以看到，去掉了类名多余的那个&rsquo;;&lsquo;，然后在后面加了个_CF 后缀。重命名应该是为了不合之前安装的 dex 文件的名字冲突。</p>
+
+<p>(new FileDataStore(file) 作用就是清空 file 里的内容)
+最后，将 dexFile 文件清空，把 dexBuilder 的内容写入其中。</p>
+
+<p>到这里，<code>buildCode(smaliDir, dexFile, info)</code>方法就结束了, 看看下一个方法<code>build(outFile, dexFile);</code></p>
+
+<h5 id="apkpatch-build-outfile-dexfile">ApkPatch build(outFile, dexFile)</h5>
+
+<p>上一个方法已经把内容填充到 dexFile 内了，我们来看看它的源码。</p>
+
+<pre><code class="language-java">protected void build(File outFile, File dexFile)
+    throws KeyStoreException, FileNotFoundException, IOException, NoSuchAlgorithmException, CertificateException, UnrecoverableEntryException{
+    //获取应用签名相关信息
+    KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+    KeyStore.PrivateKeyEntry privateKeyEntry = null;
+    InputStream is = new FileInputStream(this.keystore);
+    keyStore.load(is, this.password.toCharArray());
+    privateKeyEntry = (KeyStore.PrivateKeyEntry)keyStore.getEntry(this.alias,
+      new KeyStore.PasswordProtection(this.entry.toCharArray()));
+
+    PatchBuilder builder = new PatchBuilder(outFile, dexFile,
+      privateKeyEntry, System.out);
+
+    //将getMeta()中获取的Manifest内容写入&quot;META-INF/PATCH.MF&quot;文件中
+    builder.writeMeta(getMeta());
+
+    //单纯调用了close()命令, 将异常处理放在子函数中。
+    //这里做了一个异常分层，即不同抽象层次的子函数需要处理的异常不一样
+    //具体请参阅《Code Complete》(代码大全)在恰当的抽象层次抛出异常
+    builder.sealPatch();
+}
+</code></pre>
+
+<p>要打包了，打包完是要签名的，所以需要获取签名的相关信息，这一部分就不详细讲解了。
+这里提一下<code>getMeta()</code>函数，因为开头我们提到的<code>Patch</code> <code>init()</code> 函数内
+这句<code>List strings = Arrays.asList(main.getValue(attrName).split(&quot;,&quot;));</code>中的那个 strings 就是从这里写入的</p>
+
+<pre><code class="language-java"> protected Manifest getMeta()
+{
+    Manifest manifest = new Manifest();
+    Attributes main = manifest.getMainAttributes();
+    main.putValue(&quot;Manifest-Version&quot;, &quot;1.0&quot;);
+    main.putValue(&quot;Created-By&quot;, &quot;1.0 (ApkPatch)&quot;);
+    main.putValue(&quot;Created-Time&quot;,
+      new Date(System.currentTimeMillis()).toGMTString());
+    main.putValue(&quot;From-File&quot;, this.from.getName());
+    main.putValue(&quot;To-File&quot;, this.to.getName());
+    main.putValue(&quot;Patch-Name&quot;, this.name);
+    main.putValue(&quot;Patch-Classes&quot;, Formater.dotStringList(this.classes));
+    return manifest;
+}
+</code></pre>
+
+<p>那个 classes 就是我们那个将类名修改后保存起来的<code>Set</code>，
+<code>Formater.dotStringList(this.classes));</code>这个方法就是遍历<code>Set</code>，并将其中用<code>','</code>作为分隔符，将整个<code>Set</code>中保存的<code>String</code>拼接
+所以在<code>Patch</code> <code>init()</code>方法内，就可以反过来组成一个<code>List</code>。</p>
+
+<p>那么，我们来看看中间那条没注释的语句，通过<code>PatchBuilder()</code>的构造函数生成<code>PatchBuilder</code>，我们来看看<code>PatchBuilder</code>的构造函数</p>
+
+<h5 id="patchbuilder-constructor">PatchBuilder Constructor</h5>
+
+<pre><code class="language-java">public PatchBuilder(File outFile, File dexFile, KeyStore.PrivateKeyEntry key, PrintStream verboseStream){
+    this.mBuilder = new SignedJarBuilder(new FileOutputStream(outFile, false), key.getPrivateKey(),
+        (X509Certificate)key.getCertificate());
+    this.mBuilder.writeFile(dexFile, &quot;classes.dex&quot;);
+}
+</code></pre>
+
+<p>这个就是把 dexFile 里的内容，经过修改，加上签名，写入 classes.dex 文件中，但是这里实在看不出来其中的细节，
+所以，我们要进入<code>SignedJarBuilder</code>类一探究竟</p>
+
+<p>先看它的构造函数。</p>
+
+<h5 id="signedjarbuilder-constructor">SignedJarBuilder Constructor</h5>
+
+<pre><code class="language-java">public SignedJarBuilder(OutputStream out, PrivateKey key, X509Certificate certificate)
+    throws IOException, NoSuchAlgorithmException{
+    this.mOutputJar = new JarOutputStream(new BufferedOutputStream(out));
+    //设置压缩级别
+    this.mOutputJar.setLevel(9);
+    this.mKey = key;
+    this.mCertificate = certificate;
+    if ((this.mKey != null) &amp;&amp; (this.mCertificate != null)) {
+      this.mManifest = new Manifest();
+      Attributes main = this.mManifest.getMainAttributes();
+      main.putValue(&quot;Manifest-Version&quot;, &quot;1.0&quot;);
+      main.putValue(&quot;Created-By&quot;, &quot;1.0 (ApkPatch)&quot;);
+      this.mBase64Encoder = new BASE64Encoder();
+      this.mMessageDigest = MessageDigest.getInstance(&quot;SHA1&quot;);
+    }
+}
+</code></pre>
+
+<p>这个方法做了一些初始化，做了一些赋值操作，大家经常写类似的代码，就不进行分析了，只是为了让大家看<code>writeFile(File, String)</code>的时候容易理解一些。</p>
+
+<h5 id="signedjarbuilder-writefile-file-string">SignedJarBuilder writeFile(File, String)</h5>
+
+<p><code>writeFile(File, String)</code>做了什么呢？</p>
+
+<pre><code class="language-java">public void writeFile(File inputFile, String jarPath){
+    FileInputStream fis = new FileInputStream(inputFile);
+    JarEntry entry = new JarEntry(jarPath);
+    entry.setTime(inputFile.lastModified());
+    writeEntry(fis, entry);
+}
+</code></pre>
+
+<p>这个方法调用了<code>writeEntry(InputStream, JarEntry)</code>方法, 来看一看它的源码</p>
+
+<h5 id="signedjarbuilder-writeentry-inputstream-jarentry">SignedJarBuilder writeEntry(InputStream, JarEntry)</h5>
+
+<pre><code class="language-java">private void writeEntry(InputStream input, JarEntry entry)
+  throws IOException{
+    this.mOutputJar.putNextEntry(entry);
+    int count;
+    while ((count = input.read(this.mBuffer)) != -1)
+    {
+      int count;
+      this.mOutputJar.write(this.mBuffer, 0, count);
+
+      if (this.mMessageDigest != null) {
+        //将mBuffer中的内容放入mMessageDigest内部数组
+        this.mMessageDigest.update(this.mBuffer, 0, count);
+      }
+    }
+
+    this.mOutputJar.closeEntry();
+    if (this.mManifest != null)
+    {
+      Attributes attr = this.mManifest.getAttributes(entry.getName());
+      if (attr == null) {
+        attr = new Attributes();
+        this.mManifest.getEntries().put(entry.getName(), attr);
+      }
+      attr.putValue(&quot;SHA1-Digest&quot;, this.mBase64Encoder.encode(this.mMessageDigest.digest()));
+    }
+}
+</code></pre>
+
+<p>mBuffer 是 4096 bytes 的数组。
+这段代码主要从 input 中读取一个 buffer 的数据，然后写入 entry 中，这里应该就可以理解我上面说的 dexFile 里的内容，写入 classes.dex 文件中了吧。</p>
+
+<p><code>build(outFile, dexFile);</code>结束了，看看最后一个方法<code>release(this.out, dexFile, outFile)</code></p>
+
+<h5 id="apkpatch-release-this-out-dexfile-outfile">ApkPatch release(this.out, dexFile, outFile)</h5>
+
+<pre><code class="language-java">protected void release(File outDir, File dexFile, File outFile) throws NoSuchAlgorithmException, FileNotFoundException, IOException
+{
+    MessageDigest messageDigest = MessageDigest.getInstance(&quot;md5&quot;);
+    FileInputStream fileInputStream = new FileInputStream(dexFile);
+    byte[] buffer = new byte[8192];
+    int len = 0;
+    while ((len = fileInputStream.read(buffer)) &gt; 0) {
+      messageDigest.update(buffer, 0, len);
+    }
+
+    String md5 = HexUtil.hex(messageDigest.digest());
+    fileInputStream.close();
+    outFile.renameTo(new File(outDir, this.name + &quot;-&quot; + md5 + &quot;.apatch&quot;));
+}
+</code></pre>
+
+<p>最后就是把 dexFile 进行了 md5 加密，并把<code>build(outFile, dexFile);</code>函数中生成的 outFile 重命名。这样，AndFix 框架所需要的补丁文件就生成了。</p>
+
+<p>还记得上面提到的 Patch 类中读取 Manifest 的那些属性吗？在<code>build(outFile, dexFile);</code>函数中，那个<code>getMeta()</code>函数把它读取的属性写到了文件中。</p>
+
+<p>到这里，第二篇分析也结束了，下一篇将会进入 Android 代码中一探它做了什么的究竟。</p>
+
+    </div>
+
+    
+    
+
+    
+    
+<div class="post-reward">
+  <input type="checkbox" name="reward" id="reward" hidden />
+  <label class="reward-button" for="reward">赞赏支持</label>
+  <div class="qr-code">
+    
+    
+    
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/img/reward/alipay-qr-code.png">
+        <span>支付宝打赏</span>
+      </label>
+  </div>
+</div>
+
+    <footer class="post-footer">
+      <div class="post-tags">
+          
+          <a href="/tags/andfix/">AndFix</a>
+          
+        </div>
+
+      
+      <nav class="post-nav">
+        
+          <a class="prev" href="/post/andfix-%E8%A7%A3%E6%9E%90%E4%B8%8B/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">AndFix解析-(下)</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
+        
+          <a class="next" href="/post/andfix-%E8%A7%A3%E6%9E%90%E4%B8%8A/">
+            <span class="next-text nav-default">AndFix解析-(上)</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+  <div id="disqus_thread"></div>
+    <script type="text/javascript">
+    (function() {
+      
+      
+      if (window.location.hostname === 'localhost') return;
+
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      var disqus_shortname = 'yunair';
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:airzhaoyn@gmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://github.com/yunair" class="iconfont icon-github" title="github"></a>
+  <a href="http://blog.airzone.world/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    
+      2015 - 
+    2018
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">Air</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+<script src="/lib/highlight/highlight.pack.js?v=20171001"></script><script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox-3.1.20.min.js"></script>
+
+
+<script type="text/javascript" src="/dist/even.min.js?v=3.2.0"></script>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-103683322-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+
+
+
+
+</body>
+</html>

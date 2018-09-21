@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>activity on Air Little Place</title>
+    <link>http://blog.airzone.world/tags/activity/</link>
+    <description>Recent content in activity on Air Little Place</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Sun, 21 Jan 2018 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="http://blog.airzone.world/tags/activity/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Activity启动流程</title>
+      <link>http://blog.airzone.world/post/activity%E7%9A%84%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B/</link>
+      <pubDate>Sun, 21 Jan 2018 00:00:00 +0000</pubDate>
+      
+      <guid>http://blog.airzone.world/post/activity%E7%9A%84%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B/</guid>
+      <description>前言 作为Android开发，我们经常会写startActivity方法，这样我们就可以启动Activity了，在这个过程中到底发生了什么呢？</description>
+    </item>
+    
+  </channel>
+</rss>

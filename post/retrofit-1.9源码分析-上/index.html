@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Retrofit-1.9源码分析-(上) - Air Little Place</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="Air" />
+  <meta name="description" content="Retrofit 项目的 GitHub Retrofit 官网介绍 Type-safe HTTP client for Android and Java。 接下来的这几篇文章的分析都是基于 1.9 版本的。 看过我前面文章的开发者们应该知道，我不喜欢把一篇文章写的" />
+
+  <meta name="keywords" content="blog" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.49-DEV" />
+
+
+<link rel="canonical" href="http://blog.airzone.world/post/retrofit-1.9%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E4%B8%8A/" />
+
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+
+<link href="/dist/even.min.css?v=3.2.0" rel="stylesheet">
+<link href="/lib/fancybox/jquery.fancybox-3.1.20.min.css" rel="stylesheet">
+
+
+
+
+<meta property="og:title" content="Retrofit-1.9源码分析-(上)" />
+<meta property="og:description" content="Retrofit 项目的 GitHub Retrofit 官网介绍 Type-safe HTTP client for Android and Java。 接下来的这几篇文章的分析都是基于 1.9 版本的。 看过我前面文章的开发者们应该知道，我不喜欢把一篇文章写的" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://blog.airzone.world/post/retrofit-1.9%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E4%B8%8A/" /><meta property="article:published_time" content="2016-01-13T00:00:00&#43;00:00"/>
+<meta property="article:modified_time" content="2016-01-13T00:00:00&#43;00:00"/>
+<meta itemprop="name" content="Retrofit-1.9源码分析-(上)">
+<meta itemprop="description" content="Retrofit 项目的 GitHub Retrofit 官网介绍 Type-safe HTTP client for Android and Java。 接下来的这几篇文章的分析都是基于 1.9 版本的。 看过我前面文章的开发者们应该知道，我不喜欢把一篇文章写的">
+
+
+<meta itemprop="datePublished" content="2016-01-13T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2016-01-13T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="3714">
+
+
+
+<meta itemprop="keywords" content="retrofit,square," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Retrofit-1.9源码分析-(上)"/>
+<meta name="twitter:description" content="Retrofit 项目的 GitHub Retrofit 官网介绍 Type-safe HTTP client for Android and Java。 接下来的这几篇文章的分析都是基于 1.9 版本的。 看过我前面文章的开发者们应该知道，我不喜欢把一篇文章写的"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">Air</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">Air</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">Retrofit-1.9源码分析-(上)</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2016-01-13 </span>
+        
+        <span class="more-meta"> 约 3714 字 </span>
+        <span class="more-meta"> 预计阅读 8 分钟 </span>
+        
+      </div>
+    </header>
+
+    
+    
+<div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  
+  <div class="post-toc-content">
+    <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#用法">用法</a></li>
+<li><a href="#初始化-restadapter">初始化 RestAdapter</a>
+<ul>
+<li><a href="#restadapter-builder">RestAdapter.Builder</a></li>
+<li><a href="#restadapter-ensuresanedefaults">RestAdapter ensureSaneDefaults()</a></li>
+<li><a href="#platform">Platform</a></li>
+<li><a href="#platform-android">Platform.Android</a></li>
+<li><a href="#platform-hasokhttponclasspath">Platform hasOkHttpOnClasspath()</a></li>
+</ul></li>
+<li><a href="#restadapter-create">RestAdapter create()</a></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+  </div>
+</div>
+
+    
+    
+
+    
+    <div class="post-content">
+      
+
+<p><a href="https://github.com/square/retrofit">Retrofit 项目的 GitHub</a></p>
+
+<p>Retrofit 官网介绍 Type-safe HTTP client for Android and Java。</p>
+
+<p>接下来的这几篇文章的分析都是基于 1.9 版本的。</p>
+
+<p>看过我前面文章的开发者们应该知道，我不喜欢把一篇文章写的很长，所以这个分析依旧会有好几篇，好了，我们开始第一篇的分析。</p>
+
+<p>看到一个库，我们要首先会用，然后再去深入其中，研究其中的源代码。</p>
+
+<p>那我们来看看这个库的用法。</p>
+
+<h3 id="用法">用法</h3>
+
+<p>官网上的教程是这样写的。</p>
+
+<p>首先定义请求接口：</p>
+
+<pre><code class="language-java">public interface GitHubService {
+    //被注释的内容是同步方法，在Android 4.0以后不允许主线程进行网络请求，所以一般不这么用
+    //@GET(&quot;/users/{user}/repos&quot;)
+    //List&lt;Repo&gt; listRepos(@Path(&quot;user&quot;) String user);
+    @GET(&quot;/users/{user}/repos&quot;)
+    void listRepos(@Path(&quot;user&quot;) String user, Callback&lt;List&lt;Repo&gt;&gt; callback);
+}
+</code></pre>
+
+<p>然后初始化<code>RestAdapter</code>，并且通过 RestAdapter 生成刚才代理的实现类</p>
+
+<pre><code class="language-java">RestAdapter restAdapter = new RestAdapter.Builder()
+    .setEndpoint(&quot;https://api.github.com&quot;)
+    .build();
+
+GitHubService service = restAdapter.create(GitHubService.class);
+</code></pre>
+
+<p>现在就可以调用接口发送请求了。</p>
+
+<pre><code class="language-java">service.listRepos(&quot;octocat&quot;, new Callback&lt;List&lt;Repo&gt;&gt;(){
+    @Override
+    public void success(List&lt;Repo&gt; repos, Response response) {
+    }
+
+    @Override
+    public void failure(RetrofitError error) {
+    }
+});
+</code></pre>
+
+<p>这样就返回了网络请求对应的 Model，并且通过回调让返回的结果在主线程进行操作，</p>
+
+<p>从网络请求返回的数据到对应的 Model 转换是在<code>RestAdapter</code>那里定义的，默认是<code>Gson</code>解析，即默认服务端返回格式是 Json，</p>
+
+<p>当然你也可以使用不一样的 Json 解析库，当服务端返回 Xml，Protocol Buffer 的时候，你也可以解析，只要自己实现 Converter 接口，并在<code>RestAdapter</code>中设置即可。</p>
+
+<p>这里有一个问题，如果服务端的接口不是全部返回一个格式怎么办？或者不是同一个 Endpoint 怎么办？每一个都需要定义一个对应的<code>RestAdapter</code>对应。</p>
+
+<p>所以这里可能出现的问题就是，某些接口可能数据很简单，但是返回格式不统一，那么就需要新写一个这样类似的模板代码。</p>
+
+<p>这样，我们大概了解了这个版本的库使用方式：</p>
+
+<ol>
+<li>定义一个接口，通过注解说明它是什么请求类型，并且在注解内写明它的相对于 Endpoint(2.0 版本称作 BaseUrl,这样就好理解多了)的 Url，</li>
+</ol>
+
+<p>然后声明一个方法，这个方法中的参数就是网络请求时服务端需要的参数，也可以把网络请求的路径作为方法参数，最后定义一个回调，让返回结果在主线程中执行。</p>
+
+<ol>
+<li><p>定义<code>RestAdapter</code>，并对其进行必要的设置，通过它生成那个接口对应的实现类。</p></li>
+
+<li><p>调用实现类，执行网络请求。</p></li>
+</ol>
+
+<p>可以看出，定义<code>RestAdapter</code>是其中很重要的一步，那么我们先来分析它到底做了什么。</p>
+
+<h3 id="初始化-restadapter">初始化 RestAdapter</h3>
+
+<p>我们看到示例，通过<code>Builder</code>来初始化的，那么源码中一定用了建造着模式，一般情况下，如果可设置项不多，不会用这样一个模式，</p>
+
+<p>看来<code>RestAdapter</code>的可设置项非常多，我们来看看。</p>
+
+<p>在<code>RestAdapter</code>内部的静态<code>Builder</code>类中，有这么多可以设置的内容。</p>
+
+<h4 id="restadapter-builder">RestAdapter.Builder</h4>
+
+<pre><code class="language-java">    private Endpoint endpoint;  //就是BaseUrl，
+    private Client.Provider clientProvider; //最终执行网络请求使用的库
+    private Executor httpExecutor;  //http线程池的具体实现
+    private Executor callbackExecutor; //callback在哪个线程执行
+    private RequestInterceptor requestInterceptor; //网络请求的拦截者，可以给网络请求加入共同的参数
+    private Converter converter; //网络请求返回值的解析方式(Json/Xml)
+    private Profiler profiler;   //可以记录HTTP方法执行时间和状态码
+    private ErrorHandler errorHandler; //错误处理
+    private Log log;
+    private LogLevel logLevel = LogLevel.NONE;
+</code></pre>
+
+<p>如果分别深入每个类，那么，除了最后的 LogLevel 是 enum 之外，其他都是接口，有多少开发者还记得面向接口编程，不面向实现编程，</p>
+
+<p>或者说作为开发者的我们记得这句话，但是自己实现的时候都忘记了。</p>
+
+<p>其实这些接口就是一个个 hook，留给使用者去自定义。但是这个库也提供了默认的参数，那这个默认的参数在哪里设置呢？</p>
+
+<p>看回我们前面的例子，对于建造着模式，最后一步要使用<code>build()</code>方法来返回一个对应的类，那么我们来看一下这个<code>build()</code>方法。</p>
+
+<pre><code class="language-java">/** Create the {@link RestAdapter} instances. */
+    public RestAdapter build() {
+      if (endpoint == null) {
+        throw new IllegalArgumentException(&quot;Endpoint may not be null.&quot;);
+      }
+      ensureSaneDefaults();
+      return new RestAdapter(endpoint, clientProvider, httpExecutor, callbackExecutor,
+          requestInterceptor, converter, profiler, errorHandler, log, logLevel);
+    }
+</code></pre>
+
+<p>这里很容易可以看出，必须要设置 EndPoint 才能继续使用。</p>
+
+<p>那么其它的类变量一定在<code>ensureSaneDefaults()</code>方法初始化了，否则当库的使用者未设置的时候，其它都是<code>null</code>了。</p>
+
+<p>我们来看一下它的源码：</p>
+
+<h4 id="restadapter-ensuresanedefaults">RestAdapter ensureSaneDefaults()</h4>
+
+<pre><code class="language-java">    private void ensureSaneDefaults() {
+      if (converter == null) {
+        converter = Platform.get().defaultConverter();
+      }
+      if (clientProvider == null) {
+        clientProvider = Platform.get().defaultClient();
+      }
+      if (httpExecutor == null) {
+        httpExecutor = Platform.get().defaultHttpExecutor();
+      }
+      if (callbackExecutor == null) {
+        callbackExecutor = Platform.get().defaultCallbackExecutor();
+      }
+      if (errorHandler == null) {
+        errorHandler = ErrorHandler.DEFAULT;
+      }
+      if (log == null) {
+        log = Platform.get().defaultLog();
+      }
+      if (requestInterceptor == null) {
+        requestInterceptor = RequestInterceptor.NONE;
+      }
+    }
+  }
+</code></pre>
+
+<p>可以看到，主要需要关心的接口都是由<code>Platform</code>类实现的，那我们进入其中一探究竟。</p>
+
+<h4 id="platform">Platform</h4>
+
+<pre><code class="language-java">abstract class Platform{
+  private static final Platform PLATFORM = findPlatform();
+
+  static Platform get() {
+    return PLATFORM;
+  }
+
+  private static Platform findPlatform() {
+      try {
+        Class.forName(&quot;android.os.Build&quot;);
+        if (Build.VERSION.SDK_INT != 0) {
+          return new Android();
+        }
+      } catch (ClassNotFoundException ignored) {
+      }
+
+      if (System.getProperty(&quot;com.google.appengine.runtime.version&quot;) != null) {
+        return new AppEngine();
+      }
+
+      return new Base();
+    }
+}
+</code></pre>
+
+<p>想要初始化它们，先使用<code>Platform.get()</code>方法，这个方法获取了单例<code>Platform</code>对象 PLATFORM，这里给了我们实现单例的一种思路。</p>
+
+<p>通过<code>findPlatform()</code>方法，如果是 Android 平台，则使用内部的<code>Android</code>子类，如果是 Google AppEngine，则使用内部的<code>AppEngine</code>子类，</p>
+
+<p>如果都不是，则使用内部的<code>Base</code>子类，还记得这个库的目标吧？是 Java 和 Android 平台的 HTTP 库，所以这里还可能是 Java 平台，所以要使用另外一种实现方式。</p>
+
+<p>这次分析主要针对 Android 平台，所以如果好奇另外两个实现，请自己查看源码。</p>
+
+<p>还记得我们在使用<code>RestAdapter</code>的<code>Builder</code>的时候除了<code>Endpoint</code>之外的接口吗？在<code>Platform</code>内部，定义了其它默认的实现：</p>
+
+<pre><code class="language-java">abstract Converter defaultConverter();
+abstract Client.Provider defaultClient();
+abstract Executor defaultHttpExecutor();
+abstract Executor defaultCallbackExecutor();
+abstract RestAdapter.Log defaultLog();
+</code></pre>
+
+<p>均是抽象方法，意味着这些都要靠子类实现，那么我们看一下<code>Android</code>子类是如何实现的：</p>
+
+<h4 id="platform-android">Platform.Android</h4>
+
+<pre><code class="language-java">private static class Android extends Platform {
+    @Override Converter defaultConverter() {
+      return new GsonConverter(new Gson()); //默认Gson，处理请求返回的Json
+    }
+
+    @Override Client.Provider defaultClient() {
+      final Client client;
+      if (hasOkHttpOnClasspath()) {     //存在Okhttp库，当然用OkHttp了
+        client = OkClientInstantiator.instantiate();
+      } else if (Build.VERSION.SDK_INT &lt; Build.VERSION_CODES.GINGERBREAD) {
+        client = new AndroidApacheClient();  //Android 2.3以下用HttpClient
+      } else {
+        client = new UrlConnectionClient(); //Android 2.3以上用HttpUrlConnection
+      }
+      return new Client.Provider() {
+        @Override public Client get() {
+          return client;
+        }
+      };
+    }
+
+    @Override Executor defaultHttpExecutor() {
+      return Executors.newCachedThreadPool(new ThreadFactory() { //使用CachedThreadPool来管理网络请求
+        @Override public Thread newThread(final Runnable r) {
+          return new Thread(new Runnable() {
+            @Override public void run() {
+              Process.setThreadPriority(THREAD_PRIORITY_BACKGROUND); //给线程设置优先级
+              r.run();
+            }
+          }, RestAdapter.IDLE_THREAD_NAME);
+        }
+      });
+    }
+
+    @Override Executor defaultCallbackExecutor() {
+      return new MainThreadExecutor();  //callback在主线程执行
+    }
+
+    @Override RestAdapter.Log defaultLog() {
+      return new AndroidLog(&quot;Retrofit&quot;);
+    }
+  }
+</code></pre>
+
+<p>这里<code>hasOkHttpOnClasspath()</code>方法我觉得很棒，和前面找对应的平台一样，通过<code>Class.forName(包名)</code>找类，看是否存在。</p>
+
+<p>如果自己写一个库的时候是好用的一种方式，支持一些新的东东。放一下它的源码。</p>
+
+<h4 id="platform-hasokhttponclasspath">Platform hasOkHttpOnClasspath()</h4>
+
+<pre><code class="language-java">private static boolean hasOkHttpOnClasspath() {
+    try {
+      Class.forName(&quot;com.squareup.okhttp.OkHttpClient&quot;);
+      return true;
+    } catch (ClassNotFoundException ignored) {
+    }
+    return false;
+}
+</code></pre>
+
+<p>到这里为止，<code>RestAdapter</code>就创建好了，接下来跟着例子继续，<code>RestAdapter</code>调用<code>create()</code>方法，创建接口的实现类。</p>
+
+<h3 id="restadapter-create">RestAdapter create()</h3>
+
+<pre><code class="language-java">public &lt;T&gt; T create(Class&lt;T&gt; service) {
+    Utils.validateServiceClass(service); //验证Service是否有效，判断条件：1.这个类是接口  2.该接口不是其它接口的子接口 (接口也可以继承)
+    return (T) Proxy.newProxyInstance(service.getClassLoader(),
+				new Class&lt;?&gt;[] { service },
+				new RestHandler(getMethodInfoCache(service)));
+}
+</code></pre>
+
+<p>这里，通过一个动态代理生成了接口的实现类，并在第三个参数里做了一些的操作。</p>
+
+<p>**动态代理的作用：在运行时创建一个实现了一组给定接口的新类。</p>
+
+<p>为什么要用动态代理？因为在编译时无法确定需要实现哪个接口。**</p>
+
+<p>我们慢慢分析，先看这个方法的签名:</p>
+
+<pre><code class="language-java">/**
+   * Returns an instance of the dynamically built class for the specified
+   * interfaces. Method invocations on the returned instance are forwarded to
+   * the specified invocation handler. The interfaces must be visible from the
+   * supplied class loader; no duplicates are permitted. All non-public
+   * interfaces must be defined in the same package.
+   *
+   * @param loader
+   *            the class loader that will define the proxy class
+   * @param interfaces
+   *            an array of {@code Class} objects, each one identifying an
+   *            interface thill be implemented by the returned proxy
+   *            object
+   * @param invocationHandler
+   *            the invocation handler that handles the dispatched method
+   *            invocations
+   * @return a new proxy object that delegates to the handler {@code h}
+**/
+public static Object newProxyInstance(ClassLoader loader, Class&lt;?&gt;[] interfaces,
+			InvocationHandler invocationHandler)throws IllegalArgumentException {
+	return getProxyClass(loader, interfaces)
+      .getConstructor(InvocationHandler.class)
+      .newInstance(invocationHandler);
+}
+</code></pre>
+
+<p>方法体不管它的错误处理部分，先看它的参数，这个方法有三个参数：</p>
+
+<ol>
+<li>loader，没什么可说的，就是一个 ClassLoader</li>
+<li>interfaces, 传入的接口数组，里面的方法由代理实现</li>
+<li>invocationHandler, 方法调用的处理器</li>
+</ol>
+
+<p>对于前两个参数默认大家都已经熟悉了，我们看一下最后一个<code>InvocationHandler</code>,这个接口很简单，只定义了一个方法，如下：</p>
+
+<pre><code class="language-java">public Object invoke(Object proxy, Method method, Object[] args) throws Throwable;
+</code></pre>
+
+<p>举个例子来讲这个方法的含义：</p>
+
+<p>拿经纪人的比喻来说吧，</p>
+
+<p>简单来说，你需要让我做一件事情(要调用原始对象的一个函数)，但是，因为我不很会和别人谈判(作为框架不能和业务逻辑耦合太多)，</p>
+
+<p>那么我就找了一个经纪人，由他来和你谈，当经纪人把前前后后的各种事情帮我弄好之后，</p>
+
+<p>(可以过滤请求，可以让其他对象来完成对原始对象的调用)</p>
+
+<p>我就可以做我的事情(原始对象调用自己的那个函数)，而不用为这些不擅长的事情分心了。</p>
+
+<p>看看<code>invoke()</code>方法注释中的例子：</p>
+
+<pre><code class="language-java">public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+    //do some processing before the method invocation
+
+    //invoke the method
+    Object result = method.invoke(proxy, args);
+
+    //do some processing after the method invocation
+    return result;
+}
+</code></pre>
+
+<p>在调用方法前后都能加一些你需要做的额外工作，是不是很像我举的例子？还有很重要的一点，你要把原始对象做完的结果返回给调用者。</p>
+
+<p>我们把视线移回到<code>newProxyInstance()</code>的方法体中，在这里先看一下为什么这个方法返回的对象可以被强制转换为传入的接口对象，</p>
+
+<p>就像官方提供的 demo 一样，</p>
+
+<pre><code class="language-java">GitHubService service = restAdapter.create(GitHubService.class);
+</code></pre>
+
+<p>传入<code>GitHubService</code>，然后最后就可以强制转换为<code>GitHubService</code>对象。</p>
+
+<p>**原因就是在<code>newProxyInstance()</code>这个方法的第二个参数上，我们给这个代理对象提供了一组什么接口，那么我这个代理对象就会实现了这组接口，</p>
+
+<p>这个时候我们当然可以将这个代理对象强制类型转化为这组接口中的任意一个。**</p>
+
+<p>我们传入<code>GitHubService</code>,代理类把这个接口的方法都实现了，自然能转换成<code>GitHubService</code>对象。</p>
+
+<p>在这里第一篇分析就结束了，可以看到<code>new RestHandler(getMethodInfoCache(service))</code>这个方法都没有跟进去，</p>
+
+<p>或许由于局限在 Java 这门语言的缘故，是因为我觉得<code>Proxy.newProxyInstance()</code>方法很不容易理解，所以到这里结束，</p>
+
+<p>​</p>
+
+    </div>
+
+    
+    
+
+    
+    
+<div class="post-reward">
+  <input type="checkbox" name="reward" id="reward" hidden />
+  <label class="reward-button" for="reward">赞赏支持</label>
+  <div class="qr-code">
+    
+    
+    
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/img/reward/alipay-qr-code.png">
+        <span>支付宝打赏</span>
+      </label>
+  </div>
+</div>
+
+    <footer class="post-footer">
+      <div class="post-tags">
+          
+          <a href="/tags/retrofit/">retrofit</a>
+          
+          <a href="/tags/square/">square</a>
+          
+        </div>
+
+      
+      <nav class="post-nav">
+        
+          <a class="prev" href="/post/retrofit_1.9%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E4%B8%8B/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">Retrofit-1.9源码分析-(下)</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
+        
+          <a class="next" href="/post/%E7%BF%BB%E8%AF%91%E4%BD%BF%E7%94%A8%E6%AD%A3%E7%A1%AE%E7%9A%84%E6%96%B9%E5%BC%8F%E7%BB%98%E5%88%B6%E5%B8%83%E5%B1%80/">
+            <span class="next-text nav-default">(翻译)使用正确的方式绘制布局</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+  <div id="disqus_thread"></div>
+    <script type="text/javascript">
+    (function() {
+      
+      
+      if (window.location.hostname === 'localhost') return;
+
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      var disqus_shortname = 'yunair';
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:airzhaoyn@gmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://github.com/yunair" class="iconfont icon-github" title="github"></a>
+  <a href="http://blog.airzone.world/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    
+      2015 - 
+    2018
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">Air</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+<script src="/lib/highlight/highlight.pack.js?v=20171001"></script><script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox-3.1.20.min.js"></script>
+
+
+<script type="text/javascript" src="/dist/even.min.js?v=3.2.0"></script>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-103683322-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+
+
+
+
+</body>
+</html>

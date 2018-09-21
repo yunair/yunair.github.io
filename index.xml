@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Air Little Place</title>
+    <link>http://blog.airzone.world/</link>
+    <description>Recent content on Air Little Place</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Fri, 21 Sep 2018 10:00:16 +0800</lastBuildDate>
+    
+	<atom:link href="http://blog.airzone.world/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>About</title>
+      <link>http://blog.airzone.world/about/</link>
+      <pubDate>Fri, 21 Sep 2018 10:00:16 +0800</pubDate>
+      
+      <guid>http://blog.airzone.world/about/</guid>
+      <description>程序员一枚，暂时专注后端,Android，会点前端。 关注 Kotlin, Java, Python, Go, Lisp Mail: airzhaoyn@gmail.com 欢迎大家和我一起讨论技术</description>
+    </item>
+    
+    <item>
+      <title>App启动流程</title>
+      <link>http://blog.airzone.world/post/app%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B/</link>
+      <pubDate>Sat, 24 Feb 2018 00:00:00 +0000</pubDate>
+      
+      <guid>http://blog.airzone.world/post/app%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B/</guid>
+      <description>前言 作为 Android 用户，我们会点击桌面图标，然后一个 app 就启动了了，在这个过程中到底发生了什么呢？换句话说 Android app 是怎么启动的呢？如果和我有一样的好奇，我</description>
+    </item>
+    
+    <item>
+      <title>Activity启动流程</title>
+      <link>http://blog.airzone.world/post/activity%E7%9A%84%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B/</link>
+      <pubDate>Sun, 21 Jan 2018 00:00:00 +0000</pubDate>
+      
+      <guid>http://blog.airzone.world/post/activity%E7%9A%84%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B/</guid>
+      <description>前言 作为Android开发，我们经常会写startActivity方法，这样我们就可以启动Activity了，在这个过程中到底发生了什么呢？</description>
+    </item>
+    
+    <item>
+      <title>AndroidPlugin源码解析-(九)</title>
+      <link>http://blog.airzone.world/post/androidplugin%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%B9%9D/</link>
+      <pubDate>Sun, 08 Oct 2017 00:00:00 +0000</pubDate>
+      
+      <guid>http://blog.airzone.world/post/androidplugin%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%B9%9D/</guid>
+      <description>前言 前面我们分了 8 篇讲解整个 Android Apk 的打包过程，可以说我们中间几篇文章都是只见树木不见森林，研究了其中的细节，但缺少对这个过程的整体把握，这篇文</description>
+    </item>
+    
+    <item>
+      <title>AndroidPlugin源码解析-(八)</title>
+      <link>http://blog.airzone.world/post/androidplugin%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E5%85%AB/</link>
+      <pubDate>Sat, 30 Sep 2017 00:00:00 +0000</pubDate>
+      
+      <guid>http://blog.airzone.world/post/androidplugin%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E5%85%AB/</guid>
+      <description>这篇文章我们就来看看打包过程中最后一个方法createPackagingTask createPackagingTask public void createPackagingTask(@NonNull TaskFactory tasks, @NonNull VariantScope variantScope, boolean publishApk, @Nullable AndroidTask&amp;lt;InstantRunWrapperTask&amp;gt; fullBuildInfoGeneratorTask) { GlobalScope globalScope = variantScope.getGlobalScope(); ApkVariantData variantData = (ApkVariantData) variantScope.getVariantData(); boolean signedApk = variantData.isSigned(); // s</description>
+    </item>
+    
+    <item>
+      <title>AndroidPlugin源码解析-(七)</title>
+      <link>http://blog.airzone.world/post/androidplugin%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%B8%83/</link>
+      <pubDate>Sun, 10 Sep 2017 00:00:00 +0000</pubDate>
+      
+      <guid>http://blog.airzone.world/post/androidplugin%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%B8%83/</guid>
+      <description>忽视了 Aidl, Shader, Ndk, Jni, Jack, DataBinding, StripNativeLibrary, Split, InstantRun, Lint 这些 Task 之后，我们就只剩下面三个重要的 Task 了： createJavacTask(tasks, variantScope); createPostCompilationTasks(tasks, variantScope); createPackagingTask(tasks, variantScope, true /publishApk/, fullBuildInfoGeneratorTask); 这篇文章我们来分析前面两个 Task createJavacTask 这个 Task 的方法为: public AndroidTask&amp;lt;? extends JavaCompile&amp;gt;</description>
+    </item>
+    
+    <item>
+      <title>AndroidPlugin源码解析-(六)</title>
+      <link>http://blog.airzone.world/post/androidplugin%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E5%85%AD/</link>
+      <pubDate>Tue, 15 Aug 2017 00:00:00 +0000</pubDate>
+      
+      <guid>http://blog.airzone.world/post/androidplugin%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E5%85%AD/</guid>
+      <description>上篇提到，我们这篇研究的是接下来三个过程, 分别是: createBuildConfigTask createApkProcessResTask createProcessJavaResTasks 接下来，我们一个一个来看 createBuildConfigTask 这个 task 实际执行如下方法: // must clear the folder in case the packagename changed, otherwise, // there&#39;ll be two classes. File</description>
+    </item>
+    
+    <item>
+      <title>AndroidPlugin源码解析-(五)</title>
+      <link>http://blog.airzone.world/post/androidplugin%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%BA%94/</link>
+      <pubDate>Thu, 20 Jul 2017 00:00:00 +0000</pubDate>
+      
+      <guid>http://blog.airzone.world/post/androidplugin%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%BA%94/</guid>
+      <description>上篇提到，我们这篇研究的是如下过程, 分别是: createGenerateResValuesTask createMergeResourcesTask createMergeAssetsTask 接下来，我们一个一个来看 createGenerateResValuesTask 这个 task 实际执行下面的方法： // 该folder名字为resValue</description>
+    </item>
+    
+    <item>
+      <title>AndroidPlugin源码解析-(四)</title>
+      <link>http://blog.airzone.world/post/androidplugin%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E5%9B%9B/</link>
+      <pubDate>Fri, 30 Jun 2017 00:00:00 +0000</pubDate>
+      
+      <guid>http://blog.airzone.world/post/androidplugin%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E5%9B%9B/</guid>
+      <description>接下来几篇就来解析上篇提到的代码。 一个一个 Task 来看 createAnchorTasks 这个方法创建的 Tasks 就如名字所示，是 Anchor Tasks（即所谓的锚点任务）。在这里不做仔细的解析。 具</description>
+    </item>
+    
+    <item>
+      <title>AndroidPlugin源码解析-(三)</title>
+      <link>http://blog.airzone.world/post/androidplugin%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%B8%89/</link>
+      <pubDate>Thu, 15 Jun 2017 00:00:00 +0000</pubDate>
+      
+      <guid>http://blog.airzone.world/post/androidplugin%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%B8%89/</guid>
+      <description>上个系列文章留下的taskManager.createTasksForVariantData(tasks, variantData);的分析放</description>
+    </item>
+    
+    <item>
+      <title>AndroidPlugin源码解析-(二)</title>
+      <link>http://blog.airzone.world/post/androidplugin%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%BA%8C/</link>
+      <pubDate>Wed, 31 May 2017 00:00:00 +0000</pubDate>
+      
+      <guid>http://blog.airzone.world/post/androidplugin%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%BA%8C/</guid>
+      <description>前言 上一篇文章还没分析完，还留了剩下两步，这一篇我们继续跟进。 先从第三步开始： BasePlugin createTasks 看apply方法中第三个过程createTasks() private void</description>
+    </item>
+    
+    <item>
+      <title>AndroidPlugin源码解析-(一)</title>
+      <link>http://blog.airzone.world/post/androidplugin%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%B8%80/</link>
+      <pubDate>Tue, 30 May 2017 00:00:00 +0000</pubDate>
+      
+      <guid>http://blog.airzone.world/post/androidplugin%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%B8%80/</guid>
+      <description>前言 上一篇我们知道com.android.application plugin 对应的类为com.android.build.gradle.AppPlug</description>
+    </item>
+    
+    <item>
+      <title>Android Plugin 概述</title>
+      <link>http://blog.airzone.world/post/androidplugin%E6%A6%82%E8%BF%B0/</link>
+      <pubDate>Mon, 29 May 2017 00:00:00 +0000</pubDate>
+      
+      <guid>http://blog.airzone.world/post/androidplugin%E6%A6%82%E8%BF%B0/</guid>
+      <description>Plugin前言 用Android Studio的会发现，我们新建的Android工程会在根目录的build.gradle文件内引入一个clas</description>
+    </item>
+    
+    <item>
+      <title>Groovy &amp; Gradle 入门</title>
+      <link>http://blog.airzone.world/post/groovygradle%E5%85%A5%E9%97%A8/</link>
+      <pubDate>Wed, 01 Mar 2017 00:00:00 +0000</pubDate>
+      
+      <guid>http://blog.airzone.world/post/groovygradle%E5%85%A5%E9%97%A8/</guid>
+      <description>Groovy Groovy的API文档位于 http://www.groovy-lang.org/api.html 字符串 单引号&amp;rdquo;中的内容严格对应Java中的String，不对$符号进行转义 def singleQuote=&#39;I am $ dolloar&#39; //输出就是</description>
+    </item>
+    
+    <item>
+      <title>OkHttp源码解析-(下)</title>
+      <link>http://blog.airzone.world/post/okhttp%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90-%E4%B8%8B/</link>
+      <pubDate>Sat, 10 Dec 2016 00:00:00 +0000</pubDate>
+      
+      <guid>http://blog.airzone.world/post/okhttp%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90-%E4%B8%8B/</guid>
+      <description>这篇的主要内容就是解析这一个个拦截器，所以重新将图放在这里。 图中存在用户自定义的Interceptor对象，这一部分我们忽略，剩下的Inte</description>
+    </item>
+    
+    <item>
+      <title>OkHttp源码解析-(上)</title>
+      <link>http://blog.airzone.world/post/okhttp%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90-%E4%B8%8A/</link>
+      <pubDate>Sat, 03 Dec 2016 00:00:00 +0000</pubDate>
+      
+      <guid>http://blog.airzone.world/post/okhttp%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90-%E4%B8%8A/</guid>
+      <description>一直都知道Retrofit-OkHttp-Okio是Square公司封装的用于网络请求的大杀器，项目中也往往都在用Retrofit，看过我之</description>
+    </item>
+    
+    <item>
+      <title>Jenkins的使用</title>
+      <link>http://blog.airzone.world/post/jenkins%E4%BD%BF%E7%94%A8/</link>
+      <pubDate>Tue, 11 Oct 2016 00:00:00 +0000</pubDate>
+      
+      <guid>http://blog.airzone.world/post/jenkins%E4%BD%BF%E7%94%A8/</guid>
+      <description>前提: 使用 Git 作为公司的版本控制工具，使用 GitLab 作为对应的服务器 首先安装 Jenkins plugins, 下面列出两个关键的 Plugins GitLab Plugin Git plugin 打包 APK 对于 APK 的打包，相信大家公司内部都有不</description>
+    </item>
+    
+    <item>
+      <title>Retrofit2源码分析-(下)</title>
+      <link>http://blog.airzone.world/post/retrofit2.0%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%B8%8B/</link>
+      <pubDate>Sun, 22 May 2016 00:00:00 +0000</pubDate>
+      
+      <guid>http://blog.airzone.world/post/retrofit2.0%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%B8%8B/</guid>
+      <description>引言 上篇我们主要看了一下Retrofit的设计者对Retrofit1.+版本设计的评价（好的方面和坏的方面），同时也讲了Retrofit2都</description>
+    </item>
+    
+    <item>
+      <title>Retrofit2源码分析-(上)</title>
+      <link>http://blog.airzone.world/post/retrofit2.0%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%B8%8A/</link>
+      <pubDate>Sun, 08 May 2016 00:00:00 +0000</pubDate>
+      
+      <guid>http://blog.airzone.world/post/retrofit2.0%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%B8%8A/</guid>
+      <description>前言 ​ 千呼万唤始出来的 Retrofit2.0 正式版终于出来了，首先我们来看一看 Jake Wharton 的演讲，这次演讲主要讲了 1.0 版本的好处和问题，以及 2.0 版本的优势，对于好处，我们在</description>
+    </item>
+    
+    <item>
+      <title>Android管理任务栈之—launchMode</title>
+      <link>http://blog.airzone.world/post/android%E7%AE%A1%E7%90%86%E4%BB%BB%E5%8A%A1%E6%A0%88%E4%B9%8Blaunchmode/</link>
+      <pubDate>Sun, 06 Mar 2016 00:00:00 +0000</pubDate>
+      
+      <guid>http://blog.airzone.world/post/android%E7%AE%A1%E7%90%86%E4%BB%BB%E5%8A%A1%E6%A0%88%E4%B9%8Blaunchmode/</guid>
+      <description>前言 之前遇到了一个问题，大概是有 4 个 Activity，分别为 A, B, C, D Activity，当你的 Activity 跳转, A -&amp;gt; B -&amp;gt; C -&amp;gt; D 跳转，此时，你需要从 D 跳回</description>
+    </item>
+    
+    <item>
+      <title>Retrofit-1.9源码分析-(下)</title>
+      <link>http://blog.airzone.world/post/retrofit_1.9%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E4%B8%8B/</link>
+      <pubDate>Sat, 16 Jan 2016 00:00:00 +0000</pubDate>
+      
+      <guid>http://blog.airzone.world/post/retrofit_1.9%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E4%B8%8B/</guid>
+      <description>看过上一篇的分析，并思考了我在最后留给大家的对那个方法的思考之后，我们就可以继续解析这个库了。 记得上一篇提到的小尾巴吗？这里我们先不谈这个小</description>
+    </item>
+    
+    <item>
+      <title>Retrofit-1.9源码分析-(上)</title>
+      <link>http://blog.airzone.world/post/retrofit-1.9%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E4%B8%8A/</link>
+      <pubDate>Wed, 13 Jan 2016 00:00:00 +0000</pubDate>
+      
+      <guid>http://blog.airzone.world/post/retrofit-1.9%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E4%B8%8A/</guid>
+      <description>Retrofit 项目的 GitHub Retrofit 官网介绍 Type-safe HTTP client for Android and Java。 接下来的这几篇文章的分析都是基于 1.9 版本的。 看过我前面文章的开发者们应该知道，我不喜欢把一篇文章写的</description>
+    </item>
+    
+    <item>
+      <title>(翻译)使用正确的方式绘制布局</title>
+      <link>http://blog.airzone.world/post/%E7%BF%BB%E8%AF%91%E4%BD%BF%E7%94%A8%E6%AD%A3%E7%A1%AE%E7%9A%84%E6%96%B9%E5%BC%8F%E7%BB%98%E5%88%B6%E5%B8%83%E5%B1%80/</link>
+      <pubDate>Tue, 12 Jan 2016 00:00:00 +0000</pubDate>
+      
+      <guid>http://blog.airzone.world/post/%E7%BF%BB%E8%AF%91%E4%BD%BF%E7%94%A8%E6%AD%A3%E7%A1%AE%E7%9A%84%E6%96%B9%E5%BC%8F%E7%BB%98%E5%88%B6%E5%B8%83%E5%B1%80/</guid>
+      <description>原文 ： https://possiblemobile.com/2013/05/layout-inflation-as-intended/ 绘制(inflation，翻译下同)布局(Layout)是在 Android 的 Context 中使用的术语，它的作用是解析一个 XML 布局资源并且把这个资源转换到视图</description>
+    </item>
+    
+    <item>
+      <title>(翻译)什么是Context</title>
+      <link>http://blog.airzone.world/post/%E7%BF%BB%E8%AF%91%E4%BB%80%E4%B9%88%E6%98%AF-context/</link>
+      <pubDate>Sat, 09 Jan 2016 00:00:00 +0000</pubDate>
+      
+      <guid>http://blog.airzone.world/post/%E7%BF%BB%E8%AF%91%E4%BB%80%E4%B9%88%E6%98%AF-context/</guid>
+      <description>原文 ： https://possiblemobile.com/2013/06/context/ Context 大概是 Android 应用中使用最多的元素，同时，它可能也是最被滥用的元素 Context 对象如此常见，经常在不同的类中被传来传去，它可以用于你完全不关心的场</description>
+    </item>
+    
+    <item>
+      <title>AndFix解析-(下)</title>
+      <link>http://blog.airzone.world/post/andfix-%E8%A7%A3%E6%9E%90%E4%B8%8B/</link>
+      <pubDate>Fri, 23 Oct 2015 00:00:00 +0000</pubDate>
+      
+      <guid>http://blog.airzone.world/post/andfix-%E8%A7%A3%E6%9E%90%E4%B8%8B/</guid>
+      <description>我们接着分析阿里开源的 AndFix 库， 上一篇分析了Patch类，这个类相当于我们提供补丁的容器，容器里有了东西，我们要对容器进行操作了, 于是开始了我们</description>
+    </item>
+    
+    <item>
+      <title>AndFix解析-(中)</title>
+      <link>http://blog.airzone.world/post/andfix-%E8%A7%A3%E6%9E%90%E4%B8%AD/</link>
+      <pubDate>Sat, 10 Oct 2015 00:00:00 +0000</pubDate>
+      
+      <guid>http://blog.airzone.world/post/andfix-%E8%A7%A3%E6%9E%90%E4%B8%AD/</guid>
+      <description>我们接着分析阿里开源的 AndFix 库，上次留下了三个坑，一个方法，两个类，不知道你们是否想急切了解呢？ loadPatch()方法和AndFixMana</description>
+    </item>
+    
+    <item>
+      <title>AndFix解析-(上)</title>
+      <link>http://blog.airzone.world/post/andfix-%E8%A7%A3%E6%9E%90%E4%B8%8A/</link>
+      <pubDate>Fri, 25 Sep 2015 00:00:00 +0000</pubDate>
+      
+      <guid>http://blog.airzone.world/post/andfix-%E8%A7%A3%E6%9E%90%E4%B8%8A/</guid>
+      <description>阿里巴巴前一段时间开源了他们用来解决线上紧急 bug 的一款 Android 库——AndFix 对 Android 开发者来说真是一个很好的消息。 基于自己的经验，太长的文字很少有人</description>
+    </item>
+    
+    <item>
+      <title>Jenkins_email_failed</title>
+      <link>http://blog.airzone.world/post/jenkins_email_failed/</link>
+      <pubDate>Thu, 24 Sep 2015 00:00:00 +0000</pubDate>
+      
+      <guid>http://blog.airzone.world/post/jenkins_email_failed/</guid>
+      <description>报错信息： Failed to send out e-mail com.sun.mail.smtp.SMTPSendFailedException: 501 mail from address must be same as authorization user; nested exception is: com.sun.mail.smtp.SMTPSenderFailedException: 501 mail from address must be same as authorization user 解决方法： 在设置 Jenkins URL 底下有一个文本框 System Admin e-mail address， 这里要设置发</description>
+    </item>
+    
+  </channel>
+</rss>

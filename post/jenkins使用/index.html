@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Jenkins的使用 - Air Little Place</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="Air" />
+  <meta name="description" content="前提: 使用 Git 作为公司的版本控制工具，使用 GitLab 作为对应的服务器 首先安装 Jenkins plugins, 下面列出两个关键的 Plugins GitLab Plugin Git plugin 打包 APK 对于 APK 的打包，相信大家公司内部都有不" />
+
+  <meta name="keywords" content="blog" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.49-DEV" />
+
+
+<link rel="canonical" href="http://blog.airzone.world/post/jenkins%E4%BD%BF%E7%94%A8/" />
+
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+
+<link href="/dist/even.min.css?v=3.2.0" rel="stylesheet">
+<link href="/lib/fancybox/jquery.fancybox-3.1.20.min.css" rel="stylesheet">
+
+
+
+
+<meta property="og:title" content="Jenkins的使用" />
+<meta property="og:description" content="前提: 使用 Git 作为公司的版本控制工具，使用 GitLab 作为对应的服务器 首先安装 Jenkins plugins, 下面列出两个关键的 Plugins GitLab Plugin Git plugin 打包 APK 对于 APK 的打包，相信大家公司内部都有不" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://blog.airzone.world/post/jenkins%E4%BD%BF%E7%94%A8/" /><meta property="article:published_time" content="2016-10-11T00:00:00&#43;00:00"/>
+<meta property="article:modified_time" content="2016-10-11T00:00:00&#43;00:00"/>
+<meta itemprop="name" content="Jenkins的使用">
+<meta itemprop="description" content="前提: 使用 Git 作为公司的版本控制工具，使用 GitLab 作为对应的服务器 首先安装 Jenkins plugins, 下面列出两个关键的 Plugins GitLab Plugin Git plugin 打包 APK 对于 APK 的打包，相信大家公司内部都有不">
+
+
+<meta itemprop="datePublished" content="2016-10-11T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2016-10-11T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="1441">
+
+
+
+<meta itemprop="keywords" content="Jenkins," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Jenkins的使用"/>
+<meta name="twitter:description" content="前提: 使用 Git 作为公司的版本控制工具，使用 GitLab 作为对应的服务器 首先安装 Jenkins plugins, 下面列出两个关键的 Plugins GitLab Plugin Git plugin 打包 APK 对于 APK 的打包，相信大家公司内部都有不"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">Air</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">Air</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">Jenkins的使用</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2016-10-11 </span>
+        
+        <span class="more-meta"> 约 1441 字 </span>
+        <span class="more-meta"> 预计阅读 3 分钟 </span>
+        
+      </div>
+    </header>
+
+    
+    
+<div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  
+  <div class="post-toc-content">
+    <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#打包-apk">打包 APK</a></li>
+<li><a href="#打包-aar">打包 AAR</a></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+  </div>
+</div>
+
+    
+    
+
+    
+    <div class="post-content">
+      
+
+<p><strong>前提: 使用 Git 作为公司的版本控制工具，使用 GitLab 作为对应的服务器</strong></p>
+
+<p>首先安装 Jenkins plugins, 下面列出两个关键的 Plugins</p>
+
+<p><a href="https://wiki.jenkins-ci.org/display/JENKINS/GitLab+Plugin">GitLab Plugin</a></p>
+
+<p><a href="https://wiki.jenkins-ci.org/display/JENKINS/Git+Plugin">Git plugin</a></p>
+
+<h3 id="打包-apk">打包 APK</h3>
+
+<p>对于 APK 的打包，相信大家公司内部都有不同的测试环境，不同的功能需要在不同的测试环境上测试，不同的功能又对应不同的分支，如果开发人员负责根据测试人员的需求打包的话，测试人员麻烦，开发人员也麻烦。程序员一个极好的特质就是懒，那么，这时候，Jenkins 提供的<code>This build is parameterized</code>功能就派上了用处。</p>
+
+<p><img src="/img/jenkins/build_params.png" alt="" /></p>
+
+<p>勾选了这个选项之后，就可以添加自己需要的参数了，比如:</p>
+
+<p><img src="/img/jenkins/url.png" alt="测试环境地址 " />
+<img src="/img/jenkins/git_branch.png" alt="git的分支名称" /></p>
+
+<p>记住这个地方填写的<code>name</code>， 这里的名称将会是 shell 里的变量，使用$来引用对应具体的变量，下面将会看到这些变量的使用。</p>
+
+<p>既然环境和分支都已经可选，第二步是配置 Jenkins 去哪个地址拉源代码，即 SCM 配置，如下图:
+<img src="/img/jenkins/scm_git.png" alt="" /></p>
+
+<p>可以看到，在<code>Branches to build</code>的地方，我填的内容是<code>*/$git_branch</code>，这个参数就是从前面<code>This build is parameterized</code>位置添加的参数，所以用户填了哪个分支，这里就能拿到用户填写的分支，在 Build 的时候也就会拉对应分支的代码。</p>
+
+<p>按照我们的意向拉了对应分支的代码，开头所说的另外一个问题，更改对应的环境，当然，可以使用<code>ProductFlavor</code>来解决这个问题，再最后打包的情况下选择对应的<code>ProductFlavor</code>，数量少了还好说，数量多了，就会变得很麻烦。因此，这里在<code>Build Environment</code>的地方，打勾
+<code>Executor shell script on remote host using ssh</code>，如下图
+<img src="/img/jenkins/change_env.png" alt="" /></p>
+
+<p>这里需要插件<a href="https://wiki.jenkins.io/display/JENKINS/SSH+plugin?focusedCommentId=43713480">SSH Plugin</a>的支持</p>
+
+<p>在<code>Pre build script</code>的地方，修改你工程中决定使用哪个环境的文件，这里就可以使用最开头的<code>$url_host</code>那个设定的参数。</p>
+
+<p>当然还有<code>Post build script</code>，需要的话就同样写一段 shell 来达到你的目的。</p>
+
+<p>有些情况下，你需要获取这次打包对应的 git 信息，可以看到，每个打包都有一个 Git Build Data，这里面有对应的 git 信息，所以，勾选<code>inject environment variables to the build process</code>即可将对应的信息添加到这次打包的环境变量中。
+这个需要<a href="https://wiki.jenkins-ci.org/display/JENKINS/EnvInject+Plugin">Environment Injector Plugin</a>插件的支持。
+这里有个问题，就是<code>Evaluated Groovy Script</code>脚本的执行过程中，使用正常方式无法获取所有的 Jenkins 环境变量，那么需要使用<code>currentBuild.getEnvironment(currentListener).get('var')</code>来获取 var 的环境变量。currentBuild 和 currentListener 在 Evaluated Groovy Script 右边的<code>?</code>说明里</p>
+
+<p><img src="/img/jenkins/build_env_inject.png" alt="" /></p>
+
+<p>最后，测试人员肯定希望能下载打包完成的 APK，那么在最后的<code>Post-build Actions</code>即可实现该需求。</p>
+
+<p><img src="/img/jenkins/post_build_action.png" alt="" /></p>
+
+<p>在<code>Archive the artifacts</code>里面填入打包完成的 apk 的路径，则 Jenkins 会以可以下载的形式输出该 Apk 的链接在对应的打包完成页面。</p>
+
+<h3 id="打包-aar">打包 AAR</h3>
+
+<p>打包 AAR 和打包 APK 的需求是不同的，对于 AAR 的输出，一定希望对开发透明，不需要任何人去点一下 build，才去打包 AAR，这个时候，我们前面安装的 GitLab Plugin 就十分有用。有了它，我们可以设定触发打包任务的条件:</p>
+
+<p><img src="/img/jenkins/build_trigger.png" alt="" /></p>
+
+<p>画红线的 URL 代表 GitLab WebHook 需要回调的 URL，即 GitLab 收到某些事件(push, merge request ..etc)，将会调用该 URL，此时将会触发打包。在最下面还有个红线，就是指定相应的分支，在这些分支另在 GitLab WebHook 回调的时候才进行打包，公司的特殊需求即可在这里定制。</p>
+
+<p>有可能你想流式的打包，也可能你的 aar 有优先级，换句话说，A aar 可能依赖 B aar，那么一定要 B aar 打包完毕后，才能打包 A aar，那样的话你就需要下面这个插件
+<a href="https://wiki.jenkins-ci.org/display/JENKINS/Parameterized+Trigger+Plugin">Jenkins Parameterized Trigger plugin</a>
+这个插件将前一个打包 aar 的 Build Env 传给后一个打包 aar 的过程中，那样，就拥有一致的 Build Env 了。</p>
+
+    </div>
+
+    
+    
+
+    
+    
+<div class="post-reward">
+  <input type="checkbox" name="reward" id="reward" hidden />
+  <label class="reward-button" for="reward">赞赏支持</label>
+  <div class="qr-code">
+    
+    
+    
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/img/reward/alipay-qr-code.png">
+        <span>支付宝打赏</span>
+      </label>
+  </div>
+</div>
+
+    <footer class="post-footer">
+      <div class="post-tags">
+          
+          <a href="/tags/jenkins/">Jenkins</a>
+          
+        </div>
+
+      
+      <nav class="post-nav">
+        
+          <a class="prev" href="/post/okhttp%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90-%E4%B8%8A/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">OkHttp源码解析-(上)</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
+        
+          <a class="next" href="/post/retrofit2.0%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%B8%8B/">
+            <span class="next-text nav-default">Retrofit2源码分析-(下)</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+  <div id="disqus_thread"></div>
+    <script type="text/javascript">
+    (function() {
+      
+      
+      if (window.location.hostname === 'localhost') return;
+
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      var disqus_shortname = 'yunair';
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:airzhaoyn@gmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://github.com/yunair" class="iconfont icon-github" title="github"></a>
+  <a href="http://blog.airzone.world/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    
+      2015 - 
+    2018
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">Air</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+<script src="/lib/highlight/highlight.pack.js?v=20171001"></script><script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox-3.1.20.min.js"></script>
+
+
+<script type="text/javascript" src="/dist/even.min.js?v=3.2.0"></script>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-103683322-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+
+
+
+
+</body>
+</html>

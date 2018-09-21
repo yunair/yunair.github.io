@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>AndroidPlugin源码解析-(八) - Air Little Place</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="Air" />
+  <meta name="description" content="这篇文章我们就来看看打包过程中最后一个方法createPackagingTask createPackagingTask public void createPackagingTask(@NonNull TaskFactory tasks, @NonNull VariantScope variantScope, boolean publishApk, @Nullable AndroidTask&amp;lt;InstantRunWrapperTask&amp;gt; fullBuildInfoGeneratorTask) { GlobalScope globalScope = variantScope.getGlobalScope(); ApkVariantData variantData = (ApkVariantData) variantScope.getVariantData(); boolean signedApk = variantData.isSigned(); // s" />
+
+  <meta name="keywords" content="blog" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.49-DEV" />
+
+
+<link rel="canonical" href="http://blog.airzone.world/post/androidplugin%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E5%85%AB/" />
+
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+
+<link href="/dist/even.min.css?v=3.2.0" rel="stylesheet">
+<link href="/lib/fancybox/jquery.fancybox-3.1.20.min.css" rel="stylesheet">
+
+
+
+
+<meta property="og:title" content="AndroidPlugin源码解析-(八)" />
+<meta property="og:description" content="这篇文章我们就来看看打包过程中最后一个方法createPackagingTask createPackagingTask public void createPackagingTask(@NonNull TaskFactory tasks, @NonNull VariantScope variantScope, boolean publishApk, @Nullable AndroidTask&lt;InstantRunWrapperTask&gt; fullBuildInfoGeneratorTask) { GlobalScope globalScope = variantScope.getGlobalScope(); ApkVariantData variantData = (ApkVariantData) variantScope.getVariantData(); boolean signedApk = variantData.isSigned(); // s" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://blog.airzone.world/post/androidplugin%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E5%85%AB/" /><meta property="article:published_time" content="2017-09-30T00:00:00&#43;00:00"/>
+<meta property="article:modified_time" content="2017-09-30T00:00:00&#43;00:00"/>
+<meta itemprop="name" content="AndroidPlugin源码解析-(八)">
+<meta itemprop="description" content="这篇文章我们就来看看打包过程中最后一个方法createPackagingTask createPackagingTask public void createPackagingTask(@NonNull TaskFactory tasks, @NonNull VariantScope variantScope, boolean publishApk, @Nullable AndroidTask&lt;InstantRunWrapperTask&gt; fullBuildInfoGeneratorTask) { GlobalScope globalScope = variantScope.getGlobalScope(); ApkVariantData variantData = (ApkVariantData) variantScope.getVariantData(); boolean signedApk = variantData.isSigned(); // s">
+
+
+<meta itemprop="datePublished" content="2017-09-30T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2017-09-30T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="3436">
+
+
+
+<meta itemprop="keywords" content="AndroidPlugin," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="AndroidPlugin源码解析-(八)"/>
+<meta name="twitter:description" content="这篇文章我们就来看看打包过程中最后一个方法createPackagingTask createPackagingTask public void createPackagingTask(@NonNull TaskFactory tasks, @NonNull VariantScope variantScope, boolean publishApk, @Nullable AndroidTask&lt;InstantRunWrapperTask&gt; fullBuildInfoGeneratorTask) { GlobalScope globalScope = variantScope.getGlobalScope(); ApkVariantData variantData = (ApkVariantData) variantScope.getVariantData(); boolean signedApk = variantData.isSigned(); // s"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">Air</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">Air</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">AndroidPlugin源码解析-(八)</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2017-09-30 </span>
+        
+        <span class="more-meta"> 约 3436 字 </span>
+        <span class="more-meta"> 预计阅读 7 分钟 </span>
+        
+      </div>
+    </header>
+
+    
+    
+<div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  
+  <div class="post-toc-content">
+    <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#createpackagingtask">createPackagingTask</a>
+<ul>
+<li><a href="#zfiles-apk">ZFiles apk</a>
+<ul>
+<li><a href="#manifestgenerationextension-register">ManifestGenerationExtension register</a></li>
+<li><a href="#signatureextension-register">SignatureExtension register</a></li>
+</ul></li>
+<li><a href="#incrementalpackager-updatefiles">IncrementalPackager updateFiles</a></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+  </div>
+</div>
+
+    
+    
+
+    
+    <div class="post-content">
+      
+
+<p>这篇文章我们就来看看打包过程中最后一个方法<code>createPackagingTask</code></p>
+
+<h3 id="createpackagingtask">createPackagingTask</h3>
+
+<pre><code class="language-java">public void createPackagingTask(@NonNull TaskFactory tasks,
+                                @NonNull VariantScope variantScope,
+                                boolean publishApk,
+                                @Nullable AndroidTask&lt;InstantRunWrapperTask&gt; fullBuildInfoGeneratorTask) {
+    GlobalScope globalScope = variantScope.getGlobalScope();
+    ApkVariantData variantData = (ApkVariantData) variantScope.getVariantData();
+
+    boolean signedApk = variantData.isSigned(); // signingConfig配置不为null，且正确配置
+    boolean multiOutput = variantData.getOutputs().size() &gt; 1; // 这里由于忽视split，所以暂时认为这个值为false
+
+    GradleVariantConfiguration variantConfiguration = variantScope.getVariantConfiguration();
+    /**
+     * PrePackaging step class that will look if the packaging of the main APK split is
+     * necessary when running in InstantRun mode. In InstantRun mode targeting an api 23 or
+     * above device, resources are packaged in the main split APK. However when a warm swap is
+     * possible, it is not necessary to produce immediately the new main SPLIT since the runtime
+     * use the resources.ap_ file directly. However, as soon as an incompatible change forcing a
+     * cold swap is triggered, the main APK must be rebuilt (even if the resources were changed
+     * in a previous build).
+     */
+    IncrementalMode incrementalMode = getIncrementalMode(variantConfiguration);
+
+    List&lt;ApkVariantOutputData&gt; outputDataList = variantData.getOutputs();
+
+    // loop on all outputs. The only difference will be the name of the task, and location
+    // of the generated data.
+    for (final ApkVariantOutputData variantOutputData : outputDataList) {
+        final VariantOutputScope variantOutputScope = variantOutputData.getScope();
+
+        final String outputName = variantOutputData.getFullName();
+        InstantRunPatchingPolicy patchingPolicy =
+                variantScope.getInstantRunBuildContext().getPatchingPolicy();
+
+        DefaultGradlePackagingScope packagingScope =
+                new DefaultGradlePackagingScope(variantOutputScope);
+
+        AndroidTask&lt;PackageApplication&gt; packageApp =
+                androidTasks.create(
+                        tasks,
+                        new PackageApplication.StandardConfigAction(
+                                packagingScope, patchingPolicy));
+
+        packageApp.configure(
+                tasks,
+                task -&gt; variantOutputData.packageAndroidArtifactTask = task);
+
+        TransformManager transformManager = variantScope.getTransformManager();
+
+        // Common code for both packaging tasks.
+        Consumer&lt;AndroidTask&lt;PackageApplication&gt;&gt; configureResourcesAndAssetsDependencies =
+                task -&gt; {
+                    task.dependsOn(tasks, variantScope.getMergeAssetsTask());
+                    task.dependsOn(tasks, variantOutputScope.getProcessResourcesTask());
+                    transformManager
+                            .getStreams(StreamFilter.RESOURCES)
+                            .forEach(stream -&gt; task.dependsOn(tasks, stream.getDependencies()));
+                };
+
+        configureResourcesAndAssetsDependencies.accept(packageApp);
+
+        CoreSigningConfig signingConfig = packagingScope.getSigningConfig();
+
+        //noinspection VariableNotUsedInsideIf - we use the whole packaging scope below.
+        if (signingConfig != null) {
+            ValidateSigningTask.ConfigAction configAction =
+                    new ValidateSigningTask.ConfigAction(packagingScope);
+
+            AndroidTask&lt;?&gt; validateSigningTask = androidTasks.get(configAction.getName());
+            if (validateSigningTask == null) {
+                validateSigningTask = androidTasks.create(tasks, configAction);
+            }
+
+            packageApp.dependsOn(tasks, validateSigningTask);
+        }
+
+
+        packageApp.optionalDependsOn(
+                tasks,
+                variantOutputScope.getShrinkResourcesTask(),
+                // TODO: When Jack is converted, add activeDexTask to VariantScope.
+                variantOutputScope.getVariantScope().getJavaCompilerTask(),
+                // TODO: Remove when Jack is converted to AndroidTask.
+                variantData.javaCompilerTask,
+                variantOutputData.packageSplitResourcesTask,
+                variantOutputData.packageSplitAbiTask);
+
+
+        for (TransformStream stream : transformManager.getStreams(StreamFilter.DEX)) {
+            // TODO Optimize to avoid creating too many actions
+            packageApp.dependsOn(tasks, stream.getDependencies());
+        }
+
+        for (TransformStream stream : transformManager.getStreams(StreamFilter.NATIVE_LIBS)) {
+            // TODO Optimize to avoid creating too many actions
+            packageApp.dependsOn(tasks, stream.getDependencies());
+        }
+
+        variantScope.setPackageApplicationTask(packageApp);
+
+        AndroidTask&lt;?&gt; appTask = packageApp;
+
+        if (signedApk) {
+            /*
+             * There may be a zip align task in the variant output scope, even if we don't
+             * need one for this because we're using new packaging.
+             */
+            if (variantData.getZipAlignEnabled()
+                    &amp;&amp; variantOutputScope.getSplitZipAlignTask() != null) {
+                appTask.dependsOn(tasks, variantOutputScope.getSplitZipAlignTask());
+            }
+        }
+
+        // single output
+        variantOutputScope.setAssembleTask(variantScope.getAssembleTask());
+        variantOutputData.assembleTask = variantData.assembleVariantTask;
+
+        variantOutputScope.getAssembleTask().dependsOn(tasks, appTask);
+
+        if (publishApk) {
+            final String projectBaseName = globalScope.getProjectBaseName();
+
+            // if this variant is the default publish config or we also should publish non
+            // defaults, proceed with declaring our artifacts.
+            if (getExtension().getDefaultPublishConfig().equals(outputName)) {
+                appTask.configure(tasks, packageTask -&gt; project.getArtifacts().add(&quot;default&quot;,
+                        new ApkPublishArtifact(
+                                projectBaseName,
+                                null,
+                                (FileSupplier) packageTask)));
+
+                for (FileSupplier outputFileProvider :
+                        variantOutputData.getSplitOutputFileSuppliers()) {
+                    project.getArtifacts().add(&quot;default&quot;,
+                            new ApkPublishArtifact(projectBaseName, null, outputFileProvider));
+                }
+
+                try {
+                    if (variantOutputData.getMetadataFile() != null) {
+                        project.getArtifacts().add(
+                                &quot;default&quot; + VariantDependencies.CONFIGURATION_METADATA,
+                                new MetadataPublishArtifact(projectBaseName, null,
+                                        variantOutputData.getMetadataFile()));
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+
+                if (variantData.getMappingFileProvider() != null) {
+                    project.getArtifacts().add(
+                            &quot;default&quot; + VariantDependencies.CONFIGURATION_MAPPING,
+                            new MappingPublishArtifact(projectBaseName, null,
+                                    variantData.getMappingFileProvider()));
+                }
+            }
+
+            if (getExtension().getPublishNonDefault()) {
+                appTask.configure(tasks, packageTask -&gt; project.getArtifacts().add(
+                        variantData.getVariantDependency().getPublishConfiguration().getName(),
+                        new ApkPublishArtifact(
+                                projectBaseName,
+                                null,
+                                (FileSupplier) packageTask)));
+
+                for (FileSupplier outputFileProvider :
+                        variantOutputData.getSplitOutputFileSuppliers()) {
+                    project.getArtifacts().add(
+                            variantData.getVariantDependency().getPublishConfiguration().getName(),
+                            new ApkPublishArtifact(
+                                    projectBaseName,
+                                    null,
+                                    outputFileProvider));
+                }
+
+                try {
+                    if (variantOutputData.getMetadataFile() != null) {
+                        project.getArtifacts().add(
+                                variantData.getVariantDependency().getMetadataConfiguration().getName(),
+                                new MetadataPublishArtifact(
+                                        projectBaseName,
+                                        null,
+                                        variantOutputData.getMetadataFile()));
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+
+                if (variantData.getMappingFileProvider() != null) {
+                    project.getArtifacts().add(
+                            variantData.getVariantDependency().getMappingConfiguration().getName(),
+                            new MappingPublishArtifact(
+                                    projectBaseName,
+                                    null,
+                                    variantData.getMappingFileProvider()));
+                }
+
+                if (variantData.classesJarTask != null) {
+                    project.getArtifacts().add(
+                            variantData.getVariantDependency().getClassesConfiguration().getName(),
+                            variantData.classesJarTask);
+                }
+            }
+        }
+    }
+
+
+    // create install task for the variant Data. This will deal with finding the
+    // right output if there are more than one.
+    // Add a task to install the application package
+    if (signedApk) {
+        AndroidTask&lt;InstallVariantTask&gt; installTask = androidTasks.create(
+                tasks, new InstallVariantTask.ConfigAction(variantScope));
+        installTask.dependsOn(tasks, variantScope.getAssembleTask());
+    }
+
+    if (getExtension().getLintOptions().isCheckReleaseBuilds()
+            &amp;&amp; (incrementalMode == IncrementalMode.NONE)) {
+        createLintVitalTask(tasks, variantData);
+    }
+
+    // add an uninstall task
+    final AndroidTask&lt;UninstallTask&gt; uninstallTask = androidTasks.create(
+            tasks, new UninstallTask.ConfigAction(variantScope));
+
+    tasks.named(UNINSTALL_ALL, uninstallAll -&gt; uninstallAll.dependsOn(uninstallTask.getName()));
+}
+</code></pre>
+
+<p>这个方法很长，我们挑重点来看。</p>
+
+<p>先看<code>AndroidTask&lt;PackageApplication&gt;</code>这个 Task，这个 Task 具体做哪些事情呢？</p>
+
+<pre><code class="language-java">@Override
+protected void doFullTaskAction() throws IOException {
+    /*
+     * Clear the cache to make sure we have do not do an incremental build.
+     */
+    cacheByPath.clear();
+
+    /*
+     * Also clear the intermediate build directory. We don't know if anything is in there and
+     * since this is a full build, we don't want to get any interference from previous state.
+     */
+    // build/intermediates/incremental/
+    FileUtils.deleteDirectoryContents(getIncrementalFolder());
+
+    Set&lt;File&gt; androidResources = new HashSet&lt;&gt;();
+    // build/intermediates/res/resources-${buildType}.ap_
+    // 开启shrinkResources build/intermediates/res/resources-${buildType}-stripped.ap_
+    File androidResourceFile = getResourceFile();
+    if (androidResourceFile != null) {
+        androidResources.add(androidResourceFile);
+    }
+
+    /*
+     * Additionally, make sure we have no previous package, if it exists.
+     */
+    // build/outpus/apk/
+    getOutputFile().delete();
+
+    ImmutableMap&lt;RelativeFile, FileStatus&gt; updatedDex =
+            IncrementalRelativeFileSets.fromZipsAndDirectories(getDexFolders());
+    ImmutableMap&lt;RelativeFile, FileStatus&gt; updatedJavaResources =
+                IncrementalRelativeFileSets.fromZipsAndDirectories(getJavaResourceFiles());
+    ImmutableMap&lt;RelativeFile, FileStatus&gt; updatedAssets =
+                IncrementalRelativeFileSets.fromZipsAndDirectories(
+                        Collections.singleton(getAssets()));
+    ImmutableMap&lt;RelativeFile, FileStatus&gt; updatedAndroidResources =
+            IncrementalRelativeFileSets.fromZipsAndDirectories(androidResources);
+    ImmutableMap&lt;RelativeFile, FileStatus&gt; updatedJniResources=
+            IncrementalRelativeFileSets.fromZipsAndDirectories(getJniFolders());
+
+    doTask(
+            updatedDex,
+            updatedJavaResources,
+            updatedAssets,
+            updatedAndroidResources,
+            updatedJniResources);
+
+
+}
+</code></pre>
+
+<p>这段代码里关键代码执行路径都写在了注释里，发现这段代码调用了<code>doTask</code>方法，我们看看这个方法做了什么:</p>
+
+<pre><code class="language-java">private void doTask(
+        @NonNull ImmutableMap&lt;RelativeFile, FileStatus&gt; changedDex,
+        @NonNull ImmutableMap&lt;RelativeFile, FileStatus&gt; changedJavaResources,
+        @NonNull ImmutableMap&lt;RelativeFile, FileStatus&gt; changedAssets,
+        @NonNull ImmutableMap&lt;RelativeFile, FileStatus&gt; changedAndroidResources,
+        @NonNull ImmutableMap&lt;RelativeFile, FileStatus&gt; changedNLibs)
+        throws IOException {
+    PrivateKey key;
+    X509Certificate certificate;
+    boolean v1SigningEnabled;
+    boolean v2SigningEnabled;
+
+    try {
+        if (signingConfig != null &amp;&amp; signingConfig.isSigningReady()) {
+            CertificateInfo certificateInfo =
+                    KeystoreHelper.getCertificateInfo(
+                            signingConfig.getStoreType(),
+                            checkNotNull(signingConfig.getStoreFile()),
+                            checkNotNull(signingConfig.getStorePassword()),
+                            checkNotNull(signingConfig.getKeyPassword()),
+                            checkNotNull(signingConfig.getKeyAlias()));
+            key = certificateInfo.getKey();
+            certificate = certificateInfo.getCertificate();
+            v1SigningEnabled = signingConfig.isV1SigningEnabled();
+            v2SigningEnabled = signingConfig.isV2SigningEnabled();
+        } else {
+            key = null;
+            certificate = null;
+            v1SigningEnabled = false;
+            v2SigningEnabled = false;
+        }
+
+        ApkCreatorFactory.CreationData creationData =
+                new ApkCreatorFactory.CreationData(
+                        getOutputFile(),
+                        key,
+                        certificate,
+                        v1SigningEnabled,
+                        v2SigningEnabled,
+                        null, // BuiltBy
+                        getBuilder().getCreatedBy(),
+                        getMinSdkVersion(),
+                        PackagingUtils.getNativeLibrariesLibrariesPackagingMode(manifest),
+                        getNoCompressPredicate()::apply);
+
+        try (IncrementalPackager packager = createPackager(creationData)) {
+            packager.updateDex(changedDex);
+            packager.updateJavaResources(changedJavaResources);
+            packager.updateAssets(changedAssets);
+            packager.updateAndroidResources(changedAndroidResources);
+            packager.updateNativeLibraries(changedNLibs);
+        }
+    } catch (PackagerException | KeytoolException e) {
+        throw new RuntimeException(e);
+    }
+
+    /*
+     * Save all used zips in the cache.
+     */
+    // cache相关代码，忽视掉
+}
+</code></pre>
+
+<p>看到这些参数<code>v1SigningEnabled, v2SigningEnabled</code>不知道你会联想到什么，没错，就是和 apk 签名相关。</p>
+
+<p>这里的核心就是这段代码:</p>
+
+<pre><code class="language-java">IncrementalPackager packager = createPackager(creationData))
+packager.updateDex(changedDex);
+packager.updateJavaResources(changedJavaResources);
+packager.updateAssets(changedAssets);
+packager.updateAndroidResources(changedAndroidResources);
+packager.updateNativeLibraries(changedNLibs);
+</code></pre>
+
+<p>创建<code>Packager</code>对象这里就不看了，在下面的方法中用到这里面的参数的时候再来讲讲对应参数的含义。
+也就是看一下接下来的 5 个方法:</p>
+
+<pre><code class="language-java">packager.updateDex(changedDex);
+packager.updateJavaResources(changedJavaResources);
+packager.updateAssets(changedAssets);
+packager.updateAndroidResources(changedAndroidResources);
+</code></pre>
+
+<p>后面这 5 个方法最终全部是调用<code>updateFiles</code>方法，这个方法的主要执行的都是<code>mApkCreator</code>对象的方法，所以先讲一下<code>ApkCreator</code>这个对象，讲完之后再来看一看这个方法:</p>
+
+<p>对于 ApkZFileCreator 的构造函数来说，主要是构造了一个<code>ZFile</code>文件，我们直接看那个方法:</p>
+
+<h4 id="zfiles-apk">ZFiles apk</h4>
+
+<pre><code class="language-java">public static ZFile apk(
+        @NonNull File f,
+        @NonNull ZFileOptions options,
+        @Nullable PrivateKey key,
+        @Nullable X509Certificate certificate,
+        boolean v1SigningEnabled,
+        boolean v2SigningEnabled,
+        @Nullable String builtBy,
+        @Nullable String createdBy,
+        int minSdkVersion)
+        throws IOException {
+    ZFile zfile = apk(f, options);
+    // 根据我们的代码分析过程，这里是null
+    if (builtBy == null) {
+        builtBy = DEFAULT_BUILD_BY;
+    }
+
+    if (createdBy == null) {
+        createdBy = DEFAULT_CREATED_BY;
+    }
+
+    ManifestGenerationExtension manifestExt = new ManifestGenerationExtension(builtBy,
+            createdBy);
+    manifestExt.register(zfile);
+
+    if (key != null &amp;&amp; certificate != null) {
+        if (v1SigningEnabled) {
+                String apkSignedHeaderValue =
+                        (v2SigningEnabled)
+                                ? SignatureExtension
+                                        .SIGNATURE_ANDROID_APK_SIGNER_VALUE_WHEN_V2_SIGNED
+                                : null;
+                SignatureExtension jarSignatureSchemeExt = new SignatureExtension(manifestExt,
+                        minSdkVersion, certificate, key,
+                        apkSignedHeaderValue);
+                jarSignatureSchemeExt.register();
+            }
+            if (v2SigningEnabled) {
+                FullApkSignExtension apkSignatureSchemeV2Ext =
+                        new FullApkSignExtension(
+                                zfile,
+                                minSdkVersion,
+                                certificate,
+                                key);
+                apkSignatureSchemeV2Ext.register();
+            }
+            if (!v1SigningEnabled) {
+                // Remove v1 signature files from the APK
+                for (StoredEntry entry : zfile.entries()) {
+                    if (SignatureExtension.isIgnoredFile(
+                            entry.getCentralDirectoryHeader().getName())) {
+                        entry.delete();
+                    }
+                }
+            }
+    }
+
+    return zfile;
+}
+</code></pre>
+
+<p>首先，这个方法通过<code>apk(f, options)</code>生成了<code>ZFile</code>文件，这个方法设置了<code>ZFile</code>的对齐规则，然后，调用<code>ZFile</code>的构造函数生成<code>ZFile</code>，也就是空的最终生成的<code>Apk</code>文件，生成之后，我们继续往下看，可以看到，这里有几个<code>Extension</code>, 分别为<code>ManifestGenerationExtension</code>, <code>SignatureExtension</code>, <code>FullApkSignExtension</code>, 我们来看看这三个类的作用是什么:</p>
+
+<h5 id="manifestgenerationextension-register">ManifestGenerationExtension register</h5>
+
+<pre><code class="language-java">public void register(@NonNull ZFile zFile) throws IOException {
+    Preconditions.checkState(mExtension == null, &quot;register() has already been invoked.&quot;);
+    mZFile = zFile;
+
+    rebuildManifest();
+
+    mExtension = new ZFileExtension() {
+        @Nullable
+        @Override
+        public IOExceptionRunnable beforeUpdate() {
+            return ManifestGenerationExtension.this::updateManifest;
+        }
+    };
+
+    mZFile.addZFileExtension(mExtension);
+}
+</code></pre>
+
+<p>这个方法的核心在<code>mZFile.addZFileExtension(mExtension);</code>，这个<code>ZFileExtension</code>的作用是在<code>ZFile</code>对应状态的时候通知该<code>Extensions</code>执行操作。
+在最终的 Apk 中，反编译一下，<code>META-INF/MANIFEST.MF</code>这个文件就是这里生成的。</p>
+
+<h5 id="signatureextension-register">SignatureExtension register</h5>
+
+<pre><code class="language-java">public void register() throws IOException {
+    Preconditions.checkState(mExtension == null, &quot;register() already invoked&quot;);
+
+    mExtension = new ZFileExtension() {
+        @Nullable
+        @Override
+        public IOExceptionRunnable beforeUpdate() {
+            return SignatureExtension.this::updateSignatureIfNeeded;
+        }
+
+        @Nullable
+        @Override
+        public IOExceptionRunnable added(@NonNull final StoredEntry entry,
+                @Nullable final StoredEntry replaced) {
+            if (replaced != null) {
+                Preconditions.checkArgument(entry.getCentralDirectoryHeader().getName().equals(
+                        replaced.getCentralDirectoryHeader().getName()));
+            }
+
+            if (isIgnoredFile(entry.getCentralDirectoryHeader().getName())) {
+                return null;
+            }
+
+            return () -&gt; {
+                if (replaced != null) {
+                    SignatureExtension.this.removed(replaced);
+                }
+
+                SignatureExtension.this.added(entry);
+            };
+        }
+
+        @Nullable
+        @Override
+        public IOExceptionRunnable removed(@NonNull final StoredEntry entry) {
+            if (isIgnoredFile(entry.getCentralDirectoryHeader().getName())) {
+                return null;
+            }
+
+            return () -&gt; SignatureExtension.this.removed(entry);
+        }
+    };
+
+    mManifestExtension.zFile().addZFileExtension(mExtension);
+    readSignatureFile();
+}
+</code></pre>
+
+<p>这里也是一样，注册了一个<code>ZFileExtension</code>，作用就是在后面写入文件的时候进行签名，这个签名文件的位置是<code>META-INF/CERT.SF</code>
+这里是 V1 签名的实现，如果允许 V2 签名，则在该文件的前几行的存在<code>X-Android-APK-Signed: 2</code>这个声明，否则的话说明没开启 V2 签名。
+V2 签名的<code>register</code>实现我们就不看了，和这个类似，如果想研究 V2 签名的细节，这里很重要，但是你要了解 Zip 文件格式再来看会很有帮助。</p>
+
+<p>好了，这些讲完之后我们就可以看<code>updateFiles</code>方法了，记得每次<code>ZFile</code>文件改变状态的时候，都会回调上面的这些<code>Extension</code>。</p>
+
+<h4 id="incrementalpackager-updatefiles">IncrementalPackager updateFiles</h4>
+
+<pre><code class="language-java">private void updateFiles(@NonNull Set&lt;PackagedFileUpdate&gt; updates) throws IOException {
+    Preconditions.checkNotNull(mApkCreator, &quot;mApkCreator == null&quot;);
+
+    // 这个的意思是拿到状态为`FileStatus.REMOVED`的文件，接下来拿到文件名
+    Iterable&lt;String&gt; deletedPaths =
+            Iterables.transform(
+                    Iterables.filter(
+                            updates,
+                            Predicates.compose(
+                                    Predicates.equalTo(FileStatus.REMOVED),
+                                    PackagedFileUpdate.EXTRACT_STATUS)),
+                    PackagedFileUpdate.EXTRACT_NAME);
+
+    for (String deletedPath : deletedPaths) {
+        mApkCreator.deleteFile(deletedPath);
+    }
+    // 状态为FileStatus.NEW或者FileStatus.CHANGED的PackagedFileUpdate断言
+    Predicate&lt;PackagedFileUpdate&gt; isNewOrChanged =
+            Predicates.compose(
+                    Predicates.or(
+                            Predicates.equalTo(FileStatus.NEW),
+                            Predicates.equalTo(FileStatus.CHANGED)),
+                    PackagedFileUpdate.EXTRACT_STATUS);
+    // Source为Base的文件，source的类型为`build/intermediates/incremental/package${buildType}/dex-renamer-state.txt`
+    Function&lt;PackagedFileUpdate, File&gt; extractBaseFile =
+            Functions.compose(
+                    RelativeFile.EXTRACT_BASE,
+                    PackagedFileUpdate.EXTRACT_SOURCE);
+
+    Iterable&lt;PackagedFileUpdate&gt; newOrChangedNonArchiveFiles =
+            Iterables.filter(
+                    updates,
+                    Predicates.and(
+                            isNewOrChanged,
+                            Predicates.compose(
+                                    Files.isDirectory(),
+                                    extractBaseFile)));
+
+    for (PackagedFileUpdate rf : newOrChangedNonArchiveFiles) {
+        mApkCreator.writeFile(rf.getSource().getFile(), rf.getName());
+    }
+
+    Iterable&lt;PackagedFileUpdate&gt; newOrChangedArchiveFiles =
+            Iterables.filter(
+                    updates,
+                    Predicates.and(
+                            isNewOrChanged,
+                            Predicates.compose(
+                                    Files.isFile(),
+                                    extractBaseFile)));
+
+    Iterable&lt;File&gt; archives = Iterables.transform(newOrChangedArchiveFiles, extractBaseFile);
+    Set&lt;String&gt; names = Sets.newHashSet(
+            Iterables.transform(
+                    newOrChangedArchiveFiles,
+                    PackagedFileUpdate.EXTRACT_NAME));
+
+    /*
+     * Build the name map. The name of the file in the filesystem (or zip file) may not
+     * match the name we want to package it as. See PackagedFileUpdate for more information.
+     */
+    Map&lt;String, String&gt; pathNameMap = Maps.newHashMap();
+    for (PackagedFileUpdate archiveUpdate : newOrChangedArchiveFiles) {
+        pathNameMap.put(archiveUpdate.getSource().getOsIndependentRelativePath(),
+                archiveUpdate.getName());
+    }
+
+    for (File arch : Sets.newHashSet(archives)) {
+        mApkCreator.writeZip(arch, pathNameMap::get, name -&gt; !names.contains(name));
+    }
+}
+</code></pre>
+
+<p>首先通过各种条件过滤出符合条件的文件列表，然后通过<code>mApkCreator.writeFile</code> <code>mApkCreator.writeZip</code>这两个方法将文件写入 apk 中。</p>
+
+<p>这里就不详细讲了，因为这些方法最终还是调用<code>ZFile</code>对象的方法，想了解这些方法的具体实现，请先了解 Zip 文件格式，或者等我之后的文章。</p>
+
+<p>这样，就把所有的<code>Dex</code>, <code>JavaResources</code>, <code>Assets</code>, <code>AndroidResources</code>, <code>JniResources</code>，写入 Apk 文件中，并进行了签名。
+</br></p>
+
+<p>回到<code>createPackagingTask</code>方法继续往下看，可以看到有<code>ValidateSigningTask</code>这个 Task。</p>
+
+<p>这个 Task 我们就不详细解释了，因为代码很容易理解，就是检测<code>keystore</code>文件是否存在，不存在的话检测默认的<code>debug.keystore</code>。</p>
+
+<p>因为<code>packageApp.dependsOn(tasks, validateSigningTask);</code>这个方法，我们知道，先验证签名后打包 Apk。
+</br></p>
+
+<p>好了，继续往下看，可以看到一个<code>ZipAlign</code>的 Task，这个 Task 的任务就是执行<code>zipalign</code>，也就是将文件进行 4 位对齐。</p>
+
+<p>这个 Task 构造了<code>zipalign</code>的命令行参数，执行的命令为<code>${zipalignPath}/zipalign -f -p 4 ${inputFile} ${outputFile}</code>
+</br></p>
+
+<p>下面就是<code>if (publishApk)</code>这个 if 条件了，里面的内容就是增加最终输出的文件的个数，每个<code>Artifact</code>代表一个最终的文件。
+我们这个系列的文章主要是 apk 的流程，所以这里就不详细分析了。
+</br></p>
+
+<p>前面完成了打包 Task，后面就可以安装到手机里了，安装到手机由<code>InstallVariantTask</code>这个任务完成。</p>
+
+<p>这个任务使用<code>adb</code>，将文件传入手机中，并使用<code>pm</code>命令安装 apk。原先我还以为直接使用<code>adb install -r ${apkFile}</code>来实现的，原来不是我理解的啊。</p>
+
+<p>最后，添加<code>Lint</code>任务，加入卸载 Apk 的任务，这样，整个 Apk 打包流程就结束了。</p>
+
+    </div>
+
+    
+    
+
+    
+    
+<div class="post-reward">
+  <input type="checkbox" name="reward" id="reward" hidden />
+  <label class="reward-button" for="reward">赞赏支持</label>
+  <div class="qr-code">
+    
+    
+    
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/img/reward/alipay-qr-code.png">
+        <span>支付宝打赏</span>
+      </label>
+  </div>
+</div>
+
+    <footer class="post-footer">
+      <div class="post-tags">
+          
+          <a href="/tags/androidplugin/">AndroidPlugin</a>
+          
+        </div>
+
+      
+      <nav class="post-nav">
+        
+          <a class="prev" href="/post/androidplugin%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%B9%9D/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">AndroidPlugin源码解析-(九)</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
+        
+          <a class="next" href="/post/androidplugin%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%B8%83/">
+            <span class="next-text nav-default">AndroidPlugin源码解析-(七)</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+  <div id="disqus_thread"></div>
+    <script type="text/javascript">
+    (function() {
+      
+      
+      if (window.location.hostname === 'localhost') return;
+
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      var disqus_shortname = 'yunair';
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:airzhaoyn@gmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://github.com/yunair" class="iconfont icon-github" title="github"></a>
+  <a href="http://blog.airzone.world/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    
+      2015 - 
+    2018
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">Air</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+<script src="/lib/highlight/highlight.pack.js?v=20171001"></script><script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox-3.1.20.min.js"></script>
+
+
+<script type="text/javascript" src="/dist/even.min.js?v=3.2.0"></script>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-103683322-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+
+
+
+
+</body>
+</html>

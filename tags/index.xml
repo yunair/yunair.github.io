@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Tags on Air Little Place</title>
+    <link>http://blog.airzone.world/tags/</link>
+    <description>Recent content in Tags on Air Little Place</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Fri, 23 Oct 2015 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="http://blog.airzone.world/tags/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>AndFix</title>
+      <link>http://blog.airzone.world/tags/andfix/</link>
+      <pubDate>Fri, 23 Oct 2015 00:00:00 +0000</pubDate>
+      
+      <guid>http://blog.airzone.world/tags/andfix/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>AndroidPlugin</title>
+      <link>http://blog.airzone.world/tags/androidplugin/</link>
+      <pubDate>Sun, 08 Oct 2017 00:00:00 +0000</pubDate>
+      
+      <guid>http://blog.airzone.world/tags/androidplugin/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Jenkins</title>
+      <link>http://blog.airzone.world/tags/jenkins/</link>
+      <pubDate>Tue, 11 Oct 2016 00:00:00 +0000</pubDate>
+      
+      <guid>http://blog.airzone.world/tags/jenkins/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>activity</title>
+      <link>http://blog.airzone.world/tags/activity/</link>
+      <pubDate>Sun, 21 Jan 2018 00:00:00 +0000</pubDate>
+      
+      <guid>http://blog.airzone.world/tags/activity/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>android</title>
+      <link>http://blog.airzone.world/tags/android/</link>
+      <pubDate>Sat, 24 Feb 2018 00:00:00 +0000</pubDate>
+      
+      <guid>http://blog.airzone.world/tags/android/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>app</title>
+      <link>http://blog.airzone.world/tags/app/</link>
+      <pubDate>Sat, 24 Feb 2018 00:00:00 +0000</pubDate>
+      
+      <guid>http://blog.airzone.world/tags/app/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>okhttp</title>
+      <link>http://blog.airzone.world/tags/okhttp/</link>
+      <pubDate>Sat, 10 Dec 2016 00:00:00 +0000</pubDate>
+      
+      <guid>http://blog.airzone.world/tags/okhttp/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>retrofit</title>
+      <link>http://blog.airzone.world/tags/retrofit/</link>
+      <pubDate>Sun, 22 May 2016 00:00:00 +0000</pubDate>
+      
+      <guid>http://blog.airzone.world/tags/retrofit/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>square</title>
+      <link>http://blog.airzone.world/tags/square/</link>
+      <pubDate>Sat, 10 Dec 2016 00:00:00 +0000</pubDate>
+      
+      <guid>http://blog.airzone.world/tags/square/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>翻译</title>
+      <link>http://blog.airzone.world/tags/%E7%BF%BB%E8%AF%91/</link>
+      <pubDate>Tue, 12 Jan 2016 00:00:00 +0000</pubDate>
+      
+      <guid>http://blog.airzone.world/tags/%E7%BF%BB%E8%AF%91/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>

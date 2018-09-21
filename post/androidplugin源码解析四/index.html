@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>AndroidPlugin源码解析-(四) - Air Little Place</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="Air" />
+  <meta name="description" content="接下来几篇就来解析上篇提到的代码。 一个一个 Task 来看 createAnchorTasks 这个方法创建的 Tasks 就如名字所示，是 Anchor Tasks（即所谓的锚点任务）。在这里不做仔细的解析。 具" />
+
+  <meta name="keywords" content="blog" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.49-DEV" />
+
+
+<link rel="canonical" href="http://blog.airzone.world/post/androidplugin%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E5%9B%9B/" />
+
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+
+<link href="/dist/even.min.css?v=3.2.0" rel="stylesheet">
+<link href="/lib/fancybox/jquery.fancybox-3.1.20.min.css" rel="stylesheet">
+
+
+
+
+<meta property="og:title" content="AndroidPlugin源码解析-(四)" />
+<meta property="og:description" content="接下来几篇就来解析上篇提到的代码。 一个一个 Task 来看 createAnchorTasks 这个方法创建的 Tasks 就如名字所示，是 Anchor Tasks（即所谓的锚点任务）。在这里不做仔细的解析。 具" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://blog.airzone.world/post/androidplugin%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E5%9B%9B/" /><meta property="article:published_time" content="2017-06-30T00:00:00&#43;00:00"/>
+<meta property="article:modified_time" content="2017-06-30T00:00:00&#43;00:00"/>
+<meta itemprop="name" content="AndroidPlugin源码解析-(四)">
+<meta itemprop="description" content="接下来几篇就来解析上篇提到的代码。 一个一个 Task 来看 createAnchorTasks 这个方法创建的 Tasks 就如名字所示，是 Anchor Tasks（即所谓的锚点任务）。在这里不做仔细的解析。 具">
+
+
+<meta itemprop="datePublished" content="2017-06-30T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2017-06-30T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="2782">
+
+
+
+<meta itemprop="keywords" content="AndroidPlugin," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="AndroidPlugin源码解析-(四)"/>
+<meta name="twitter:description" content="接下来几篇就来解析上篇提到的代码。 一个一个 Task 来看 createAnchorTasks 这个方法创建的 Tasks 就如名字所示，是 Anchor Tasks（即所谓的锚点任务）。在这里不做仔细的解析。 具"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">Air</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">Air</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">AndroidPlugin源码解析-(四)</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2017-06-30 </span>
+        
+        <span class="more-meta"> 约 2782 字 </span>
+        <span class="more-meta"> 预计阅读 6 分钟 </span>
+        
+      </div>
+    </header>
+
+    
+    
+<div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  
+  <div class="post-toc-content">
+    <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#createanchortasks">createAnchorTasks</a></li>
+<li><a href="#createcheckmanifesttask">createCheckManifestTask</a></li>
+<li><a href="#createdependencystreams">createDependencyStreams</a></li>
+<li><a href="#createmergeappmanifeststask">createMergeAppManifestsTask</a>
+<ul>
+<li><a href="#androidbuilder-mergemanifestsforapplication">AndroidBuilder mergeManifestsForApplication</a>
+<ul>
+<li><a href="#manifestmerger2-invoker-merge">ManifestMerger2.Invoker merge()</a></li>
+<li><a href="#manifestmerger2-merge">ManifestMerger2 merge()</a></li>
+<li><a href="#xmldocument-merge">XmlDocument merge</a></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+  </div>
+</div>
+
+    
+    
+
+    
+    <div class="post-content">
+      
+
+<p>接下来几篇就来解析上篇提到的代码。</p>
+
+<p>一个一个 Task 来看</p>
+
+<h3 id="createanchortasks">createAnchorTasks</h3>
+
+<p>这个方法创建的 Tasks 就如名字所示，是 Anchor Tasks（即所谓的锚点任务）。在这里不做仔细的解析。</p>
+
+<p>具体就是创建一些 preXXXBuild 任务，generateXXXResources/Assets/Sources 任务以及 compileXXXSources 任务。</p>
+
+<h3 id="createcheckmanifesttask">createCheckManifestTask</h3>
+
+<p>主要作用就是检测 Manifest 是否存在在指定路径。在这里也不做仔细的解析。</p>
+
+<h3 id="createdependencystreams">createDependencyStreams</h3>
+
+<p>主要作用是将所有依赖的 Jar 包合成，通过<code>TransformManager</code>来完成此任务。</p>
+
+<p>这里提一句，<code>TransformManager</code>是新加入的 Api，让我们可以开发 Gradle 插件来 Hook Android 自身的打包过程。</p>
+
+<p>Tinker 之类的库都是通过这个 Api 来 Hook 打包过程，插入自己的代码逻辑的。</p>
+
+<h3 id="createmergeappmanifeststask">createMergeAppManifestsTask</h3>
+
+<p>精简代码如下：</p>
+
+<pre><code class="language-java">public void createMergeAppManifestsTask(
+        @NonNull TaskFactory tasks,
+        @NonNull VariantScope variantScope) {
+    ApplicationVariantData appVariantData =
+            (ApplicationVariantData) variantScope.getVariantData();
+    Set&lt;String&gt; screenSizes = appVariantData.getCompatibleScreens();
+    // loop on all outputs. The only difference will be the name of the task, and location
+    // of the generated manifest
+    for (final BaseVariantOutputData vod : appVariantData.getOutputs()) {
+        VariantOutputScope scope = vod.getScope();
+         List&lt;ManifestMerger2.Invoker.Feature&gt; optionalFeatures = getIncrementalMode(
+                    variantScope.getVariantConfiguration()) != IncrementalMode.NONE
+                    ? ImmutableList.of(ManifestMerger2.Invoker.Feature.INSTANT_RUN_REPLACEMENT)
+                    : ImmutableList.of();
+        AndroidTask&lt;? extends ManifestProcessorTask&gt; processManifestTask =
+                androidTasks.create(tasks, getMergeManifestConfig(scope, optionalFeatures));
+        scope.setManifestProcessorTask(processManifestTask);
+        // 将Manifest放入对应的output文件夹内
+        // library放入build/intermediates/bundles
+        // app放入build/intermediates/manifests
+        addManifestArtifact(tasks, scope.getVariantScope().getVariantData());
+    }
+}
+</code></pre>
+
+<p>这里执行的主要代码是两种 Task，就是<code>ManifestProcessorTask</code>的子类，这个我们来仔细跟进。</p>
+
+<p>两个子类分别是<code>MergeManifests</code>和<code>ProcessManifest</code>，后者是针对 Library 打包的时候调用的，</p>
+
+<p>而且这两个子类在我们打包过程中，执行的代码都是<code>AndroidBuilder</code>里面的<code>mergeManifestsForApplication</code>方法，只不过参数不一样。</p>
+
+<p>所以直接解析<code>mergeManifestsForApplication</code> 方法了</p>
+
+<h4 id="androidbuilder-mergemanifestsforapplication">AndroidBuilder mergeManifestsForApplication</h4>
+
+<pre><code class="language-java">public void mergeManifestsForApplication(
+        @NonNull File mainManifest,
+        @NonNull List&lt;File&gt; manifestOverlays,
+        @NonNull List&lt;? extends AndroidLibrary&gt; libraries,
+        String packageOverride,
+        int versionCode,
+        String versionName,
+        @Nullable String minSdkVersion,
+        @Nullable String targetSdkVersion,
+        @Nullable Integer maxSdkVersion,
+        @NonNull String outManifestLocation,
+        @Nullable String outAaptSafeManifestLocation,
+        @Nullable String outInstantRunManifestLocation,
+        ManifestMerger2.MergeType mergeType,
+        Map&lt;String, Object&gt; placeHolders,
+        @NonNull List&lt;Invoker.Feature&gt; optionalFeatures,
+        @Nullable File reportFile) {
+    Invoker manifestMergerInvoker =
+            ManifestMerger2.newMerger(mainManifest, mLogger, mergeType)
+            .setPlaceHolderValues(placeHolders)
+            .addFlavorAndBuildTypeManifests(
+                    manifestOverlays.toArray(new File[manifestOverlays.size()]))
+            .addBundleManifests(libraries)
+            .withFeatures(optionalFeatures.toArray(
+                    new Invoker.Feature[optionalFeatures.size()]))
+            .setMergeReportFile(reportFile);
+    if (mergeType == ManifestMerger2.MergeType.APPLICATION) {
+        // 如果是Application，则加入移除tools声明的Features
+        manifestMergerInvoker.withFeatures(Invoker.Feature.REMOVE_TOOLS_DECLARATIONS);
+    }
+    //noinspection VariableNotUsedInsideIf
+    if (outAaptSafeManifestLocation != null) {
+        // 这个代表是Library， Application的时候该值为null
+        // 这个Feature的含义是Encode unresolved placeholders to be AAPT friendly.
+        // 也就是说某些placeHolders可能没有正确的赋值，留给Application赋值
+        manifestMergerInvoker.withFeatures(Invoker.Feature.MAKE_AAPT_SAFE);
+    }
+    // 这个就是将packageName versionCode versionName minSdkVersion targetSdkVersion maxSdkVersion设置进去
+    setInjectableValues(manifestMergerInvoker,
+            packageOverride, versionCode, versionName,
+            minSdkVersion, targetSdkVersion, maxSdkVersion);
+    MergingReport mergingReport = manifestMergerInvoker.merge();
+    mLogger.info(&quot;Merging result:&quot; + mergingReport.getResult());
+    switch (mergingReport.getResult()) {
+        case WARNING:
+            mergingReport.log(mLogger);
+            // fall through since these are just warnings.
+        case SUCCESS:
+            String xmlDocument = mergingReport.getMergedDocument(
+                    MergingReport.MergedManifestKind.MERGED);
+            String annotatedDocument = mergingReport.getMergedDocument(
+                    MergingReport.MergedManifestKind.BLAME);
+            if (annotatedDocument != null) {
+                mLogger.verbose(annotatedDocument);
+            }
+            save(xmlDocument, new File(outManifestLocation));
+            mLogger.info(&quot;Merged manifest saved to &quot; + outManifestLocation);
+            if (outAaptSafeManifestLocation != null) {
+                save(mergingReport.getMergedDocument(MergingReport.MergedManifestKind.AAPT_SAFE),
+                        new File(outAaptSafeManifestLocation));
+            }
+            break;
+        case ERROR:
+            mergingReport.log(mLogger);
+            throw new RuntimeException(mergingReport.getReportString());
+        default:
+            throw new RuntimeException(&quot;Unhandled result type : &quot;
+                    + mergingReport.getResult());
+    }
+}
+</code></pre>
+
+<p>我们可以看出，初始化了 manifestMergerInvoker 对象,在初始化的过程中，做了如下操作：</p>
+
+<ol>
+<li>将 placeHolder 的值设置进来</li>
+<li>将 BuildType 和 ProductFlavor 对应的 Manifests 存进来了</li>
+<li>将非 Provided 的 library 加入进来，代码如下。所以 Provided 的库不会打包到最终 apk 中。</li>
+</ol>
+
+<pre><code class="language-java">for (AndroidBundle library : libraries) {
+    if (!library.isProvided()) {
+        mLibraryFilesBuilder.add(Pair.of(library.getName(), library.getManifest()));
+    }
+}
+</code></pre>
+
+<p>接下来是<code>manifestMergerInvoker.merge()</code>，真正执行 merge 的地方，代码如下:</p>
+
+<h5 id="manifestmerger2-invoker-merge">ManifestMerger2.Invoker merge()</h5>
+
+<pre><code class="language-java">public MergingReport merge() throws MergeFailureException {
+    // provide some free placeholders values.
+    ImmutableMap&lt;ManifestSystemProperty, Object&gt; systemProperties = mSystemProperties.build();
+    if (systemProperties.containsKey(ManifestSystemProperty.PACKAGE)) {
+        // if the package is provided, make it available for placeholder replacement.
+        // 将PackageName放入待替换Map中
+        mPlaceholders.put(PACKAGE_NAME, systemProperties.get(ManifestSystemProperty.PACKAGE));
+        // as well as applicationId since package system property overrides everything
+        // but not when output is a library since only the final (application)
+        // application Id should be used to replace libraries &quot;applicationId&quot; placeholders.
+        if (mMergeType != MergeType.LIBRARY) {
+            // 如果不是Library，则将ApplicationID放入待替换Map中
+            mPlaceholders.put(APPLICATION_ID, systemProperties.get(ManifestSystemProperty.PACKAGE));
+        }
+    }
+    FileStreamProvider fileStreamProvider = mFileStreamProvider != null
+            ? mFileStreamProvider : new FileStreamProvider();
+    ManifestMerger2 manifestMerger =
+            new ManifestMerger2(
+                    mLogger,
+                    mMainManifestFile,
+                    mLibraryFilesBuilder.build(),
+                    mFlavorsAndBuildTypeFiles.build(),
+                    mFeaturesBuilder.build(),
+                    mPlaceholders.build(),
+                    new MapBasedKeyBasedValueResolver&lt;ManifestSystemProperty&gt;(systemProperties),
+                    mMergeType,
+                    Optional.fromNullable(mReportFile),
+                    fileStreamProvider);
+    return manifestMerger.merge();
+}
+</code></pre>
+
+<p>可以看到，这个<code>merge</code>方法主要就是调用<code>ManifestMerger2</code>的<code>merge</code>方法，剩下的看代码中的注释即可，<code>ManifestMerger2</code>的<code>merge</code>方法代码如下:</p>
+
+<h5 id="manifestmerger2-merge">ManifestMerger2 merge()</h5>
+
+<pre><code class="language-java">private MergingReport merge() throws MergeFailureException {
+    // initiate a new merging report
+    MergingReport.Builder mergingReportBuilder = new MergingReport.Builder(mLogger);
+    SelectorResolver selectors = new SelectorResolver();
+    // load all the libraries xml files up front to have a list of all possible node:selector
+    // values.
+    List&lt;LoadedManifestInfo&gt; loadedLibraryDocuments =
+            loadLibraries(selectors, mergingReportBuilder);
+    // load the main manifest file to do some checking along the way.
+    LoadedManifestInfo loadedMainManifestInfo = load(
+            new ManifestInfo(
+                    mManifestFile.getName(),
+                    mManifestFile,
+                    XmlDocument.Type.MAIN,
+                    Optional.&lt;String&gt;absent() /* mainManifestPackageName */),
+            selectors,
+            mergingReportBuilder);
+    // first do we have a package declaration in the main manifest ?
+    Optional&lt;XmlAttribute&gt; mainPackageAttribute =
+            loadedMainManifestInfo.getXmlDocument().getPackage();
+
+    // perform system property injection
+    performSystemPropertiesInjection(mergingReportBuilder,
+            loadedMainManifestInfo.getXmlDocument());
+    // force the re-parsing of the xml as elements may have been added through system
+    // property injection.
+    // 因为前面将mergingReportBuilder内的元素加入到loadedMainManifestInfo内了，
+    // 所以需要重新解析一遍
+    loadedMainManifestInfo = new LoadedManifestInfo(loadedMainManifestInfo,
+            loadedMainManifestInfo.getOriginalPackageName(),
+            loadedMainManifestInfo.getXmlDocument().reparse());
+    // invariant : xmlDocumentOptional holds the higher priority document and we try to
+    // merge in lower priority documents.
+    Optional&lt;XmlDocument&gt; xmlDocumentOptional = Optional.absent();
+    for (File inputFile : mFlavorsAndBuildTypeFiles) {
+        mLogger.info(&quot;Merging flavors and build manifest %s \n&quot;, inputFile.getPath());
+        LoadedManifestInfo overlayDocument = load(
+                new ManifestInfo(null, inputFile, XmlDocument.Type.OVERLAY,
+                        Optional.of(mainPackageAttribute.get().getValue())),
+                selectors,
+                mergingReportBuilder);
+        // check package declaration.
+        Optional&lt;XmlAttribute&gt; packageAttribute =
+                overlayDocument.getXmlDocument().getPackage();
+        overlayDocument.getXmlDocument().getRootNode().getXml().setAttribute(&quot;package&quot;,
+                mainPackageAttribute.get().getValue());
+        xmlDocumentOptional = merge(xmlDocumentOptional, overlayDocument, mergingReportBuilder);
+        if (!xmlDocumentOptional.isPresent()) {
+            return mergingReportBuilder.build();
+        }
+    }
+    mLogger.info(&quot;Merging main manifest %s\n&quot;, mManifestFile.getPath());
+    xmlDocumentOptional =
+            merge(xmlDocumentOptional, loadedMainManifestInfo, mergingReportBuilder);
+    if (!xmlDocumentOptional.isPresent()) {
+        return mergingReportBuilder.build();
+    }
+    // force main manifest package into resulting merged file when creating a library manifest.
+    if (mMergeType == MergeType.LIBRARY) {
+        // extract the package name...
+        String mainManifestPackageName = loadedMainManifestInfo.getXmlDocument().getRootNode()
+                .getXml().getAttribute(&quot;package&quot;);
+        // save it in the selector instance.
+        if (!Strings.isNullOrEmpty(mainManifestPackageName)) {
+            xmlDocumentOptional.get().getRootNode().getXml()
+                    .setAttribute(&quot;package&quot;, mainManifestPackageName);
+        }
+    }
+    for (LoadedManifestInfo libraryDocument : loadedLibraryDocuments) {
+        mLogger.info(&quot;Merging library manifest &quot; + libraryDocument.getLocation());
+        xmlDocumentOptional = merge(
+                xmlDocumentOptional, libraryDocument, mergingReportBuilder);
+        if (!xmlDocumentOptional.isPresent()) {
+            return mergingReportBuilder.build();
+        }
+    }
+    // done with proper merging phase, now we need to trim unwanted elements, placeholder
+    // substitution and system properties injection.
+    ElementsTrimmer.trim(xmlDocumentOptional.get(), mergingReportBuilder);
+    if (mergingReportBuilder.hasErrors()) {
+        return mergingReportBuilder.build();
+    }
+    if (!mOptionalFeatures.contains(Invoker.Feature.NO_PLACEHOLDER_REPLACEMENT)) {
+        // do one last placeholder substitution, this is useful as we don't stop the build
+        // when a library failed a placeholder substitution, but the element might have
+        // been overridden so the problem was transient. However, with the final document
+        // ready, all placeholders values must have been provided.
+        performPlaceHolderSubstitution(loadedMainManifestInfo, xmlDocumentOptional.get(),
+                mergingReportBuilder);
+        if (mergingReportBuilder.hasErrors()) {
+            return mergingReportBuilder.build();
+        }
+    }
+    // perform system property injection.
+    // 进行比如PACKAGE, VERSION_CODE, VERSION_NAME, MIN_SDK_VERSION之类的系统属性注入
+    performSystemPropertiesInjection(mergingReportBuilder, xmlDocumentOptional.get());
+    XmlDocument finalMergedDocument = xmlDocumentOptional.get();
+    // 做一些验证，排序的工作
+    PostValidator.validate(finalMergedDocument, mergingReportBuilder);
+    if (mergingReportBuilder.hasErrors()) {
+        finalMergedDocument.getRootNode().addMessage(mergingReportBuilder,
+                MergingReport.Record.Severity.WARNING,
+                &quot;Post merge validation failed&quot;);
+    }
+    // finally optional features handling.
+    // 清理tools声明等一些收尾工作
+    processOptionalFeatures(finalMergedDocument, mergingReportBuilder);
+    MergingReport mergingReport = mergingReportBuilder.build();
+    if (mReportFile.isPresent()) {
+        writeReport(mergingReport);
+    }
+    return mergingReport;
+}
+</code></pre>
+
+<p>在这段代码里，我们可以看到三个 LoadedManifestInfo 对象，分别是:</p>
+
+<ol>
+<li>loadedLibraryDocuments</li>
+<li>loadedMainManifestInfo</li>
+<li>overlayDocument</li>
+</ol>
+
+<p>loadedLibraryDocuments 虽然是<code>List&lt;LoadedManifestInfo&gt;</code>,也可以归于同一类。</p>
+
+<p>这就告诉了我们 merge 过程中，哪些 Manifest 会参与其中。再继续往下看，可以注意到，有一行代码</p>
+
+<p><code>xmlDocumentOptional = merge(xmlDocumentOptional, overlayDocument, mergingReportBuilder);</code></p>
+
+<p>又一个<code>merge</code>?!</p>
+
+<p>是的，没错，这个<code>merge</code>就是决定最终 Manifest 中元素的地方，我们来看一下代码:</p>
+
+<pre><code class="language-java">private Optional&lt;XmlDocument&gt; merge(
+        @NonNull Optional&lt;XmlDocument&gt; xmlDocument,
+        @NonNull LoadedManifestInfo lowerPriorityDocument,
+        @NonNull MergingReport.Builder mergingReportBuilder) throws MergeFailureException {
+    // 检验xml 元素的合法性...
+    //
+    Optional&lt;XmlDocument&gt; result;
+    if (xmlDocument.isPresent()) {
+        result = xmlDocument.get().merge(
+                lowerPriorityDocument.getXmlDocument(), mergingReportBuilder);
+    } else {
+        mergingReportBuilder.getActionRecorder().recordDefaultNodeAction(
+                lowerPriorityDocument.getXmlDocument().getRootNode());
+        result = Optional.of(lowerPriorityDocument.getXmlDocument());
+    }
+
+    // if requested, dump each intermediary merging stage into the report.
+    if (mOptionalFeatures.contains(Invoker.Feature.KEEP_INTERMEDIARY_STAGES)
+            &amp;&amp; result.isPresent()) {
+        mergingReportBuilder.addMergingStage(result.get().prettyPrint());
+    }
+
+    return result;
+}
+</code></pre>
+
+<p>我们可以看到，这里面主要逻辑就在<code>if else里了</code>，先看 else 的内容:</p>
+
+<pre><code class="language-java">mergingReportBuilder.getActionRecorder().recordDefaultNodeAction(
+                lowerPriorityDocument.getXmlDocument().getRootNode());
+</code></pre>
+
+<p>这个方法的内容很简单，就是将存在于<code>lowerPriorityDocument</code>中且不存在<code>mergingReportBuilder</code>中的元素加入到<code>mergingReportBuilder</code>中，</p>
+
+<p>所以，越晚调用此方法，越会忽略<code>lowerPriorityDocument</code>中的元素。</p>
+
+<p>可以看到， merge 的过程中，三个此方法的调用顺序是:</p>
+
+<ol>
+<li><code>xmlDocumentOptional = merge(xmlDocumentOptional, overlayDocument, mergingReportBuilder);</code></li>
+<li><code>xmlDocumentOptional = merge(xmlDocumentOptional, loadedMainManifestInfo, mergingReportBuilder);</code></li>
+<li><code>xmlDocumentOptional = merge(xmlDocumentOptional, libraryDocument, mergingReportBuilder);</code></li>
+</ol>
+
+<p>这就是官方文档<a href="https://developer.android.com/studio/build/manifest-merge.html">Merge Multiple Manifest Files</a>所提到的顺序的原因。</p>
+
+<p>接下来，我们再看 if 的内容:</p>
+
+<h5 id="xmldocument-merge">XmlDocument merge</h5>
+
+<pre><code class="language-java">public Optional&lt;XmlDocument&gt; merge(
+        @NonNull XmlDocument lowerPriorityDocument,
+        @NonNull MergingReport.Builder mergingReportBuilder) {
+
+    if (getFileType() == Type.MAIN) {
+        mergingReportBuilder.getActionRecorder().recordDefaultNodeAction(getRootNode());
+    }
+    // 处理Manifest里面的tools定义的操作,这里根据tools定义的不同操作，进行不同的处理
+    getRootNode().mergeWithLowerPriorityNode(
+            lowerPriorityDocument.getRootNode(), mergingReportBuilder);
+    // 进行一些隐含的检测，比如uses-sdk, targetSdk，library和main的必须相同
+    // 某些权限申请了一个必须申请另一个，比如WRITE_EXTERNAL_STORAGE
+    addImplicitElements(lowerPriorityDocument, mergingReportBuilder);
+
+    // force re-parsing as new nodes may have appeared.
+    return mergingReportBuilder.hasErrors()
+            ? Optional.&lt;XmlDocument&gt;absent()
+            : Optional.of(reparse());
+}
+</code></pre>
+
+<p>看代码中的注释，应该大概能了解函数的含义。
+</br></p>
+
+<p>这样，整个 Manifest 的 merge 过程就讲完了.下一篇，我们来研究<code>createGenerateResValuesTask</code>,<code>createMergeResourcesTask</code>和<code>createMergeAssetsTask</code>的过程.</p>
+
+<p>如果大家有不懂，欢迎通过留言和邮件进行交流。</p>
+
+    </div>
+
+    
+    
+
+    
+    
+<div class="post-reward">
+  <input type="checkbox" name="reward" id="reward" hidden />
+  <label class="reward-button" for="reward">赞赏支持</label>
+  <div class="qr-code">
+    
+    
+    
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/img/reward/alipay-qr-code.png">
+        <span>支付宝打赏</span>
+      </label>
+  </div>
+</div>
+
+    <footer class="post-footer">
+      <div class="post-tags">
+          
+          <a href="/tags/androidplugin/">AndroidPlugin</a>
+          
+        </div>
+
+      
+      <nav class="post-nav">
+        
+          <a class="prev" href="/post/androidplugin%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%BA%94/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">AndroidPlugin源码解析-(五)</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
+        
+          <a class="next" href="/post/androidplugin%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%B8%89/">
+            <span class="next-text nav-default">AndroidPlugin源码解析-(三)</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+  <div id="disqus_thread"></div>
+    <script type="text/javascript">
+    (function() {
+      
+      
+      if (window.location.hostname === 'localhost') return;
+
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      var disqus_shortname = 'yunair';
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:airzhaoyn@gmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://github.com/yunair" class="iconfont icon-github" title="github"></a>
+  <a href="http://blog.airzone.world/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    
+      2015 - 
+    2018
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">Air</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+<script src="/lib/highlight/highlight.pack.js?v=20171001"></script><script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox-3.1.20.min.js"></script>
+
+
+<script type="text/javascript" src="/dist/even.min.js?v=3.2.0"></script>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-103683322-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+
+
+
+
+</body>
+</html>
