@@ -2,12 +2,12 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Categories on Air Little Place</title>
-    <link>http://blog.airzone.world/categories/</link>
+    <link>http://blog.air-asia.trade/categories/</link>
     <description>Recent content in Categories on Air Little Place</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     
-	<atom:link href="http://blog.airzone.world/categories/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="http://blog.air-asia.trade/categories/index.xml" rel="self" type="application/rss+xml" />
     
     
   </channel>

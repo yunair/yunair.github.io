@@ -1,2 +1,2 @@
 User-agent: *
-Sitemap: http://blog.airzone.world/sitemap.xml
+Sitemap: http://blog.air-asia.trade/sitemap.xml
