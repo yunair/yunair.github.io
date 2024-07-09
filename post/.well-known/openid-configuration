@@ -3,6 +3,7 @@
   "jwks_uri": "https://yunair.github.io/jwks/keys",
   "claims_supported": [
     "iat",
+    "aud",
     "iss",
     "name",
     "sub"
