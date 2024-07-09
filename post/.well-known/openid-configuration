@@ -1,5 +1,5 @@
 {
-  "issuer": "https://yunair.github.io",
+  "issuer": "https://yunair.github.io/post",
   "jwks_uri": "https://yunair.github.io/jwks/keys",
   "claims_supported": [
     "aud",
