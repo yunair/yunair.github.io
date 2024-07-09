@@ -2,12 +2,10 @@
   "issuer": "https://yunair.github.io/post",
   "jwks_uri": "https://yunair.github.io/jwks/keys",
   "claims_supported": [
-    "aud",
     "iat",
     "iss",
     "name",
-    "sub",
-    "custom"
+    "sub"
   ],
   "response_types_supported": [
     "id_token"
